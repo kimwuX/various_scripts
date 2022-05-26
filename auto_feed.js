@@ -1889,16 +1889,18 @@ function deal_with_title(title){
             return data.slice(0,2) + '.'+ data.slice(3,data.length);
         });
     }
-    title = title.replace(/H ?(26[45])/i, "H.$1").replace(/x265[.-]10bit/i, 'x265 10bit');
+    //title = title.replace(/H ?(26[45])/i, "H.$1").replace(/x265[.-]10bit/i, 'x265 10bit');
     title = title.replace(/\s+\[2?x?(免费|free)\].*$|\(限时.*\)|\(限時.*\)/ig, '').replace(/\[.*?\]/ig, '').replace(/剩余时间.*/i, '');
-    title = title.replace(/\(|\)/ig, '').replace(/ - /, '-').trim();
+    //title = title.replace(/\(|\)/ig, '').replace(/ - /, '-').trim();
     title = title.replace('_10_', '(_10_)');
-    return title;
+    return title.trim();
 }
 
 //处理副标题逻辑业务封装进函数
 function deal_with_subtitle(subtitle){
-    subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
+    //subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
+    subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/autoup/i, '');
+    subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
     return subtitle;
 }
 
@@ -9131,8 +9133,8 @@ setTimeout(function(){
 
         if (origin_site == 'TTG') {
             raw_info.small_descr = raw_info.name.split('[')[1].replace(']', '');
-            raw_info.small_descr = raw_info.small_descr.replace('「', '');
-            raw_info.small_descr = raw_info.small_descr.replace('」', '');
+            raw_info.small_descr = raw_info.small_descr.replace('「', '[');
+            raw_info.small_descr = raw_info.small_descr.replace('」', ']');
             raw_info.name = raw_info.name.split('[')[0];
         }
 
@@ -9147,8 +9149,8 @@ setTimeout(function(){
         }
 
         if (origin_site == 'HDHome' || origin_site == 'MTeam' || origin_site == 'HDRoute') {
-            raw_info.small_descr = raw_info.small_descr.replace(/【|】/g, " ");
-            raw_info.small_descr = raw_info.small_descr.replace(/diy/i, "【DIY】");
+            //raw_info.small_descr = raw_info.small_descr.replace(/【|】/g, " ");
+            //raw_info.small_descr = raw_info.small_descr.replace(/diy/i, "【DIY】");
 
             //DIY图文换序兼顾圆盘补quote
             var img_info = '';
@@ -9477,7 +9479,9 @@ setTimeout(function(){
                 else{
                     img_url = used_site_info[key].url + 'favicon.ico';
                 }
-                para.innerHTML = '<img src='+ img_url+ ' class="round_icon">' + ' ' + key;
+                //不显示图标
+                //para.innerHTML = '<img src='+ img_url+ ' class="round_icon">' + ' ' + key;
+                para.innerHTML = key;
             }
         }
         if (origin_site == 'PTer') {
@@ -10696,8 +10700,10 @@ setTimeout(function(){
             var info_text = raw_info.name.split('*');
             var author_name = info_text[0];
             var music_name = '待填';
+            var author = '待填';
             if (author_name.split('-').length > 1) {
-                music_name = author_name.split('-').pop().trim();
+                author = author_name.substring(0, raw_info.name.indexOf('-')).trim();
+                music_name = author_name.substring(raw_info.name.indexOf('-') + 1).trim();
             }
 
             var year = '';
@@ -10705,7 +10711,6 @@ setTimeout(function(){
                 year = raw_info.name.match(/(19|20)\d+/)[0];
                 music_name = music_name.split(year)[0].trim();
             }
-            var author = raw_info.name.split(music_name)[0].replace(/-( *)?$/, '').trim();
             $('#yadg_input').wait(function(){
                 $('#yadg_input').val(music_name);
                 $('#yadg_input').parentsUntil('table').last().css({"margin-left": "0.5%", "width": "99%"});
@@ -10891,8 +10896,16 @@ setTimeout(function(){
                             });
                         });
                     } else {
-                        var track_list = raw_info.descr.match(/0?1(\.|\))[\s\S]*\d+.*(\n|$)/)[0];
+                        var track_list = raw_info.descr.match(/0?1(\.|\))[\s\S]*$/)[0];
                         $('textarea[name="track_list"]').val(track_list);
+                        $('#descr').wait(function(){
+                            if (raw_info.origin_site == 'LemonHD') {
+                                $('#descr').val(raw_info.descr.split(/\[img\].*\[\/img\]/i)[1].trim());
+                            }
+                            else {
+                                $('#descr').val(raw_info.descr.trim());
+                            }
+                        });
                     }
                 } catch(err) {}
                 try{
@@ -11275,6 +11288,7 @@ setTimeout(function(){
                     raw_info.name = raw_info.name.replace(/(5\.1|2\.0|7\.1|1\.0)/, function(data){
                         return data.replace('.', '{@}');
                     });
+                    raw_info.small_descr = raw_info.small_descr.replace(/\[/g, '【').replace(/\]/g, '】');
                     raw_info.name = raw_info.name.replace(/h\.(26(5|4))/i, 'H{@}$1');
                     $('input[name=subtitle]').val(raw_info.small_descr.trim());
                     allinput[i].value = raw_info.name;
@@ -11298,7 +11312,7 @@ setTimeout(function(){
                         allinput[i].value = raw_info.name;
                     }
                 } else if (forward_site == 'OpenCD') {
-                    allinput[i].value = raw_info.small_descr.replace('- {自抓}', '');
+                    allinput[i].value = raw_info.small_descr.replace('- {自抓}', '').trim();
                 }
             }
 
