@@ -34,7 +34,10 @@
 // @match       *://open.cd/*
 // @match       *://u2.dmhy.org/*
 // @match       *://audiences.me/*
+// @match       *://tjupt.org/*
+// @match       *://www.tjupt.org/*
 // @exclude     */showup.php*
+// @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
 // @exclude     */fun.php*
 // @icon         https://s1.ax1x.com/2022/05/26/XEHBt0.png
