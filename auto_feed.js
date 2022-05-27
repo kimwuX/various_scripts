@@ -3177,6 +3177,8 @@ function getBlob(url, filetype, callback) {
 }
 
 function addTorrent(url, name, forward_site) {
+    //取消自动上传种子文件
+    return;
     if (forward_site == 'OpenCD') {
         name = name.replace(/\*/g, '');
     }
