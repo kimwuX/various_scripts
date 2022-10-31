@@ -9223,7 +9223,7 @@ setTimeout(function(){
                 if ($('#kspectrum').length) {
                     raw_info.musicspectrum = $('#kspectrum').find('img').attr('src');
                     if (!raw_info.musicspectrum.match(/^http/)) {
-                        raw_info.musicspectrum = 'https://lemonhd.org/img/' + raw_info.musicspectrum;
+                        raw_info.musicspectrum = 'https://lemonhd.org/' + raw_info.musicspectrum;
                     }
                 }
             }
