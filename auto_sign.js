@@ -11,6 +11,7 @@
 // @match       *://lemonhd.org/*
 // @match       *://pthome.net/*
 // @match       *://pt.soulvoice.club/*
+// @match       *://pt.btschool.club/*
 // @match       *://1ptba.com/*
 // @match       *://www.hddolby.com/*
 // @match       *://hdzone.me/*

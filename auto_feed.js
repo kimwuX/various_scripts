@@ -1979,7 +1979,10 @@ function deal_with_title(title){
 
 //处理副标题逻辑业务封装进函数
 function deal_with_subtitle(subtitle){
-    subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
+    //subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
+    subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/autoup/i, '');
+    subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
+    subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
     return subtitle;
 }
 
@@ -6180,7 +6183,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         $('#go_ptgen').prop('value', '正在获取');
         var flag = true;
         if (match_link('imdb', url)) {
-            falg = true;
+            flag = true;
             raw_info.url = match_link('imdb', url);
         } else if (match_link('douban', url)) {
             flag = false;
@@ -7694,7 +7697,7 @@ if (site_url.match(/^https:\/\/pterclub.com\/upload.php/)) {
             $(e.target).prop('value', '正在获取');
             var flag = true;
             if (link_type == 'url') {
-                falg = true;
+                flag = true;
                 tmp_raw_info.url = link;
             } else {
                 flag = false;
@@ -7732,7 +7735,7 @@ if (site_url.match(/^https:\/\/piggo.me\/upload.php/)) {
             $(e.target).prop('value', '正在获取');
             var flag = true;
             if (link_type == 'url') {
-                falg = true;
+                flag = true;
                 tmp_raw_info.url = link;
             } else {
                 flag = false;
@@ -10914,8 +10917,8 @@ setTimeout(function(){
 
         if (origin_site == 'TTG') {
             raw_info.small_descr = raw_info.name.split('[')[1].replace(']', '');
-            raw_info.small_descr = raw_info.small_descr.replace('「', '');
-            raw_info.small_descr = raw_info.small_descr.replace('」', '');
+            raw_info.small_descr = raw_info.small_descr.replace('「', '[');
+            raw_info.small_descr = raw_info.small_descr.replace('」', ']');
             raw_info.name = raw_info.name.split('[')[0];
         }
 
@@ -10930,8 +10933,8 @@ setTimeout(function(){
         }
 
         if (origin_site == 'HDHome' || origin_site == 'MTeam' || origin_site == 'HDRoute') {
-            raw_info.small_descr = raw_info.small_descr.replace(/【|】/g, " ");
-            raw_info.small_descr = raw_info.small_descr.replace(/diy/i, "【DIY】");
+            //raw_info.small_descr = raw_info.small_descr.replace(/【|】/g, " ");
+            //raw_info.small_descr = raw_info.small_descr.replace(/diy/i, "【DIY】");
 
             //DIY图文换序兼顾圆盘补quote
             var img_info = '';
@@ -11328,7 +11331,8 @@ setTimeout(function(){
                 else{
                     img_url = used_site_info[key].url + 'favicon.ico';
                 }
-                para.innerHTML = '<div style="display:inline-block"><img src='+ img_url+ ' class="round_icon" style="display:inline-block">' + ' ' + key + '</div>';
+                //para.innerHTML = '<div style="display:inline-block"><img src='+ img_url+ ' class="round_icon" style="display:inline-block">' + ' ' + key + '</div>';
+                para.innerHTML = key;
             }
         }
 
@@ -13572,6 +13576,7 @@ setTimeout(function(){
                     raw_info.name = raw_info.name.replace(/(5\.1|2\.0|7\.1|1\.0)/, function(data){
                         return data.replace('.', '{@}');
                     });
+                    raw_info.small_descr = raw_info.small_descr.replace(/\[/g, '【').replace(/\]/g, '】');
                     raw_info.name = raw_info.name.replace(/h\.(26(5|4))/i, 'H{@}$1');
                     $('input[name=subtitle]').val(raw_info.small_descr.trim());
                     allinput[i].value = raw_info.name;
@@ -15583,7 +15588,7 @@ setTimeout(function(){
             if (raw_info.golden_torrent == "true") {
                 tag_gold.checked = true;
             }
-            if (raw_info.origin_site != 'HDRoute') {
+            if (tag_gold.checked && raw_info.origin_site != 'HDRoute') {
                 document.getElementsByName('from_url')[0].value = raw_info.origin_url.replace('***', '/');
             }
         }
