@@ -3428,13 +3428,14 @@ function getBlob(url, forward_announce, forward_site, filetype, callback) {
                         return;
                     }
                     if (r.match(/13:creation date/)) {
-                        try {
-                            var date_str = r.match(/13:creation datei(\d+)e/)[0];
-                            var date = r.match(/13:creation datei(\d+)e/)[1];
-                            var new_date = parseInt(date) + 600 + parseInt(Math.random()*(600),10);
-                            var new_date_str = `13:creation datei${new_date.toString()}e`
-                            new_torrent += new_date_str;
-                        } catch (err) {}
+                        // try {
+                        //     var date_str = r.match(/13:creation datei(\d+)e/)[0];
+                        //     var date = r.match(/13:creation datei(\d+)e/)[1];
+                        //     var new_date = parseInt(date) + 600 + parseInt(Math.random()*(600),10);
+                        //     var new_date_str = `13:creation datei${new_date.toString()}e`
+                        //     new_torrent += new_date_str;
+                        // } catch (err) {}
+                        new_torrent += `13:creation datei${Math.round(new Date()/1000)}e`
                     }
                     new_torrent += '8:encoding5:UTF-8';
                     var info = r.match(/4:info[\s\S]*?privatei1e/)[0];
@@ -11005,7 +11006,7 @@ setTimeout(function(){
                 if ($('#kspectrum').length) {
                     raw_info.musicspectrum = $('#kspectrum').find('img').attr('src');
                     if (!raw_info.musicspectrum.match(/^http/)) {
-                        raw_info.musicspectrum = 'https://lemonhd.org/img/' + raw_info.musicspectrum;
+                        raw_info.musicspectrum = 'https://lemonhd.org/' + raw_info.musicspectrum;
                     }
                 }
             }
