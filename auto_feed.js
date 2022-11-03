@@ -3427,6 +3427,10 @@ function getBlob(url, forward_announce, forward_site, filetype, callback) {
                         alert('种子文件加载失败！！！');
                         return;
                     }
+                    if (r.match(/10:created by\d+:/)) {
+                        var cb = r.match(/10:created by(\d+):/)
+                        new_torrent += r.substr(cb.index, cb[0].length+parseInt(cb[1]))
+                    }
                     if (r.match(/13:creation date/)) {
                         // try {
                         //     var date_str = r.match(/13:creation datei(\d+)e/)[0];
@@ -3438,6 +3442,7 @@ function getBlob(url, forward_announce, forward_site, filetype, callback) {
                         new_torrent += `13:creation datei${Math.round(new Date()/1000)}e`
                     }
                     new_torrent += '8:encoding5:UTF-8';
+                    console.log(new_torrent)
                     var info = r.match(/4:info[\s\S]*?privatei1e/)[0];
                     new_torrent += info;
                     var new_source = `6:source${forward_site.length}:${forward_site.toUpperCase()}`;
