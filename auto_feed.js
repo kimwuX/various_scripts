@@ -1971,19 +1971,19 @@ function deal_with_title(title){
     }
     title = title.replace(/H ?(26[45])/i, "H.$1").replace(/x265[.-]10bit/i, 'x265 10bit');
     title = title.replace(/\s+\[2?x?(免费|free)\].*$|\(限时.*\)|\(限時.*\)/ig, '').replace(/\[.*?\]/ig, '').replace(/剩余时间.*/i, '');
-    title = title.replace(/\(|\)/ig, '').replace(/ - /, '-').trim();
+    title = title.replace(/\(|\)/ig, '').replace(/ - /, '-');
     title = title.replace('_10_', '(_10_)');
     title = title.replace('V2.1080p', 'V2 1080p');
-    return title;
+    return title.trim();
 }
 
 //处理副标题逻辑业务封装进函数
 function deal_with_subtitle(subtitle){
     //subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
-    subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/autoup/i, '');
+    subtitle = subtitle.replace(/\[checked by.*?\]/gi, '').replace(/autoup/i, '');
     subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
     subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
-    return subtitle;
+    return subtitle.trim();
 }
 
 //字典转成字符串传达到跳转页面
@@ -14310,10 +14310,10 @@ setTimeout(function(){
                 source_box.options[index].selected = true;
             }
 
-            var poster = document.getElementsByName('url_poster')[0];
-            if (raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)){
-                poster.value = raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)[1].split('=').pop();
-            }
+            //var poster = document.getElementsByName('url_poster')[0];
+            //if (raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)){
+            //    poster.value = raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)[1].split('=').pop();
+            //}
 
             descr_box[0].style.height = '120px';
             descr_box[1].style.height = '200px';
