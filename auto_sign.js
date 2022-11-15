@@ -49,7 +49,7 @@
 (function () {
 
     function isSignable(str) {
-        return str && str.search(/签\s*到|簽\s*到|打\s*卡/) != -1 && str.search(/已|成功|查看|記錄/) == -1
+        return /签\s*到|簽\s*到|打\s*卡/.test(str) && !/已|成功|查看|記錄/.test(str)
     }
 
     setTimeout(function() {
@@ -63,12 +63,13 @@
         }
         else {
             res = $('a').filter(function() {
-                return isSignable($(this).text()) && $(this).attr('href').search(/usercp\.php/i) == -1;
+                return isSignable($(this).text()) && !/(usercp|details)\.php/i.test($(this).attr('href'))
             })
         }
 
         if (res && res.length > 0) {
             res[0].click()
+            console.log(res[0])
             console.log('Signed.')
         }
     }, 1000)

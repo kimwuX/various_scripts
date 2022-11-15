@@ -14350,6 +14350,22 @@ setTimeout(function(){
             cmctdescr = raw_info.descr.slice(0,raw_info.descr.search(/\[quote\]/));
             cmctdescr = cmctdescr.replace(/\[img\]htt.*[\s\S]*?img\]/i, '');
 
+            //附加信息
+            raw_info.extra_text = '';
+            if (raw_info.descr.search(/\[quote\]/) < raw_info.descr.search(/\[img\]/)) {
+                try{
+                    raw_info.extra_text = raw_info.descr.match(/(\[quote\][\s\S]*?)\[img\]/)[1];
+                } catch (err) {
+                    raw_info.extra_text = '';
+                }
+            }
+            var st_idx = raw_info.descr.search(/\[img\]/);
+            if (st_idx < 0) st_idx = 0;
+            var reg_q = raw_info.descr.slice(st_idx).match(/\[quote\][\s\S]*?字幕[\s\S]*?\[\/quote\]/);
+            if (reg_q) {
+                raw_info.extra_text += reg_q[0];
+            }
+
             if (raw_info.mediainfo_cmct){
                 descr_box[1].value = raw_info.mediainfo_cmct.trim();
             } else {
@@ -14361,7 +14377,7 @@ setTimeout(function(){
             if(descr_box[1].value.indexOf('Report created by') > 0){
                 descr_box[1].value = descr_box[1].value.substring(0, descr_box[1].value.indexOf('Report created by')); //删除reporty by, cmct媒体信息不支持ReportBy
             }
-            descr_box[2].value = raw_info.descr;
+            descr_box[2].value = raw_info.extra_text;
             var clear = document.createElement('input');
             clear.type = 'button';
             clear.value = " 清空附加信息 ";
