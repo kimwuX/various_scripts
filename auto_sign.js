@@ -3,7 +3,7 @@
 // @namespace    http://www.kimwu.com/
 // @version      1.0.0
 // @description  PT站点自动签到脚本
-// @author       kimwu
+// @author       kim.wu
 // @match       *://ourbits.club/*
 // @match       *://hdhome.org/*
 // @match       *://hdchina.org/*
