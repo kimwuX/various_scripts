@@ -58,12 +58,12 @@
         let res
         if (site_url.search(/haidan\.video/i) != -1) {
             res = $('#modalBtn').filter(function() {
-                return isSignable($(this).attr('value'))
+                return isSignable($(this).prop('value'))
             })
         }
         else {
             res = $('a').filter(function() {
-                return isSignable($(this).text()) && !/(usercp|details)\.php/i.test($(this).attr('href'))
+                return isSignable($(this).text()) && !/(usercp|details|forums)\.php/i.test($(this).prop('href'))
             })
         }
 

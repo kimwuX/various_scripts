@@ -2056,7 +2056,8 @@ String.prototype.medium_sel = function() { //媒介
         result = 'HDTV';
     } else if (result.match(/(Remux)/i) && ! result.match(/Encode/)) {
         result = 'Remux';
-    } else if (result.match(/(Blu-ray|.MPLS|Bluray原盘)/i) && !result.match(/Encode/i)) {
+    //mod by kim.wu
+    } else if (result.match(/(Blu-ray|.MPLS|Bluray原盘|BD Discs)/i) && !result.match(/Encode/i)) {
         result = 'Blu-ray';
     } else if (result.match(/(UHD|UltraHD)/i) && !result.match(/Encode/i)) {
         result = 'UHD';
@@ -14831,7 +14832,8 @@ setTimeout(function(){
             if (raw_info.name.match(/(pad$|ipad)/i)){
                 $('#browsecat').val('27');
             }
-            $('#share_rule').val('3');
+            //mod by kim.wu
+            //$('#share_rule').val('3');
 
             //格式
             $("select[name='standard_sel']").val('10'); //默认其它
