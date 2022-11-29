@@ -16,6 +16,7 @@
 // @match        https://img.hdbits.org/
 // @match        http*://*/offer*php*
 // @match        https://xthor.tk/*
+// @match        https://desitorrents.tv/torrents*
 // @match        https://hdf.world/*
 // @match        https://broadcity.in/*
 // @match        https://secret-cinema.pw/torrents.php?id=*
@@ -79,12 +80,11 @@
 // @resource     css http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css
 // @require      https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js
 // @require      https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js
-// @require      https://unpkg.com/auto-feed-media@1.0.1/index.js
 // @require      https://greasyfork.org/scripts/430180-imgcheckbox2/code/imgCheckbox2.js?version=956211
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1079125
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      1.9.9.9
+// @version      2.0.0.3
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -99,30 +99,7 @@
 /*
 日志：
 
-    2022年以前的日志请参看："https://github.com/tomorrow505/auto_feed_js/wiki/更新日志"
-
-    20220408：修复部分bug，部分更新。
-    20220418：支持SC转入转出，支持MTV转入转出，修复部分bug。
-    20220423：支持NBL转出，修复部分MTV的转出bug。
-    20220424：支持avz，phd，CNZ转入，修复部分bug。
-    20220425：支持ANT转入转出。重新支持IPT/torrentseeds查重检索。
-    20220428：支持IN查重检索。修复部分bug。简单支持digitalcore转出。
-
-    20220503：支持转入丐帮、TVV。
-    20220504：简单支持xthor、HDF; 修复部分bug。
-    20220505：修复部分bug，英化蓝鸟部分页面，英化HDF,XTHOR部分页面。
-    20220506：支持蓝鸟转出。英化filelist以及bdc部分页面。所有英化页面托管在GitHub上，可能需要翻墙才会正确显示。
-    20220510：修复个人搭建的autofeed版ptgen节点，用的人多容易挂。整合动漫版本，并重构部分代码。支持猪猪网PT站转入转出，支持bwtorrents转出，支持NBL中文显示。
-    20220511：支持MTV、bluebird中文显示。英化openlook-韩国T站部分页面。
-    20220512：支持openlook-韩国T站转出，部分功能还需要完善。支持新站CarPt。修复部分bug，适配柠檬皇后音乐互转。猫站上传页面集成ptgen。
-    20220513：优化RED和jpop转柠檬和皇后的代码逻辑，集成音乐转载脚本pth_yadg适配皇后和柠檬。
-    20220518：支持海豚、lztr转出到皇后柠檬。支持部分内站间不下载种子直接发布，出现跨源请求询问是否信任一律选择允许此域名。
-    20220519：支持大部分站点转发内站不需要下载种子，xthor直接生成nfo,不需要手动上传。
-    20220521：支持OPS转发，修复部分bug...支持北洋皇后双域名。
-    20220522：支持bib转发至部分内站，修复部分bug。
-    20220523：支持HDB图片选择之后不下载直接跳转ptpimg和imgbox上传。
-    20220524：更新海豹组名显示，适配bit-hdtv，jptv转出(设置界面语言为简体中文)，命名还有点问题。取消hon3yhd支持，原因：关站。
-    20220525：将简化MI面板托管到设置页面，并根据功能只显示相对应内容。支持豆瓣电影、豆瓣音乐、豆瓣读书一键复制简介。
+    2022年6月以前的日志请参看："https://github.com/tomorrow505/auto_feed_js/wiki/更新日志"
 
     20220604：修复海豹部分bug，修复piggo部分bug。优化禁转判断后跳转逻辑。
     20220605：新增图片提取功能：https://github.com/tomorrow505/auto_feed_js/wiki/图片处理
@@ -136,7 +113,7 @@
     20220708：适配支持TVV转出。
     20220710：优化皮转入，修复GPW部分bug，简单支持一键签到(测试中)。
     20220716：继续完善一键签到。修复部分bug。
-    20220726：支持MP4/MKV视频文件获取mediainfo+截图。功能待测试
+    20220726：支持MP4/MKV视频文件获取mediainfo+截图。功能待测试(已取消)...https://unpkg.com/auto-feed-media@1.0.1/index.js
     20220730：适配MV类型转发，修复部分bug。
     20220802：支持转入ITZMX、NapQAQ、HDPt(明教)，修复1PTBA、3Wmg部分bug。(by shmt86)
     20220807：一键签到取消天空和北洋，增加支持妞的转入。具体见教程：https://github.com/tomorrow505/auto_feed_js/wiki/%E8%BD%AC%E8%BD%BD%E5%88%B0BTN
@@ -148,9 +125,11 @@
     20221013：适配monika，修复部分bug。
     20221021：适配织梦PT，修复部分bug。
     20221103：适配红叶PT。
+    20221117：修复部分bug，去掉mediainfo和截图功能，鸡肋而且占用体积大。修复没有猫不能进入设置页面的bug。第一次NP站点应该都可以设置。
+    20221119：适配ICC2022。
+    20221128：适配DTR/HONE转出。
 */
 
-//获取网页地址，有很多种可能，首先是简单处理页面，及时返回，另外一种匹配上发布页面，一种匹配上源页面，分别处理两种逻辑
 var site_url = decodeURI(location.href);
 const TIMEOUT = 6000;
 const N = "\n";
@@ -222,6 +201,12 @@ if (location.href == 'https://npupt.com/upload.php'){
 }
 if (location.href.match(/^.{3,30}userdetail/i) && !site_url.match(/bluebird-hd/) && !site_url.match(/broadcity.in/)) {
     return;
+}
+
+if (location.href.match(/https:\/\/desitorrents.tv\/torrents/)) {
+    $('#torrent-list-table').find('tr:gt(0)').map((index,e)=>{
+        $(e).find('td:eq(2)').find('a.torrent-listings-name').after(`<a href="${$(e).find('a.torrent-listings-name').attr('href')}" target="_blank"><font color=green>跳转</font></a>`)
+    });
 }
 
 function disableother(select,target){
@@ -792,8 +777,8 @@ var imdb_chosen = GM_getValue('imdb_chosen') === undefined ? 0: GM_getValue('imd
 * 设置依托站点，可以选择【PTer/LemonHD/HDDolby/CMCT/PThome/OurBits/TCCF/TJUPT】
 * 实在打不开可以打开以上站点个人设置页面加#setting, 如：https://springsunday.net/usercp.php?action=personal#setting
 */
-const default_setting_host = 'PTer';
-var setting_host = GM_getValue('setting_host') === undefined ? default_setting_host: GM_getValue('setting_host');
+// const default_setting_host = 'PTer';
+var setting_host = GM_getValue('setting_host') === undefined ? null: GM_getValue('setting_host');
 
 //用来转存海报使用的ptpimg的key,打开首页即可获取
 var used_ptp_img_key = GM_getValue('used_ptp_img_key') === undefined ? '': GM_getValue('used_ptp_img_key');
@@ -930,6 +915,7 @@ const default_site_info = {
     'ZMPT': {'url': 'https://zmpt.cc/', 'enable': 1},
     '红叶': {'url': 'https://leaves.red/', 'enable': 1},
     'iHDBits': {'url': 'http://ihdbits.me/', 'enable': 1},
+    'ICC': {'url': 'https://www.icc2022.com/', 'enable': 1},
 };
 
 //初始化数据site_order/used_site_info等等
@@ -1032,6 +1018,7 @@ const default_search_list = [
     `<a href="https://search.douban.com/movie/subject_search?search_text={imdbid}" target="_blank">Douban</a>`,
     `<a href="https://uhdbits.org/torrents.php?searchstr={imdbid}" target="_blank">UHD</a>`,
     `<a href="http://zmk.pw/search?q={search_name}" target="_blank">ZMK</a>`,
+    `<a href="https://mediaarea.net/MediaInfoOnline" target="_blank">MediaiInfo</a>`,
     `<a href="https://assrt.net/sub/?searchword={search_name}" target="_blank">SSW</a>`,
 ];
 
@@ -1103,11 +1090,12 @@ const setting_host_list = {
     'CMCT': 'https://springsunday.net/usercp.php?action=personal',
     'PThome': 'https://www.pthome.net/usercp.php?action=personal',
     'OurBits': 'https://ourbits.club/usercp.php?action=personal',
-    'TCCF': 'https://et8.org/usercp.php?action=personal',
     'TJUPT': 'https://www.tjupt.org/usercp.php?action=personal',
     'HDSky': 'https://hdsky.me/usercp.php?action=personal',
     'MTeam': 'https://kp.m-team.cc/usercp.php?action=personal',
 };
+
+var used_setting_host_list = GM_getValue('setting_host_list') === undefined ? setting_host_list : JSON.parse(GM_getValue('setting_host_list'));
 
 const default_rehost_img_info = {
     'freeimage': {
@@ -1203,6 +1191,8 @@ const o_site_info = {
     'TVV': 'http://tv-vault.me/',
     'SugoiMusic': 'https://sugoimusic.me/',
     'Monika': 'https://monikadesign.uk/',
+    'DTR': 'https://desitorrents.tv/',
+    'HONE': 'https://hawke.uno/'
 };
 
 //部分站点加载图标会有问题，可以将图标下载下来上传到公网图床提供网址即可
@@ -1277,22 +1267,13 @@ FILM SYNOPSIS/BRIEF REVIEW:
   Film Aspect Ratio..: {aspect_ratio}{dvdformat}
   Source.............: {source}
   Film Distributor...: [url=addlink]specify[/url]
-  Ripping Program....: (specify)
-  Total  Bitrate.....: {bitrate}
+  Ripping Program....: Not my rip
+  Total Bitrate......: {bitrate}
 
-Menus......: [ ] Untouched
-             [ ] Stripped
-
-Video......: [ ] Untouched
-             [ ] Re-encoded
-
-Extras.....: [ ] Untouched
-             [ ] Stripped
-             [ ] Re-encoded
-             [ ] None
-
-Audio......: [ ] Untouched
-             [ ] Stripped tracks
+Menus......: [x] Untouched
+Video......: [x] Untouched
+Extras.....: [x] Untouched
+Audio......: [x] Untouched
 [/pre]
 
 BD only..........BDInfo Report:
@@ -1668,7 +1649,7 @@ function walkDOM(n) {
         } else if (n.nodeName == '#text' && site_url.match(/npupt/)) {
             n.data = n.data.replace(/^ +| +$/g, '');
         } else if (n.nodeName == 'BR') {
-            if (site_url.match(/u2.dmhy.org|ourbits.club\/details.php.*|totheglory.im.*|blutopia.xyz.*|awesome-hd|hudbt|cinemageddon|hdpost.top|asiancinema.me|hd-olimpo.club|digitalcore.club|bwtorrents.tv/i)) {
+            if (site_url.match(/u2.dmhy.org|ourbits.club\/details.php.*|totheglory.im.*|blutopia.xyz.*|desitorrents.tv|hudbt|cinemageddon|hdpost.top|asiancinema.me|hd-olimpo.club|digitalcore.club|bwtorrents.tv/i)) {
                 n.innerHTML = '\r\n';
             }
         } else if (n.nodeName == 'LEGEND') {
@@ -1875,7 +1856,7 @@ function judge_if_the_site_as_source() {
     if (site_url.match(/^https:\/\/hdcity.city\/upload/)){
         return 2;
     }
-    if (site_url.match(/^https:\/\/(pt.hdpost.top|asiancinema.me|hd-olimpo.club|jptv.club|blutopia.xyz|monikadesign.uk)\/torrents\/\d+$/)){
+    if (site_url.match(/^https:\/\/(pt.hdpost.top|asiancinema.me|hd-olimpo.club|jptv.club|blutopia.xyz|desitorrents.tv|monikadesign.uk|hawke.uno)\/torrents\/\d+$/)){
         return 1;
     }
     if (site_url.match(/^https:\/\/www.torrentseeds.org\/torrents\/\d+/)){
@@ -1993,8 +1974,8 @@ function deal_with_title(title){
 //处理副标题逻辑业务封装进函数
 function deal_with_subtitle(subtitle){
     //mod by kim.wu
-    //subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, "").replace(/autoup/i, '');
-    subtitle = subtitle.replace(/\[checked by.*?\]/gi, '').replace(/autoup/i, '');
+    //subtitle = subtitle.replace(/\[checked by.*?\]/i, '').replace(/(\[|\])/g, " ").replace(/autoup/i, '').replace(/ +/, ' ').trim();
+    subtitle = subtitle.replace(/\[checked by.*?\]/gi, '').replace(/autoup/i, '').replace(/ +/, ' ').trim();
     subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
     subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
     return subtitle.trim();
@@ -2581,7 +2562,7 @@ function get_mediainfo_picture_from_descr(descr){
     info.pic_info = cmctimgs.trim();
     return info;
 }
-function fill_raw_info(raw_info){
+function fill_raw_info(raw_info, forward_site){
 
     raw_info.descr = raw_info.descr.replace(/%3A/g, ':').replace(/%2F/g, "/");
 
@@ -2707,9 +2688,12 @@ function fill_raw_info(raw_info){
     if (raw_info.edition_info.codec_sel()) {
         raw_info.codec_sel = raw_info.edition_info.codec_sel();
     }
-    if (!raw_info.codec_sel) {
+    if (!raw_info.codec_sel || forward_site == 'PTer') {
         if (raw_info.descr.match(/Writing library.*(x264|x265)/)) {
             raw_info.codec_sel = raw_info.descr.match(/Writing library.*(x264|x265)/)[1].toUpperCase();
+            if (raw_info.name.match(/H.?26[45]/)) {
+                raw_info.name = raw_info.name.replace(/H.?26[45]/i, raw_info.codec_sel.toLowerCase())
+            }
         } else if (raw_info.descr.match(/Video[\s\S]*?Format.*?HEVC/i)){
             raw_info.codec_sel = 'H265';
         } else if (raw_info.descr.match(/Video[\s\S]*?Format.*?AVC/i)){
@@ -2971,8 +2955,11 @@ function init_buttons_for_transfer(container, site, mode, raw_info) {
         }
 
     } else {
-        if (site == 'BHD' || site == 'BLU' || site == 'HDPost' || site == 'ACM' || site == 'HDOli' || site == 'Telly' || site == 'jptv' || site == 'torrentdb' || site == 'Monika'){
+        if (['BHD', 'BLU', 'HDPost', 'ACM', 'HDOli', 'Telly', 'jptv', 'torrentdb', 'Monika', 'DTR', 'HONE'].indexOf(site) > -1){
             $('#douban_button,#ptgen_button,#search_button,#download_pngs').css({"border": "1px solid #0D8ED9", "color": "#FFFFFF", "backgroundColor": "#292929"});
+            if (site == 'HONE') {
+                $('#douban_button,#ptgen_button,#search_button,#download_pngs').css({"width": "80px"})
+            }
         } else if (site == 'TorrentLeech') {
             $('#douban_button,#ptgen_button,#search_button,#download_pngs').css({"border": "1px solid green", "color": "#FFFFFF", "backgroundColor": "#292929"});
         }
@@ -2995,7 +2982,7 @@ function init_buttons_for_transfer(container, site, mode, raw_info) {
     }
 
     //把白框换个颜色
-    if (['PTP', 'xthor', 'HDF', 'BHD', 'BLU', 'TorrentLeech', 'HDPost', 'ACM', 'HDOli', 'jptv', 'torrentdb', 'Monika'].indexOf(site) > -1) {
+    if (['PTP', 'xthor', 'HDF', 'BHD', 'BLU', 'TorrentLeech', 'HDPost', 'ACM', 'HDOli', 'jptv', 'torrentdb', 'Monika', 'DTR', 'HONE'].indexOf(site) > -1) {
         textarea.style.backgroundColor = '#4d5656';
         textarea.style.color = 'white';
         input_box.style.backgroundColor = '#4d5656';
@@ -3216,6 +3203,8 @@ function getDoc(url, meta, callback) {
             if (responseDetail.status === 200) {
                 let doc = page_parser(responseDetail.responseText);
                 callback(doc, responseDetail, meta);
+            } else {
+                callback('error', null, null);
             }
         }
     });
@@ -5636,7 +5625,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
     $('#begin_sign').click((e)=>{
         e.preventDefault();
         var attendance_sites = ['PThome', 'HDHome', 'LemonHD', 'HDDolby', 'Audiences', 'OurBits', 'GainB', 'PigGo', 'SoulVoice', 'UltraHD', 'CarPt', 'HHClub', '红叶',
-                'ptchina', 'HDVideo', 'HDAtmos', 'HDZone', 'HDTime', '3Wmg', 'FreeFarm', 'HDfans', 'PTT', 'HDMaYi', 'HDPt', 'ZMPT', 'iHDBits'];
+                'ptchina', 'HDVideo', 'HDAtmos', 'HDZone', 'HDTime', '3Wmg', 'FreeFarm', 'HDfans', 'PTT', 'HDMaYi', 'HDPt', 'ZMPT', 'iHDBits', 'ICC'];
 
         attendance_sites.forEach((e)=>{
             if (used_signin_sites.indexOf(e) > -1) {
@@ -5996,7 +5985,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
 
     //**************************************************** 3 *************************************************************************
     $('#setting').append(`<b>选择脚本设置站点(默认猫站)：</b>`);
-    for (key in setting_host_list){
+    for (key in used_setting_host_list){
         $('#setting').append(`<input type="radio" name="setting_site" value="${key}">${key}`);
     }
     $(`input:radio[name="setting_site"][value="${setting_host}"]`).prop('checked', true);
@@ -6179,7 +6168,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         GM_setValue('used_tmdb_key', $(`input[name="tmdb_key"]`).val());
 
         //处理匿名
-        if_uplver = $(`input[name="anonymous"]`).prop('checked') ? 1: 0;
+        if_uplver = $(`input[name="anonymous"]:last`).prop('checked') ? 1: 0;
         GM_setValue('if_uplver', if_uplver);
 
         if_douban_jump = $(`input[name="douban_jump"]`).prop('checked') ? 1: 0;
@@ -6303,192 +6292,6 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
     $('#mediainfo').append(`<input type="button" id="simplify" value="简化信息" style="margin-bottom:5px"><br>`);
     $('#mediainfo').append(`<textarea id="clarify_media_info" style="width:700px" rows="20"></textarea><br>`);
 
-    $('#mediainfo').append(`<div id="video-demo-container">
-        <button id="upload-button" style="width:320px; margin-left:160px">Select MP4/MKV Video</button>
-        <input type="file" id="file-to-upload" accept="video/mp4,video/x-matroska" />
-        <video id="main-video" controls>
-            <source type="video/mp4">
-        </video>
-        <div id="video-canvas">
-        </div>
-        <textarea id="mediainfo_output" style="width:640px; margin-bottom:5px" rows="30"></textarea>
-        <div id="thumbnail-container">
-            <span>截图展示：<a class="upload_img" href="https://imgbox.com" style="color:blue">-->上传imgbox<--</a> | 
-            <a class="upload_img" href="https://www.imagebam.com/" style="color:blue">-->上传imagebam<--</a> 
-            </span><br>
-        </div>
-    </div>`);
-
-    var new_style = `
-        #video-demo-container {
-            width: 800px;
-            margin: 40px auto;
-        }
-
-        #main-video {
-            display: none;
-            max-width: 400px;
-        }
-
-        #thumbnail-container {
-            display: none;
-        }
-
-        #video-canvas {
-            display: none;
-        }
-
-        #upload-button {
-            width: 150px;
-            display: block;
-            margin: 20px auto;
-        }
-
-        #file-to-upload {
-            display: none;
-        }
-    `;
-    GM_addStyle(new_style);
-
-    for (var i = 0; i < 6; i++) {
-        $('#video-canvas').append(`<canvas class="canvas"></canvas>`);
-        $('#thumbnail-container').append(`<a href=""><img style="max-width:320px; display:inline-block;margin-right:6px;" src="" /></a>`)
-    }
-
-    var _CANVAS = document.querySelectorAll(".canvas");
-    var _CTXS = [];
-    for (var i = 0; i < 6; i++) {
-        var _CTX = _CANVAS[i].getContext("2d");
-        _CTXS.push(_CTX);
-    }
-    _VIDEO = document.querySelector("#main-video");
-
-    document.querySelector("#upload-button").addEventListener('click', function() {
-        document.querySelector("#file-to-upload").click();
-    });
-
-    document.querySelector("#file-to-upload").addEventListener('change', function() {
-        // Validate whether MP4/MKV
-        file = document.querySelector("#file-to-upload").files[0];
-        console.log(file.type)
-        if(['video/mp4', 'video/x-matroska'].indexOf(file.type) == -1) {
-            alert('Error : Only MP4/MKV format allowed');
-            return;
-        }
-        var video_name = file.name;
-        $('.upload_img').click((e)=>{
-            var imgs = [];
-            e.preventDefault();
-            $(`#thumbnail-container`).find(`img`).map((index,el)=>{
-                imgs.push($(el).attr('src'));
-            });
-            imgs.push(video_name);
-            GM_setValue("64imgs", JSON.stringify(imgs));
-            window.open(e.target.href, '_blank');
-        });
-        // Object Url as the video source
-        document.querySelector("#main-video source").setAttribute('src', URL.createObjectURL(document.querySelector("#file-to-upload").files[0]));
-
-        // Load the video and show it
-        _VIDEO.load();
-        // _VIDEO.style.display = 'inline';
-
-        // Load metadata of the video to get video duration and dimensions
-        _VIDEO.addEventListener('loadedmetadata', function() {
-            var video_duration = _VIDEO.duration,
-            duration_options_html = '';
-
-            var step = Math.floor(video_duration/7);
-            var times = [];
-            for (var i = 0; i < 6; i++) {
-                times.push((i+1)*step);
-            }
-
-            Array.from(_CANVAS).forEach((item)=>{
-                item.width = _VIDEO.videoWidth;
-                item.height = _VIDEO.videoHeight;
-            });
-
-            times.forEach((t,index)=>{
-                setTimeout(function(){
-                    _VIDEO.currentTime = t;
-                }, index*3000);
-
-            });
-            $(`#thumbnail-container`).css('display', 'block');
-        });
-
-        var img_index = 0;
-        _VIDEO.addEventListener('seeked', () => {
-                _CTXS[img_index].drawImage(_VIDEO, 0, 0, _VIDEO.videoWidth, _VIDEO.videoHeight);
-                $(`#thumbnail-container`).find(`img:eq(${img_index})`).attr('src', _CANVAS[img_index].toDataURL());
-                $(`#thumbnail-container>a:eq(${img_index})`).attr('href', _CANVAS[img_index].toDataURL());
-                $(`#thumbnail-container>a:eq(${img_index})`).attr('download', `${video_name}-thumbnail-${img_index}.png`);
-                img_index += 1;
-        });
-    });
-
-    function add_drop_function(el) {
-        el.addEventListener("dragenter",function(e){  //拖进
-            e.preventDefault();
-        })
-        el.addEventListener("dragover",function(e){  //拖来拖去 
-            e.preventDefault();
-        })
-        el.addEventListener('drop', function(event) {
-            event.preventDefault();
-            document.querySelector("#file-to-upload").files = event.dataTransfer.files;
-            document.querySelector("#file-to-upload").dispatchEvent(evt);
-        });
-    }
-    add_drop_function(document.querySelector("#upload-button"));
-    add_drop_function(document.querySelector("#mediainfo_output"));
-
-    try {
-        const fileinput = document.getElementById('file-to-upload');
-        const output = document.getElementById('mediainfo_output');
-
-        const onChangeFile = (mediainfo) => {
-          const file = fileinput.files[0];
-          if (file) {
-            output.value = 'Working…'
-            const getSize = () => file.size
-            const readChunk = (chunkSize, offset) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader()
-                reader.onload = (event) => {
-                  if (event.target.error) {
-                    reject(event.target.error)
-                  }
-                  resolve(new Uint8Array(event.target.result))
-                }
-                reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize))
-              })
-
-            mediainfo
-                .analyzeData(getSize, readChunk)
-                .then((result) => {
-                    result = result.replace(/Movie name.*\n/, '');
-                    if (result.match(/(Unique ID.*\n)/)) {
-                        result = result.replace(/(Unique ID.*\n)/, `$1Complete name                            : ${file.name}\n`);
-                    } else {
-                        result = result.replace(/(General.*\n)/, `$1Complete name                            : ${file.name}\n`);
-                    }
-                    output.value = result;
-                })
-                .catch((error) => {
-                  output.value = `An error occured:\n${error.stack}`
-                })
-          }
-        }
-
-        MediaInfo({ format: 'text' }, (mediainfo) => {
-            fileinput.addEventListener('change', () => onChangeFile(mediainfo))
-        });
-    } catch(err) {
-        $('#mediainfo_output').css('display', 'none');
-    }
-
     $('#simplify').click(function(){
         var mediainfo_text = simplifyMI($('#media_info').val(), null);
         $('#clarify_media_info').val(mediainfo_text);
@@ -6500,10 +6303,11 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
     $('#dealimg').append(`<input type="button" id="send_ptpimg" value="转ptpimg" style="margin-bottom:5px;margin-left:5px">`);
     $('#dealimg').append(`<input type="button" id="send_pixhost" value="转pixhost" style="margin-bottom:5px;margin-left:5px">`);
     $('#dealimg').append(`<input type="button" id="send_imgbox" value="转imgbox" style="margin-bottom:5px;margin-left:5px">`);
+    $('#dealimg').append(`<input type="button" id="send_hdbits" value="转HDBits" style="margin-bottom:5px;margin-left:5px">`);
     $('#dealimg').append(`<input type="button" id="get_imgbb" value="imgbb源图" style="margin-bottom:5px;margin-left:5px">`);
-    $('#dealimg').append(`<input type="button" id="350px" value="350px缩略" style="margin-bottom:5px;margin-left:5px">`);
     $('#dealimg').append(`<input type="button" id="change" value="字符串替换" style="margin-bottom:5px;margin-left:5px">`);
     $('#dealimg').append(`<input type="text" style="width: 50px; text-align:center; margin-left: 5px" id="img_source" />--<input type="text" style="width: 50px; text-align:center; margin-right: 5px" id="img_dest" /><br>`);
+    $('#dealimg').append(`<input type="button" id="350px" value="350px缩略" style="margin-bottom:5px;margin-right:5px">`);
     $('#dealimg').append(`<input type="button" id="enter2space" value="换行->空格" style="margin-bottom:5px;margin-right:5px">`);
     $('#dealimg').append(`<input type="button" id="get_encode" value="图片提取" style="margin-bottom:5px;margin-right:5px">`);
     $('#dealimg').append(`从第<input type="text" style="width: 30px; text-align:center; margin-left: 5px; margin-right:5px" id="start" />张开始每隔<input type="text" style="width: 30px; text-align:center; margin-left: 5px; margin-right:5px" id="step" />张获取其中第<input type="text" style="width: 30px; text-align:center; margin-left: 5px;margin-right:5px" id="number" />张。<br>`);
@@ -6546,14 +6350,14 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             } else if (item.match(/pixhost/)) {
                 pic_info += '[img]' + item.replace('//t', '//img').replace('thumbs', 'images') + '[/img]\n';
             } else if (item.match(/pterclub.com|beyondhd.co\/images/)) {
-                pic_info += '[img]' + item.replace(/th.png/, 'png') + '[/img]\n';
+                pic_info += '[img]' + item.replace(/th.png/, 'png').replace(/md.png/, 'png') + '[/img]\n';
             } else if (item.match(/tu.totheglory.im/)) {
                 pic_info += '[img]' + item.replace(/_thumb.png/, '.png') + '[/img]\n';
             } else if (item.match(/img.hdchina.org/)) {
                 pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
             } else if (item.match(/cinematik/)) {
                 pic_info += '[img]' + item.replace(/thu/, 'big') + '[/img]\n';
-            } else if (item.match(/img4k.net/)) {
+            } else if (item.match(/img4k.net|img.hdhome.org/)) {
                 pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
             } else {
                 pic_info += '[img]' + item + '[/img]\n';
@@ -6601,6 +6405,24 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             images.push(name);
             GM_setValue('HDB_images', images.join(', '));
             window.open('https://imgbox.com/', '_blank');
+        }
+    });
+
+    $('#send_hdbits').click((e)=>{
+        var origin_str = $('#picture').val();
+        images = origin_str.match(/\[img\]http[^\[\]]*?(jpg|png|webp)/g).map((item)=>{ return item.replace(/\[.*?\]/g, ''); });
+        if (images.length) {
+            var name = 'set your gallary name';
+            try {
+                if (descr.match(/Disc Title:/)) {
+                    name = descr.match(/Disc Title:(.*)/)[1].trim();
+                } else if (descr.match(/Complete name.*?:/i)) {
+                    name = descr.match(/Complete name.*?:(.*)/)[1].trim();
+                }
+            } catch(err) {console.log(err)}
+            images.push(name);
+            GM_setValue('HDB_images', images.join(', '));
+            window.open('https://img.hdbits.org/', '_blank');
         }
     });
 
@@ -6674,10 +6496,20 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             })
             return p;
         }
+        function getpostdoc(url) {
+            var p = new Promise((resolve, reject)=>{
+                getDoc(url,null,function(doc){
+                    console.log(doc)
+                    var source_img_url = $('#download', doc).attr('href').split('?')[0];
+                    resolve(source_img_url);
+                });
+            })
+            return p;
+        }
         var origin_str = $('#picture').val();
         var imgbb_urls = origin_str.match(/https?:\/\/i.ibb.co[^\[\]]*?(jpg|png)/g);
-        if (!imgbb_urls.length) {
-            alert("没有监测到imgbb链接");
+        if (imgbb_urls === null) {
+            // alert("没有监测到imgbb链接");
         } else {
             var imgbb_tasks = [];
             imgbb_urls.map(item=>{
@@ -6688,6 +6520,26 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             Promise.all(imgbb_tasks).then((data)=>{
                 for (i=0; i<data.length; i++) {
                     origin_str = origin_str.replace(imgbb_urls[i], data[i]);
+                }
+                origin_str = origin_str.match(/\[img\]https?:.*?(jpg|png)\[\/img\]/g).join('\n');
+                $('#result').val(origin_str);
+            })
+        }
+        var postimg_urls = origin_str.match(/https?:\/\/i.postimg.cc[^\[\]]*?(jpg|png)/g);
+        if (postimg_urls === null) {
+            // alert("没有监测到imgbb链接");
+        } else {
+            var imgpost_tasks = [];
+            postimg_urls.map(item=>{
+                var imgpost_show_url = 'https://postimg.cc/' + item.match(/https:\/\/i.postimg.cc\/(.*?)\//)[1];
+                console.log(imgpost_show_url)
+                var imgpost_p = getpostdoc(imgpost_show_url);
+                imgpost_tasks.push(imgpost_p);
+            })
+            Promise.all(imgpost_tasks).then((data)=>{
+                console.log(data)
+                for (i=0; i<data.length; i++) {
+                    origin_str = origin_str.replace(postimg_urls[i], data[i]);
                 }
                 origin_str = origin_str.match(/\[img\]https?:.*?(jpg|png)\[\/img\]/g).join('\n');
                 $('#result').val(origin_str);
@@ -7049,7 +6901,7 @@ function full_bdinfo2summary(descr) {
         }).join('\nSubtitle: ').split('[/quote]')[0].replace(/(\nSubtitle: )+$/, '');
     }
     if (descr.match(/Audio:[\s\S]{0,20}Codec/i)) {
-        var audio_info = descr.match(/Audio:[\s\S]{0,300}-----------([\s\S]*)/i)[1].split(/subtitles/i)[0].trim();
+        var audio_info = descr.match(/Audio:[\s\S]{0,300}-----------([\s\S]*)/i)[1].split(/subtitles|\[.*?quote\]/i)[0].trim();
         summary['Audio'] = audio_info.split('\n').map(e=>{
             var info = e.split(/\s{5,15}/).filter(function(ee){if (ee.trim() && ee.trim() != '[/quote]') return ee.trim();});
             return info.join(' / ').trim();
@@ -8734,10 +8586,10 @@ setTimeout(function(){
             }
         }
 
-        if (origin_site == 'HDPost' || origin_site == 'ACM' || origin_site == 'HDOli' || origin_site == 'jptv' || origin_site == 'Monika') {
+        if (['HDPost', 'ACM', 'HDOli', 'jptv', 'Monika', 'DTR'].indexOf(origin_site) > -1) {
             var iii = document.getElementsByTagName('h4')[0].parentNode.parentNode;
             var div_box = iii.getElementsByClassName('table-responsive')[0];
-            if (origin_site == 'HDPost') {
+            if (origin_site == 'HDPost' || origin_site == 'DTR') {
                 div_box = iii.getElementsByClassName('table-responsive')[1];
                 $('h4').first().click();
             }
@@ -8757,6 +8609,41 @@ setTimeout(function(){
                     });
                 }
             }
+        }
+
+        if (origin_site == 'HONE') {
+            raw_info.url = match_link('imdb', $('#meta-info').html());
+            console.log(raw_info.url);
+            raw_info.type = $('.torrent-category').text().get_type();
+            $('div[class="meta-general box container"]').prepend(`
+                <div style="padding-left:55px; padding-right:55px">
+                    <table id="mytable">
+                    </table>
+                </div>
+            `);
+            tbody = $('#mytable')[0];
+            insert_row = tbody.insertRow(0);
+            douban_box = tbody.insertRow(0);
+
+            raw_info.name = $('span[class="torrent-category badge-extra"]:first').text().replace(/\(|\)/g, '').replace(/English-/, '-');
+            var search_name = get_search_name(raw_info.name);
+            // reBuildHref(raw_info, forward_r);
+            if (all_sites_show_douban) {
+                getData(raw_info.url, function(data){
+                    console.log(data);
+                    if (data.data){
+                        $('td:contains(豆瓣信息)').last().parent().before(`<tr><td align=right style="font-weight: bold;">豆瓣</td><td id="douban_info"></td></tr>`);
+                        add_douban_info_table($('#douban_info'), 150, data);
+                        $('#douban_info').find('th').css({"color": "white"});
+                    }
+                });
+            }
+            raw_info.descr = '[quote]' + $('.torrent-mediainfo-dump').find('pre').text().trim() + '\n[/quote]\n\n';
+            console.log($('.table-responsive:eq(2)').find('a').has('img').length)
+            $('.table-responsive:eq(2)').find('a').has('img').map((index,e)=>{
+                raw_info.descr += `[url=${$(e).attr("href")}][img]${$(e).find("img").attr("src")}[/img][/url]`
+            });
+            raw_info.torrent_url = $('.torrent-buttons').find('a[href*="torrents/download"]').attr('href');
         }
 
         if (origin_site == 'BLU' || origin_site == 'Telly') {
@@ -9692,8 +9579,7 @@ setTimeout(function(){
                 }
             }
 
-            if (['BHD','BLU', 'HDPost', 'ACM', 'HDOli', 'Telly', 'jptv', 'Monika'].indexOf(origin_site) > -1){
-
+            if (['BHD','BLU', 'HDPost', 'ACM', 'HDOli', 'Telly', 'jptv', 'Monika', 'DTR'].indexOf(origin_site) > -1){
                 if (['Name', 'Nombre', '名称'].indexOf(tds[i].textContent.trim())>-1) {
                     raw_info.name = tds[i+1].textContent.replace(/ *\n.*/gm, '').trim();
                     if (origin_site == 'HDOli') {
@@ -9724,6 +9610,7 @@ setTimeout(function(){
                         raw_info.medium_sel = 'WEB-DL';
                     }
                 }
+                console.log(raw_info)
             } else {
                 if (tds[i].textContent.match(/Category/)){
                     if (origin_site == 'HDB') {
@@ -10855,7 +10742,7 @@ setTimeout(function(){
             raw_info.torrent_url = $('a[href*="me/download"]').attr('href');
         }
 
-        if (['BLU', 'HDPost', 'ACM', 'HDOli', 'Telly', 'jptv', 'Monika'].indexOf(origin_site) > -1) {
+        if (['BLU', 'HDPost', 'ACM', 'HDOli', 'Telly', 'jptv', 'Monika', 'DTR'].indexOf(origin_site) > -1) {
             var mediainfo_lack = false;
             try {
                 var mediainfo_box = document.getElementsByClassName('slidingDiv')[0];
@@ -11219,7 +11106,9 @@ setTimeout(function(){
             raw_info.torrent_name = raw_info.name.replace(/ /g, '.').replace(/\*/g, '') + '.torrent';
             raw_info.torrent_name = raw_info.torrent_name.replace(/\.\.+/g, '.');
         }
-        raw_info.torrent_name = raw_info.torrent_name.replace('#', '');
+
+        raw_info.torrent_name = raw_info.torrent_name.replace('#', '').replace(':', '.');
+
         console.log(raw_info.torrent_name);
         console.log(raw_info.torrent_url);
         //获取跳转的字符串
@@ -11281,7 +11170,7 @@ setTimeout(function(){
             forward_l.innerHTML = "转发种子"; forward_l.valign = "top"; forward_l.style.fontWeight = "bold";
             if ((!judge_if_the_site_in_domestic() && no_need_douban_button_sites.indexOf(origin_site) < 0) || douban_button_needed) {
                 var direct;
-                if (['PHD', 'avz', 'CNZ', 'BLU', 'TorrentLeech', 'BHD', 'HDPost', 'ACM', 'HDOli', 'Telly', 'torrentdb', 'jptv', 'Monika'].indexOf(origin_site) > -1) {
+                if (['PHD', 'avz', 'CNZ', 'BLU', 'TorrentLeech', 'BHD', 'HDPost', 'ACM', 'HDOli', 'Telly', 'torrentdb', 'jptv', 'Monika', 'DTR', 'HONE'].indexOf(origin_site) > -1) {
                     direct = "left";
                 } else {
                     direct = "right";
@@ -11299,7 +11188,7 @@ setTimeout(function(){
                     }
                 }
                 box_left.innerHTML = '豆瓣信息';
-                if (origin_site == 'NBL' || origin_site == 'IPT' || origin_site == 'torrentseeds') {
+                if (origin_site == 'NBL' || origin_site == 'IPT' || origin_site == 'torrentseeds' || origin_site == 'HONE') {
                     box_left.style.width = '60px';
                 } else if (origin_site == 'IN' || origin_site == 'digitalcore' || origin_site == 'BlueBird' || origin_site == 'bwtorrents') {
                     box_left.style.width = '80px';
@@ -11414,7 +11303,7 @@ setTimeout(function(){
         var ptgen = document.createElement('a');
         ptgen.innerHTML = 'PTgen';
         ptgen.id = 'ptgen';
-        ptgen.href = setting_host_list[setting_host] + '#ptgen?';
+        ptgen.href = used_setting_host_list[setting_host] + '#ptgen?';
         if (raw_info.dburl) {
             ptgen.href += raw_info.dburl.match(/\d+/)[0];
         } else if (raw_info.url) {
@@ -11445,7 +11334,7 @@ setTimeout(function(){
         var get_img = document.createElement('a');
         get_img.innerHTML = '提取图片';
         get_img.id = 'get_img';
-        get_img.href = setting_host_list[setting_host] + '#dealimg';
+        get_img.href = used_setting_host_list[setting_host] + '#dealimg';
         get_img.target = '_blank';
         forward_r.appendChild(get_img);
 
@@ -11466,14 +11355,14 @@ setTimeout(function(){
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var mediainfo_link = document.createElement('a');
         mediainfo_link.innerHTML = '简化MI';
-        mediainfo_link.href = setting_host_list[setting_host] + "#mediainfo";
+        mediainfo_link.href = used_setting_host_list[setting_host] + "#mediainfo";
         mediainfo_link.target = '_blank';
         forward_r.appendChild(mediainfo_link);
 
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var setting_link = document.createElement('a');
         setting_link.innerHTML = '脚本设置';
-        setting_link.href = setting_host_list[setting_host]+'#setting';
+        setting_link.href = used_setting_host_list[setting_host]+'#setting';
         setting_link.target = '_blank';
         forward_r.appendChild(setting_link);
 
@@ -11496,7 +11385,7 @@ setTimeout(function(){
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var sign_in = document.createElement('a');
         sign_in.innerHTML = '签到';
-        sign_in.href = setting_host_list[setting_host]+'#signin';
+        sign_in.href = used_setting_host_list[setting_host]+'#signin';
         sign_in.target = '_blank';
         forward_r.appendChild(sign_in);
 
@@ -11538,7 +11427,6 @@ setTimeout(function(){
                 raw_info.descr = '';
                 raw_info.extra_text = '';
                 try { raw_info.extra_text = walkDOM(document.getElementsByClassName('extra-text')[0].cloneNode(true)).trim(); } catch(Err) {}
-                console.log(raw_info.extra_text)
                 //海报和简介
                 var img_address = document.getElementById("kposter").getElementsByTagName("img")[0].src;
                 try {
@@ -12232,6 +12120,25 @@ setTimeout(function(){
             });
         }
 
+        if (setting_host == null) {
+            var url = default_site_info[origin_site].url + 'usercp.php?action=personal';
+            getDoc(url, null, function(doc){
+                if ($('#usercpnav', doc).length) {
+                    $(forward_r).find('a').map((index,e)=>{
+                        var jump_url = $(e).attr('href');
+                        if (jump_url.match(/^undefined/)) {
+                            $(e).attr('href', jump_url.replace('undefined', default_site_info[origin_site].url + 'usercp.php?action=personal'));
+                            GM_setValue('setting_host', origin_site);
+                            used_setting_host_list[origin_site] = default_site_info[origin_site].url + 'usercp.php?action=personal';
+                            GM_setValue('setting_host_list', JSON.stringify(used_setting_host_list));
+                        }
+                    });
+                } else {
+                    alert('选择一个NP架构站点进行脚本托管站点设置！！');
+                }
+            });
+        }
+
         //----------------------------------界面部署层逻辑：获取豆瓣链接button绑定点击事件-------------------------------------------------
 
         if ((!judge_if_the_site_in_domestic() && no_need_douban_button_sites.indexOf(origin_site) < 0) || douban_button_needed){
@@ -12493,7 +12400,7 @@ setTimeout(function(){
         var LemonHD_music = false, LemonHD_animate = false, LemonHD_documentary = false;
         var search_name = get_search_name(raw_info.name);
 
-        raw_info = fill_raw_info(raw_info);
+        raw_info = fill_raw_info(raw_info, forward_site);
         if (raw_info.origin_site == 'MTeam') {
             raw_info.descr = raw_info.descr.replace(/░/g, '');
         }
@@ -14059,7 +13966,7 @@ setTimeout(function(){
                     if (labels.yy){ document.getElementsByName('is_cantonese')[0].checked=true; }
                     if (labels.diy){ document.getElementsByName('is_diyed')[0].checked=true; }
                     break;
-                case 'ZMPT': case '红叶': case 'iHDBits':
+                case 'ZMPT': case '红叶': case 'iHDBits': case 'ICC':
                     if (labels.gy){ $('input[name="tags[]"][value="5"]').attr('checked', true); }
                     if (labels.yy){ $('input[name="tags[]"][value="5"]').attr('checked', true); }
                     if (labels.zz){ $('input[name="tags[]"][value="6"]').attr('checked', true); }
@@ -14367,12 +14274,13 @@ setTimeout(function(){
                 standard_box.options[index].selected = true;
             }
 
-            var source_box = document.getElementsByName('source_sel')[0];
-            var source_dict = {'欧美': 3, '大陆': 1, '香港': 2, '台湾': 2, '日本': 4, '韩国': 4, '日韩': 4,
-                               '印度': 5, '': 5, '港台': 2};
+            var source_box = $('select[name="source_sel"]');
+            var source_dict = {'欧美': 4, '大陆': 1, '香港': 2, '台湾': 3, '日本': 5, '韩国': 6,
+                               '印度': 7, '': 99};
+            source_box.val(99);
             if (source_dict.hasOwnProperty(raw_info.source_sel)){
                 var index = source_dict[raw_info.source_sel];
-                source_box.options[index].selected = true;
+                source_box.val(index);
             }
 
             //mod by kim.wu
@@ -18885,8 +18793,8 @@ setTimeout(function(){
             });
         }
 
-        else if (forward_site == 'ZMPT' || forward_site == '红叶') {
-            //类型
+        else if (forward_site == 'ICC') {
+            $('input[name="pt_gen"]').val(raw_info.dburl? raw_info.dburl: raw_info.url);
             var browsecat = $('#browsecat')
             var type_dict = {'电影': 401, '剧集': 402, '动漫': 405, '综艺': 403, '音乐': 408, '纪录': 404,
                              '体育': 407, '软件': 409, '学习': 409, '': 409, '游戏': 409, 'MV': 406};
@@ -18895,6 +18803,83 @@ setTimeout(function(){
             if (type_dict.hasOwnProperty(raw_info.type)){
                 var index = type_dict[raw_info.type];
                 browsecat.val(index);
+            }
+            try {
+                disableother('browsecat','specialcat');
+            } catch (err) {}
+            $('select[name="team_sel"]').val(5);
+            $('select[name="team_sel"]>option').map(function(index,e){
+                if (raw_info.name.match(e.innerText)) {
+                    $(`select[name="team_sel"]>option:eq(${index})`).attr('selected', true);
+                }
+            });
+            //媒介
+            var medium_box = $('select[name=medium_sel]');
+            switch(raw_info.medium_sel){
+                case 'UHD': case 'Blu-ray':
+                    medium_box.val(1); break;
+                case 'DVD':
+                    if (raw_info.name.match(/dvdr/i)) {
+                        medium_box.val(6);
+                    } else {
+                        medium_box.val(2);
+                    }
+                    break;
+                case 'Remux': medium_box.val(3); break
+                case 'HDTV': medium_box.val(5); break;
+                case 'Encode': medium_box.val(7); break;
+                case 'WEB-DL': medium_box.val(10);
+            }
+            if (raw_info.name.match(/MiniBD/i)) {
+                medium_box.val(4);
+            }
+            //视频编码
+            var codec_box = $('select[name=codec_sel]');
+            codec_box.val(5);
+            switch (raw_info.codec_sel){
+                case 'H265': case 'X265': codec_box.val(6); break;
+                case 'H264': case 'X264': codec_box.val(1); break;
+                case 'VC-1': codec_box.val(2); break;
+                case 'MPEG-2': case 'MPEG-4': codec_box.val(4); break;
+                case 'XVID': codec_box.val(3);
+            }
+            //分辨率
+            var standard_box = $('select[name=standard_sel]');
+            var standard_dict = {
+                '4K': 6, '1080p': 1, '1080i': 2, '720p': 3, 'SD': 4
+            };
+            if (standard_dict.hasOwnProperty(raw_info.standard_sel)){
+                var index = standard_dict[raw_info.standard_sel];
+                standard_box.val(index);
+            }
+            try {
+                var year = raw_info.name.match(/\d{4}[^pi]/gi).pop().slice(0, 4);
+                year = parseInt(year);
+                var years = [2011, 2001, 1981, 1961, 1941, 1921, 1901, 1851, 1800];
+                var year_selected = false;
+                years.forEach((item, index)=>{
+                    if (year > item && ! year_selected) {
+                        $('select[name="processing_sel"]').val(9-index);
+                        year_selected = true;
+                    }
+                });
+            } catch(err) {}
+        }
+
+        else if (forward_site == 'ZMPT' || forward_site == '红叶') {
+            //类型
+            var browsecat = $('#browsecat');
+            var type_dict = {'电影': 401, '剧集': 402, '动漫': 405, '综艺': 403, '音乐': 408, '纪录': 404,
+                             '体育': 407, '软件': 409, '学习': 409, '': 409, '游戏': 409, 'MV': 406};
+            //如果当前类型在上述字典中
+            browsecat.val(409)
+            if (type_dict.hasOwnProperty(raw_info.type)){
+                var index = type_dict[raw_info.type];
+                browsecat.val(index);
+            }
+
+            if (raw_info.type == '纪录' && forward_site == 'ZMPT') {
+                browsecat.val(422);
             }
 
             if (raw_info.type == '动漫' && forward_site == 'ZMPT') {
@@ -18958,17 +18943,32 @@ setTimeout(function(){
             }
             //音频编码
             var audiocodec_box = $('select[name=audiocodec_sel]');
-            switch (raw_info.audiocodec_sel){
-                case 'DTS-HD': case 'DTS-HDMA:X 7.1': case 'DTS-HDMA': audiocodec_box.val(16); break;
-                case 'TrueHD': audiocodec_box.val(7); break;
-                case 'Atmos': audiocodec_box.val(7); break;
-                case 'DTS': audiocodec_box.val(3); break;
-                case 'AC3': audiocodec_box.val(8); break;
-                case 'AAC': audiocodec_box.val(6); break;
-                case 'Flac': audiocodec_box.val(1); break;
-                case 'APE': audiocodec_box.val(2); break;
-                case 'LPCM': audiocodec_box.val(7); break;
-                case 'WAV': audiocodec_box.val(7);
+            if (forward_site == '红叶') {
+                switch (raw_info.audiocodec_sel){
+                    case 'DTS-HD': case 'DTS-HDMA:X 7.1': case 'DTS-HDMA': audiocodec_box.val(16); break;
+                    case 'TrueHD': audiocodec_box.val(7); break;
+                    case 'Atmos': audiocodec_box.val(7); break;
+                    case 'DTS': audiocodec_box.val(3); break;
+                    case 'AC3': audiocodec_box.val(8); break;
+                    case 'AAC': audiocodec_box.val(6); break;
+                    case 'Flac': audiocodec_box.val(1); break;
+                    case 'APE': audiocodec_box.val(2); break;
+                    case 'LPCM': audiocodec_box.val(7); break;
+                    case 'WAV': audiocodec_box.val(7);
+                }
+            } else {
+                switch (raw_info.audiocodec_sel){
+                    case 'DTS-HD': case 'DTS-HDMA:X 7.1': case 'DTS-HDMA': audiocodec_box.val(3); break;
+                    case 'TrueHD': audiocodec_box.val(7); break;
+                    case 'Atmos': audiocodec_box.val(7); break;
+                    case 'DTS': audiocodec_box.val(3); break;
+                    case 'AC3': audiocodec_box.val(8); break;
+                    case 'AAC': audiocodec_box.val(6); break;
+                    case 'Flac': audiocodec_box.val(1); break;
+                    case 'APE': audiocodec_box.val(2); break;
+                    case 'LPCM': audiocodec_box.val(7); break;
+                    case 'WAV': audiocodec_box.val(7);
+                }
             }
 
             if (forward_site == '红叶') {
@@ -23089,7 +23089,7 @@ setTimeout(function(){
     } else if (judge_if_the_site_as_source() == 2) { //HDCity
         if (GM_getValue('hdcity_info') !== undefined) {
             raw_info = JSON.parse(GM_getValue('hdcity_info'));
-            raw_info = fill_raw_info(raw_info);
+            raw_info = fill_raw_info(raw_info, 'HDcity');
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
         } else {
@@ -23200,7 +23200,7 @@ setTimeout(function(){
                 var announce = 'http://cinematik.net/announce.php';
                 addTorrent(raw_info.torrent_url, raw_info.torrent_name, 'TIK', announce);
                 raw_info = JSON.parse(GM_getValue('tik_info'));
-                raw_info = fill_raw_info(raw_info);
+                raw_info = fill_raw_info(raw_info, 'TIK');
                 raw_info.descr = raw_info.descr.replace(/ /g, ' ');
                 raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
                 var descr = tik_base_content;
@@ -23253,7 +23253,7 @@ setTimeout(function(){
 
                     try{
                         var audio_info = raw_info.descr.match(/(audio[\s\S]*)(text)?/i)[0].trim();
-                        var audio_infos = audio_info.split(/audio.*?\nid.*/i).filter(audio => audio.match(/Language/i));
+                        var audio_infos = audio_info.split(/audio.*?\nid.*/i).filter(audio => audio.match(/format/i));
                         descr = descr.format({'audio': audio_infos.map(e=>{
                             var audio_text = '';
                             if (e.match(/language.*:(.*)/i)) {
@@ -23286,7 +23286,10 @@ setTimeout(function(){
                             }
                             return subtitle_text;
                         }).join('\n                       ')});
-                    } catch (err) {console.log(err)}
+                    } catch (err) {
+                        console.log(err);
+                        descr = descr.format({'subtitles': "None"});
+                    }
 
                 } else {
                     var medium_sel = 'BD25';
@@ -23322,9 +23325,12 @@ setTimeout(function(){
                                         return '';
                                     }
                                 }).join('\n                       ').replace(/(\n                       )+$/, '')});
+                            } else {
+                                descr = descr.format({'subtitles': "None"});
                             }
                             if (raw_info.descr.match(/Audio:[\s\S]{0,20}Codec/i)) {
-                                var audio_info = raw_info.descr.match(/Audio:[\s\S]{0,300}-----------([\s\S]*)/i)[1].split(/subtitles/i)[0].trim();
+                                var audio_info = raw_info.descr.match(/Audio:[\s\S]{0,300}-----------([\s\S]*)/i)[1].split(/subtitles|\[.*quote\]/i)[0].trim();
+                                // alert(audio_info)
                                 descr = descr.format({'audio': audio_info.split('\n').map(e=>{
                                     var info = e.split(/  /).filter(function(e){return e;});
                                     return `${info[1].trim()} ${info[0].replace('Audio', '').replace(/Master/, 'MA').trim()} ${info[3].split('/')[0].trim()}`
@@ -23335,6 +23341,8 @@ setTimeout(function(){
                                 descr = descr.format({'subtitles': raw_info.descr.match(/Subtitle:(.*)/ig).map(e=>{
                                     return e.replace(/Subtitle.*?:?/i, '').split('/')[0].trim();
                                 }).join('\n                       ')});
+                            } else {
+                                descr = descr.format({'subtitles': "None"});
                             }
                             if (raw_info.descr.match(/Audio:(.*)/i)) {
                                 descr = descr.format({'audio': raw_info.descr.match(/Audio:(.*)/ig).map(e=>{
@@ -23356,7 +23364,11 @@ setTimeout(function(){
                 if (img_urls && img_urls.length) {
                     descr = descr.format({'screenshots': img_urls.join('\n\n')});
                 }
-                if (raw_info.descr.match(/Total.*?Bitrate:(.*)/i)) {
+
+                if (raw_info.descr.match(/\/ \d+ ?kbps \//)) {
+                    descr = descr.format({'bitrate': raw_info.descr.match(/\/ (\d+ ?kbps) \//)[1]}).replace('Total Bitrate..', 'Average Bitrate');
+                }
+                else if (raw_info.descr.match(/Total.*?Bitrate:(.*)/i)) {
                     descr = descr.format({'bitrate': raw_info.descr.match(/Total.*?Bitrate:(.*)/i)[1].trim()});
                 }
 
@@ -23379,7 +23391,14 @@ setTimeout(function(){
                         var poster = await getPoster(poster_url);
                         descr = descr.format({'poster': poster});
 
-                        descr = descr.format({'aspect_ratio': $('li.ipc-metadata-list__item:contains("Aspect ratio")', doc).text().replace('Aspect ratio', '').trim()});
+                        var aspect_ratio = $('li.ipc-metadata-list__item:contains("Aspect ratio")', doc).text().replace('Aspect ratio', '').trim();
+                        if (aspect_ratio) {
+                            descr = descr.format({'aspect_ratio': aspect_ratio});
+                        } else {
+                            if (raw_info.descr.match(/\/ \d+:\d+ \//)) {
+                                descr = descr.format({'aspect_ratio': raw_info.descr.match(/\/ (\d+:\d+) \//)[1]});
+                            }
+                        }
                         descr = descr.format({'country': Array.from($('li.ipc-metadata-list__item:contains("Countr")', doc).find('a')).map(function(e){
                             return $(e).text();
                         }).join(', ')});
@@ -23404,9 +23423,11 @@ setTimeout(function(){
                         } else {
                             $('input[name="newdir"]').val(director);
                         }
-                        var imdb_descr = $('span[class*="GenresAndPlot__TextContainerBreakpointXS"]:eq(0)', doc).text().trim();
-                        if (imdb_descr.match(/See full summary/)){
-                            var full_descr_url = 'https://www.imdb.com' + $('span[class*="GenresAndPlot__TextContainerBreakpointXS"]:eq(0)', doc).find('a').attr('href');
+                        var imdb_descr = $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).text().trim();
+                        console.log(imdb_descr)
+                        if (imdb_descr.match(/Read all/)){
+                            var full_descr_url = 'https://www.imdb.com/title/' + raw_info.url.match(/tt\d+/)[0] + '/' + $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).find('a').attr('href');
+                            console.log(full_descr_url)
                             imdb_descr = await getFullDescr(full_descr_url);
                         } else if (imdb_descr.match(/Add a Plot/)) {
                             imdb_descr =  `No data from IMDB: ${raw_info.url}`;
@@ -23425,7 +23446,7 @@ setTimeout(function(){
 
         if (GM_getValue('kg_info') !== undefined) {
             raw_info = JSON.parse(GM_getValue('kg_info'));
-            raw_info = fill_raw_info(raw_info);
+            raw_info = fill_raw_info(raw_info, 'KG');
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
         } else {
@@ -23672,7 +23693,7 @@ setTimeout(function(){
         $('#dnu_header').parent().hide();
         if (GM_getValue('btn_info') !== undefined) {
             raw_info = JSON.parse(GM_getValue('btn_info'));
-            raw_info = fill_raw_info(raw_info);
+            raw_info = fill_raw_info(raw_info, 'BTN');
             if (raw_info.name.match(/S\d+ E\d+/)) {
                 raw_info.name = raw_info.name.replace(/(S\d+) (E\d+)/, '$1$2');
             }
@@ -24310,7 +24331,7 @@ setTimeout(function(){
     } else if (judge_if_the_site_as_source() == 6) { //avz系列
         if (GM_getValue('avz_info') !== undefined) {
             raw_info = JSON.parse(GM_getValue('avz_info'));
-            raw_info = fill_raw_info(raw_info);
+            raw_info = fill_raw_info(raw_info, 'AVZ');
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
         } else {
@@ -24321,7 +24342,7 @@ setTimeout(function(){
     } else if (judge_if_the_site_as_source() == 7) {
         if (GM_getValue('task_info') !== undefined) {
             raw_info = JSON.parse(GM_getValue('task_info'));
-            raw_info = fill_raw_info(raw_info);
+            raw_info = fill_raw_info(raw_info, null);
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
             console.log(raw_info);
@@ -24504,7 +24525,7 @@ setTimeout(function(){
 
             try {
                 var infos = get_mediainfo_picture_from_descr(raw_info.descr);
-                if (raw_info.medium_sel == 'UHD' || raw_info.medium_sel == 'Blu-ray' || raw_info.medium_sel == 'DVD' || raw_info.descr.match(/mpls/i)) {
+                if (raw_info.medium_sel == 'UHD' || raw_info.medium_sel == 'Blu-ray' || raw_info.descr.match(/mpls/i)) {
                     $('textarea[name="release_desc"]').val(infos.mediainfo);
                 }
                 setTimeout(function(){
@@ -24769,7 +24790,12 @@ setTimeout(function(){
                     $('#pictures').hide();
                     $('#pictures').val('');
                 }
-            })
+            });
+
+            $('#get_ptp').parent().append(`<input type="checkbox" id="show_ptp_hidden" value="1" style="vertical-align: middle; margin-left:5px;">显示更多选项`);
+            $('#show_ptp_hidden').click((e)=>{
+                $('div.ptp-extra').removeClass('hidden');
+            });
 
             function addedition(str) {
                 var event = document.createEvent("HTMLEvents");
