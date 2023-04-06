@@ -1978,6 +1978,7 @@ function deal_with_subtitle(subtitle){
     subtitle = subtitle.replace(/\[checked by.*?\]/gi, '').replace(/autoup/i, '').replace(/ +/, ' ').trim();
     subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
     subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
+    subtitle = subtitle.replace(/\s*\/\s*/g, '/');
     return subtitle.trim();
 }
 
@@ -14299,7 +14300,7 @@ setTimeout(function(){
 
             var pic_str = raw_info.imgs_cmct ? raw_info.imgs_cmct: cmctimgs;
             pic_info = '';
-            pic_str.match(/\[img\]http[^\[\]]*?(jpg|png|webp)/g).forEach((item)=>{
+            pic_str.match(/\[img\]http[^\[\]]*?(jpg|jpeg|png|webp)/g).forEach((item)=>{
                 item = item.replace(/\[.*\]/g, '');
                 if (item.match(/imgbox/)) {
                     pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
@@ -14324,21 +14325,11 @@ setTimeout(function(){
             cmctdescr = raw_info.descr.slice(0,raw_info.descr.search(/\[quote\]/));
             cmctdescr = cmctdescr.replace(/\[img\]htt.*[\s\S]*?img\]/i, '');
 
-            //mod by kim.wu
-            //附加信息
+            //附加信息 mod by kim.wu
             raw_info.extra_text = '';
-            if (raw_info.descr.search(/\[quote\]/) < raw_info.descr.search(/\[img\]/)) {
-                try{
-                    raw_info.extra_text = raw_info.descr.match(/(\[quote\][\s\S]*?)\[img\]/)[1];
-                } catch (err) {
-                    raw_info.extra_text = '';
-                }
-            }
-            var st_idx = raw_info.descr.search(/\[img\]/);
-            if (st_idx < 0) st_idx = 0;
-            var reg_q = raw_info.descr.slice(st_idx).match(/\[quote\][\s\S]*?字幕[\s\S]*?\[\/quote\]/);
+            var reg_q = raw_info.descr.match(/\[quote\]((?!quote|Unique\s+ID|Disc\s+Title|Disc\s+Label)[\s\S])*\[\/quote\]/g);
             if (reg_q) {
-                raw_info.extra_text += reg_q[0];
+                raw_info.extra_text += reg_q.join('\n\n');
             }
 
             if (raw_info.mediainfo_cmct){

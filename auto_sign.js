@@ -63,7 +63,7 @@
         }
         else {
             res = $('a').filter(function() {
-                return isSignable($(this).text()) && !/(usercp|details|forums)\.php/i.test($(this).prop('href'))
+                return isSignable($(this).text()) && !/(usercp|details|forums|messages)\.php/i.test($(this).prop('href'))
             })
         }
 
