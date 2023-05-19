@@ -1667,7 +1667,7 @@ function walkDOM(n) {
             n.nextSibling.innerHTML = '[quote]' + n.nextSibling.innerHTML + '[/quote]';
         } else if (n.nodeName == 'DIV' && n.className == 'quoted' && site_url.match(/digitalcore/)) {
             n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
-        } else if (n.nodeName == 'B') {
+        } else if (n.nodeName == 'B' || n.nodeName == 'STRONG') { //mod by kim.wu
             n.innerHTML = '[b]' + n.innerHTML + '[/b]';
         } else if (n.nodeName == 'DIV' && site_url.match(/npupt/) && n.className == 'well small') {
             n.innerHTML = '';
