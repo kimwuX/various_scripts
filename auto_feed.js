@@ -11411,6 +11411,15 @@ function auto_feed() {
         feedback.style.color = 'DarkOrange';
         forward_r.appendChild(feedback);
 
+        //mod by kim.wu
+        forward_r.innerHTML = forward_r.innerHTML + ' | ';
+        var img_host = document.createElement('a');
+        img_host.innerHTML = '图床';
+        img_host.id = 'img_host';
+        img_host.href = 'https://s3.pterclub.com';
+        img_host.target = '_blank';
+        forward_r.appendChild(img_host);
+
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var get_img = document.createElement('a');
         get_img.innerHTML = '提取图片';
