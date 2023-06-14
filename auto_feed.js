@@ -1504,7 +1504,14 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
     } else {
         if (imdbid == '') {
             tmp_search_list = used_search_list.map((e)=> {
-                if (e.match(/imdbid|imdbno/)) {
+                //mod by kim.wu
+                if (e.search(/douban.com/i) > -1) {
+                    e = e.replace('{imdbid}', '{search_name}');
+                } else if (e.search(/totheglory.im/i) > -1) {
+                    e = e.replace('imdb{imdbno}', '{search_name}');
+                } else if (e.indexOf('search={imdbid}&search_area=4') > -1) {
+                    e = e.replace('search={imdbid}&search_area=4', 'search={search_name}&search_area=0');
+                } else if (e.match(/imdbid|imdbno/)) {
                     e = e.replace(/<a/, '<a class="disabled"');
                 }
                 return e;
