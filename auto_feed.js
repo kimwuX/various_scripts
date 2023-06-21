@@ -10985,11 +10985,13 @@ function auto_feed() {
         //----------------------------------------------对国内站点获取的信息进行一些修复-------------------------------------------------------
 
         if (origin_site == 'TTG') {
-            raw_info.small_descr = raw_info.name.split('[')[1].replace(']', '');
             //mod by kim.wu
-            raw_info.small_descr = raw_info.small_descr.replace('「', '[');
-            raw_info.small_descr = raw_info.small_descr.replace('」', ']');
-            raw_info.name = raw_info.name.split('[')[0];
+            if (raw_info.name.indexOf('[') > -1) {
+                raw_info.small_descr = raw_info.name.split('[')[1].replace(']', '');
+                raw_info.small_descr = raw_info.small_descr.replace('「', '[');
+                raw_info.small_descr = raw_info.small_descr.replace('」', ']');
+                raw_info.name = raw_info.name.split('[')[0];
+            }
         }
 
         if (origin_site == 'FRDS') {
@@ -12559,11 +12561,12 @@ function auto_feed() {
         }
 
         //副标题加上原盘版本信息
-        if (check_descr(raw_info.descr) && !raw_info.name.match(/(diy|@|remux)/i) && judge_forward_site_in_domestic(forward_site)){
-            if (blurayVersion(raw_info.name) && raw_info.small_descr.indexOf(blurayVersion(raw_info.name).replace(/【|】/g, '')) < 0){
-                raw_info.small_descr = raw_info.small_descr +'    '+ blurayVersion(raw_info.name);
-            }
-        }
+        //mod by kim.wu
+        // if (check_descr(raw_info.descr) && !raw_info.name.match(/(diy|@|remux)/i) && judge_forward_site_in_domestic(forward_site)){
+        //     if (blurayVersion(raw_info.name) && raw_info.small_descr.indexOf(blurayVersion(raw_info.name).replace(/【|】/g, '')) < 0){
+        //         raw_info.small_descr = raw_info.small_descr +'    '+ blurayVersion(raw_info.name);
+        //     }
+        // }
         if (raw_info.golden_torrent == "true") {
             raw_info.small_descr = raw_info.small_descr +' | '+ 'PTP Golden Popcorn';
         }
