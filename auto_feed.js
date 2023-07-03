@@ -1510,9 +1510,9 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
         if (imdbid == '') {
             tmp_search_list = used_search_list.map((e)=> {
                 //mod by kim.wu
-                if (e.search(/douban.com/i) > -1) {
+                if (e.search(/douban\.com/i) > -1) {
                     e = e.replace('{imdbid}', '{search_name}');
-                } else if (e.search(/totheglory.im/i) > -1) {
+                } else if (e.search(/totheglory\.im/i) > -1) {
                     e = e.replace('imdb{imdbno}', '{search_name}');
                 } else if (e.indexOf('search={imdbid}&search_area=4') > -1) {
                     e = e.replace('search={imdbid}&search_area=4', 'search={search_name}&search_area=0');
@@ -1541,6 +1541,8 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
     } else if ($('.search_urls').length > 2) {
         $('.search_urls').show();
     }
+    //mod by kim.wu
+    search_name = search_name.replace(/\s/g, '+');
     site_search_lists = site_search_lists.format({'imdbid': imdbid, 'imdbno': imdbno, 'search_name': search_name});
     container.append(`${brs}<div ${div_style} class="search_urls"><font size="2px" color=${font_color}>${text}${site_search_lists}</font></div>`);
     container.find('.disabled').attr("disabled",true).click(e=>{
@@ -3149,6 +3151,8 @@ function set_jump_href(raw_info, mode) {
         }
     } else {
         var search_name = get_search_name(raw_info.name);
+        //mod by kim.wu
+        search_name = search_name.replace(/\s/g, '+');
         if (raw_info.url){
             var url = raw_info.url.match(/tt\d+/)[0];
             for (key in used_site_info) {
@@ -3187,6 +3191,8 @@ function set_jump_href(raw_info, mode) {
                         forward_url = used_site_info[key].url + 'torrents.php?action=advanced&searchstr=&searchtags=&tags_type=1&groupdesc=&imdbid={url}'.format({'url': url});
                     } else if (key == 'HDPost' || key == 'ACM' || key == 'BLU' || key == 'jptv' || key == 'Monika') {
                         forward_url = used_site_info[key].url + 'torrents?imdbId={imdbid}#page/1'.format({'imdbid': url});
+                    } else if (key == 'BTSchool') {//mod by kim.wu
+                        forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={name}&search_area=0&search_mode=0'.format({'name': search_name});
                     } else {
                         forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={url}&search_area=4&search_mode=0'.format({'url': url});
                     }
@@ -3280,7 +3286,8 @@ function get_search_name(name) {
     }
     search_name = search_name.replace(/repack|Extended|cut/ig, '');
     search_name = search_name.split(/aka/i)[0];
-    return search_name;
+    //mod by kim.wu
+    return search_name.trim();
 }
 
 function getJson(url, meta, callback) {
