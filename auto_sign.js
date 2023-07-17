@@ -17,7 +17,7 @@
 // @match       *://hdzone.me/*
 // @match       *://hddisk.life/*
 // @match       *://discfan.net/*
-// @match       *://www.hdarea.co/*
+// @match       *://hdarea.club/*
 // @match       *://hdcity.city/*
 // @match       *://dhcmusic.xyz/*
 // @match       *://totheglory.im/*
