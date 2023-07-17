@@ -858,7 +858,7 @@ const default_site_info = {
     'HaiDan': {'url': 'https://www.haidan.video/', 'enable': 1},
     'HaresClub': {'url': 'https://club.hares.top/', 'enable': 1},
     'HD4FANS': {'url': 'https://pt.hd4fans.org/', 'enable': 1},
-    'HDArea': {'url': 'https://www.hdarea.club/', 'enable': 1},
+    'HDArea': {'url': 'https://hdarea.club/', 'enable': 1},
     'HDAtmos': {'url': 'https://hdatmos.club/', 'enable': 1},
     'HDB': {'url': 'https://hdbits.org/', 'enable': 1},
     'HDChina': {'url': "https://hdchina.org/", 'enable': 1},
@@ -1477,7 +1477,8 @@ function pix_send_images(urls) {
 
 //添加搜索框架，可以自行添加或者注释站点
 function add_search_urls(container, imdbid, imdbno, search_name, mode) {
-    var div_style = 'align="center" style="border: 1px solid blue;"';
+    //mod by kim.wu
+    var div_style = 'style="border: 1px solid blue;"';
     var text = '快速搜索：';
     var brs = '</br></br>';
     var font_color = 'red';
@@ -5509,7 +5510,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             });
 
             if (used_signin_sites.indexOf('HDArea') > -1) {
-                postData('https://www.hdarea.club/sign_in.php', encodeURI('action=sign_in'), function(data){
+                postData('https://hdarea.club/sign_in.php', encodeURI('action=sign_in'), function(data){
                     if (data.match(/该页面必须在登录后才能访问/)) {
                         console.log(`开始签到HDArea：`, '失败，请重新登录！！！');
                         $(`input[kname=HDArea]`).parent().find('a').css({"color": "blue"});
