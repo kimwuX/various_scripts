@@ -5510,7 +5510,8 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             });
 
             if (used_signin_sites.indexOf('HDArea') > -1) {
-                postData('https://hdarea.club/sign_in.php', encodeURI('action=sign_in'), function(data){
+                //mod by kim.wu
+                postData(used_site_info['HDArea'].url + 'sign_in.php', encodeURI('action=sign_in'), function(data){
                     if (data.match(/该页面必须在登录后才能访问/)) {
                         console.log(`开始签到HDArea：`, '失败，请重新登录！！！');
                         $(`input[kname=HDArea]`).parent().find('a').css({"color": "blue"});
@@ -11560,7 +11561,8 @@ function auto_feed() {
             if (raw_info.name.match(/CHD|SGNB|STBOX|ONEHD|BLUCOOK|HQC|GBT|KAN|PLP/i)){
                 if (raw_info.url) {
                     $('#top').append(`<br><b><span id="checking"><font color="red">[禁转判断中……]</font></span></b>`);
-                    var check_url = 'https://chdbits.co/torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={imdbid}&search_area=4&search_mode=0';
+                    //mod by kim.wu
+                    var check_url = used_site_info[origin_site].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={imdbid}&search_area=4&search_mode=0';
                     var imdbid = raw_info.url.match(/tt\d+/)[0];
                     check_url = check_url.format({'imdbid': imdbid});
                     getDoc(check_url, null, function(doc){
@@ -11590,7 +11592,8 @@ function auto_feed() {
         } else if (origin_site == 'FRDS') {
             if (raw_info.url) {
                 $('#top').append(`<br><b><span id="checking"><font color="red">[禁转判断中……]</font></span></b>`);
-                var check_url = 'https://pt.keepfrds.com/torrents.php?incldead=1&spstate=0&inclbookmarked=0&search={imdbid}&search_area=4&search_mode=0';
+                //mod by kim.wu
+                var check_url = used_site_info[origin_site].url + 'torrents.php?incldead=1&spstate=0&inclbookmarked=0&search={imdbid}&search_area=4&search_mode=0';
                 var imdbid = raw_info.url.match(/tt\d+/)[0];
                 check_url = check_url.format({'imdbid': imdbid});
                 getDoc(check_url, null, function(doc){
