@@ -1085,6 +1085,8 @@ const reg_team_name = {
     'PuTao': /-putao/i,
     'NanYang': /-nytv/i,
     'TLFbits': /-tlf/i,
+    //mod by kim.wu
+    'HDArea': /-(HDA|.*@HDArea|EPiC)/i,
     'HDDolby': /-DBTV|-QHstudIo|Dream$|.*@dream/i,
     'FRDS': /-FRDS|@FRDS/i,
     'BeiTai': /-BeiTai/i,
@@ -11949,10 +11951,35 @@ function auto_feed() {
                         e.preventDefault();
                         return;
                     }
-                }else if (this.id == 'OurBits' && (raw_info.medium_sel == 'Remux' || raw_info.name.medium_sel() == 'Remux')) {
+                } else if (this.id == 'OurBits' && (raw_info.medium_sel == 'Remux' || raw_info.name.medium_sel() == 'Remux')) {
                     e.preventDefault();
                     alert('该站禁止Remux资源转发！');
                     return;
+                }
+                //mod by kim.wu
+                else if (raw_info.name.match(reg_team_name.HDHome)) {
+                    if (['PThome'].indexOf(this.id) > -1) {
+                        alert('HDHome资源禁转到PTHome！！！');
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (raw_info.name.match(reg_team_name.BeiTai) || raw_info.name.match(/(CnSCG|SmY|SeeHD|VeryPSP|DWR|XLMV|XJCTV|NSBC|Bitstv|Seeweb)$/i)) {
+                    if (['CMCT'].indexOf(this.id) > -1) {
+                        alert('该资源禁转到SSD！！！');
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (raw_info.name.match(reg_team_name.HDArea) || raw_info.name.match(/(SeeHD|HQC|WEBHD|ViPHD|NSBC|Xiaomi|BitsTV)$/i)) {
+                    if (['HDChina'].indexOf(this.id) > -1) {
+                        alert('该资源禁转到HDChina！！！');
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (raw_info.name.match(/(FGT|Mp4Ba|RARBG])$/i)) {
+                    if (!confirm('部分站点禁止发布该制作小组资源，确定转发？')) {
+                        e.preventDefault();
+                        return;
+                    }
                 }
                 //判断是否禁止转载，如果确认之后也可以转载
                 if (if_exclusive) {
