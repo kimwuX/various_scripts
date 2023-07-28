@@ -1735,7 +1735,13 @@ function walkDOM(n) {
                     raw_info.descr = raw_info.descr + '[img]' + n.src + '[/img]';
                 }
             } else {
-                raw_info.descr = raw_info.descr + '[img]' + n.src + '[/img]';
+                //mod by kim.wu
+                var m = n.src.match(/imgproxy\.pterclub\.com\/douban\/\?t=/i);
+                if (m) {
+                    raw_info.descr = raw_info.descr + '[img]' + n.src.slice(m.index + m[0].length) + '[/img]';
+                } else {
+                    raw_info.descr = raw_info.descr + '[img]' + n.src + '[/img]';
+                }
             }
         } else if (n.nodeName=='DIV' && site_url.match(/pthome|audiences/i) && n.className == 'codemain') {
             if (raw_info.name.match(/-ADE|-ADWeb/) && raw_info.descr.match(/General/)) {
@@ -11957,7 +11963,7 @@ function auto_feed() {
                     return;
                 }
                 //mod by kim.wu
-                else if (raw_info.name.match(/(FGT|Mp4Ba|RARBG)$/i)) {
+                else if (raw_info.name.match(/FGT$|Mp4Ba|RARBG/i)) {
                     if (!confirm('部分站点禁止发布该小组资源，确定转发？')) {
                         e.preventDefault();
                         return;
@@ -11976,7 +11982,7 @@ function auto_feed() {
                         return;
                     }
                 } else if (this.id == 'CMCT') {
-                    if (raw_info.name.match(reg_team_name.BeiTai) || raw_info.name.match(/(CnSCG|SmY|SeeHD|VeryPSP|DWR|XLMV|XJCTV|NSBC|Bitstv|Seeweb)$/i)) {
+                    if (raw_info.name.match(reg_team_name.BeiTai) || raw_info.name.match(/(CnSCG|SmY|SeeHD|VeryPSP|DWR|XLMV|XJCTV|NSBC|BitsTV|SeeWEB)$/i)) {
                         alert('触发禁转规则！');
                         e.preventDefault();
                         return;
@@ -13975,6 +13981,8 @@ function auto_feed() {
         try{
             if (forward_site == 'CHDBits') {
                 torrent_box.parentNode.innerHTML = '<input type="file" class="file" id="torrent" name="torrentfile" accept=".torrent">';
+                //mod by kim.wu
+                $('select[name=offer]').removeAttr("onchange");
             } else if (forward_site == 'HDCity' || forward_site == 'HDSpace') {
 
             } else if (forward_site == 'BHD') {

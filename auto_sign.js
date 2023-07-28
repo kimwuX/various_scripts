@@ -37,6 +37,7 @@
 // @match       *://audiences.me/*
 // @match       *://tjupt.org/*
 // @match       *://www.tjupt.org/*
+// @match       *://rousi.zip/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
