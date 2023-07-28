@@ -11957,26 +11957,33 @@ function auto_feed() {
                     return;
                 }
                 //mod by kim.wu
-                else if (raw_info.name.match(reg_team_name.HDHome)) {
-                    if (['PThome'].indexOf(this.id) > -1) {
-                        alert('HDHome资源禁转到PTHome！！！');
+                else if (raw_info.name.match(/(FGT|Mp4Ba|RARBG)$/i)) {
+                    if (!confirm('部分站点禁止发布该小组资源，确定转发？')) {
                         e.preventDefault();
                         return;
                     }
-                } else if (raw_info.name.match(reg_team_name.BeiTai) || raw_info.name.match(/(CnSCG|SmY|SeeHD|VeryPSP|DWR|XLMV|XJCTV|NSBC|Bitstv|Seeweb)$/i)) {
-                    if (['CMCT'].indexOf(this.id) > -1) {
-                        alert('该资源禁转到SSD！！！');
+                } else if (this.id == 'Audiences') {
+                    if (raw_info.name.match(/Hao4K/i)) {
+                        alert('触发禁转规则！');
                         e.preventDefault();
                         return;
                     }
-                } else if (raw_info.name.match(reg_team_name.HDArea) || raw_info.name.match(/(SeeHD|HQC|WEBHD|ViPHD|NSBC|Xiaomi|BitsTV)$/i)) {
-                    if (['HDChina'].indexOf(this.id) > -1) {
-                        alert('该资源禁转到HDChina！！！');
+                }
+                else if (this.id == 'PThome') {
+                    if (raw_info.name.match(reg_team_name.HDHome)) {
+                        alert('触发禁转规则！');
                         e.preventDefault();
                         return;
                     }
-                } else if (raw_info.name.match(/(FGT|Mp4Ba|RARBG])$/i)) {
-                    if (!confirm('部分站点禁止发布该制作小组资源，确定转发？')) {
+                } else if (this.id == 'CMCT') {
+                    if (raw_info.name.match(reg_team_name.BeiTai) || raw_info.name.match(/(CnSCG|SmY|SeeHD|VeryPSP|DWR|XLMV|XJCTV|NSBC|Bitstv|Seeweb)$/i)) {
+                        alert('触发禁转规则！');
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (this.id == 'HDChina') {
+                    if (raw_info.name.match(reg_team_name.HDArea) || raw_info.name.match(/(SeeHD|HQC|WEBHD|ViPHD|NSBC|Xiaomi|BitsTV)$/i)) {
+                        alert('触发禁转规则！');
                         e.preventDefault();
                         return;
                     }
