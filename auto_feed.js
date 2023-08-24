@@ -1736,7 +1736,7 @@ function walkDOM(n) {
                 }
             } else {
                 //mod by kim.wu
-                var m = n.src.match(/imgproxy\.pterclub\.com\/douban\/\?t=/i);
+                var m = n.src.match(/imgproxy\.pterclub\.com\/douban\/\?t=|dbimg\.audiences\.me\/\?/i);
                 if (m) {
                     raw_info.descr = raw_info.descr + '[img]' + n.src.slice(m.index + m[0].length) + '[/img]';
                 } else {
@@ -11965,6 +11965,12 @@ function auto_feed() {
                 //mod by kim.wu
                 else if (raw_info.name.match(/FGT$|Mp4Ba|RARBG/i)) {
                     if (!confirm('部分站点禁止发布该小组资源，确定转发？')) {
+                        e.preventDefault();
+                        return;
+                    }
+                } else if (raw_info.name.match(/Pete@HDSky/i)) {
+                    if (this.id == 'CHDBits' || this.id == 'OurBits') {
+                        alert('此站点禁止发布该小组资源！');
                         e.preventDefault();
                         return;
                     }
