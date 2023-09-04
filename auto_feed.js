@@ -11384,12 +11384,20 @@ function auto_feed() {
 
         //mod by kim.wu
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
-        var img_host = document.createElement('a');
-        img_host.innerHTML = '图床';
-        img_host.id = 'img_host';
-        img_host.href = 'https://s3.pterclub.com';
-        img_host.target = '_blank';
-        forward_r.appendChild(img_host);
+        var img_host1 = document.createElement('a');
+        img_host1.innerHTML = '图床1';
+        img_host1.id = 'img_host1';
+        img_host1.href = 'https://s3.pterclub.com';
+        img_host1.target = '_blank';
+        forward_r.appendChild(img_host1);
+        
+        forward_r.innerHTML = forward_r.innerHTML + ' | ';
+        var img_host2 = document.createElement('a');
+        img_host2.innerHTML = '图床2';
+        img_host2.id = 'img_host2';
+        img_host2.href = 'https://www.picgo.net/';
+        img_host2.target = '_blank';
+        forward_r.appendChild(img_host2);
 
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var get_img = document.createElement('a');

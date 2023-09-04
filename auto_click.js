@@ -1,12 +1,11 @@
 // ==UserScript==
-// @name         自动点击
+// @name         自动点击按钮
 // @namespace    http://www.kimwu.com/
 // @version      1.0
-// @description  自动点击兑换按钮
+// @description  自动点击按钮
 // @author       kim.wu
-// @match        https://pt.hd4fans.org/mybonus.php*
+// @match        https://www.baidu.com/*
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=baidu.com
 // @run-at       document-end
 // ==/UserScript==
 
@@ -14,13 +13,15 @@
 
     setTimeout(function() {
 
-        let res = $('input[name="submit"]:eq(2)');
-        //let res = $('input[name="submit"]:eq(-2)');
-
-        if (res && !res.prop("disabled") && res.length > 0) {
-            console.log(res[0]);
-            //res[0].click();
+        if ($("input[value='放弃考核']").length > 0) {
+            $("input[value='放弃考核']")[0].click();
         }
-    }, 1000);
+        else if ($("a:contains('这里')").length > 0) {
+            $("a:contains('这里')")[0].click();
+        }
+        else if ($("a:contains('返回上一页')").length > 0) {
+            $("a:contains('返回上一页')")[0].click();
+        }
+    }, 1000 + Math.random() * 2000);
 
   })();
