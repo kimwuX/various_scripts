@@ -10143,7 +10143,8 @@ function auto_feed() {
                         }
                     });
                 }
-                raw_info.descr = '[quote]转自U2, 对原作者表示感谢[/quote]\n\n' + raw_info.descr;
+                //mod by kim.wu
+                raw_info.descr = thanks_str.format({'site': origin_site, 'descr': raw_info.descr});
             }
 
             raw_info.small_descr += ' ' + raw_info.animate_info.match(/\[.*?\]/g)[0].replace(/\[|\]/g, '');
@@ -16510,13 +16511,19 @@ function auto_feed() {
                     //中文译名填写
                     try {
                         if (raw_info.source_sel == '大陆') {
-                            vidoename = raw_info.descr.match(/片.*?名([^\r\n]+)/)[1];
+                            //mod by kim.wu
+                            vidoename = raw_info.descr.match(/片.*?名：?([^\r\n]+)/)[1];
                         } else {
-                            vidoename = raw_info.descr.match(/译.*?名([^\r\n]+)/)[1];
+                            //mod by kim.wu
+                            vidoename = raw_info.descr.match(/译.*?名：?([^\r\n]+)/)[1];
                         }
                         videoname = vidoename.trim(); //去除首尾空格
                         cname_box = document.getElementById('cname');
                         cname_box.value = videoname.split('/')[0].trim();
+                        
+                        //mod by kim.wu
+                        var desc_box = document.getElementsByName('small_descr')[0];
+                        desc_box.value = desc_box.value.replace(cname_box.value, '').replace(/^[\s\/\|]+/g, '');
                     } catch (Err) {}
 
                     //英文名填写
@@ -16526,7 +16533,8 @@ function auto_feed() {
                     //地区填写，针对电影
                     if (raw_info.type == '电影' || raw_info.type == '综艺'){
                         district_box = document.getElementById('district');
-                        district = raw_info.descr.match(/(地.{0,5}?区|国.{0,5}?家|产.{0,5}?地)([^\r\n]+)/);
+                        //mod by kim.wu
+                        district = raw_info.descr.match(/(地.{0,5}?区|国.{0,5}?家|产.{0,5}?地)：?([^\r\n]+)/);
                         if (district) {
                             district = district[2];
                             district = district.trim().replace(/ /g, ''); //去除首尾空格
@@ -16568,7 +16576,8 @@ function auto_feed() {
                             document.getElementsByName('subsinfo')[0].options[2].selected=true;
                         }
                         //语言
-                        language = raw_info.descr.match(/语.{0,5}?言([^\r\n]+)/);
+                        //mod by kim.wu
+                        language = raw_info.descr.match(/语.{0,5}?言：?([^\r\n]+)/);
                         if (language) {
                             language = language[1];
                             language = language.trim(); //去除首尾空格
@@ -16601,7 +16610,8 @@ function auto_feed() {
                         }
 
                         //语言
-                        language = raw_info.descr.match(/语.{0,5}?言([^\r\n]+)/);
+                        //mod by kim.wu
+                        language = raw_info.descr.match(/语.{0,5}?言：?([^\r\n]+)/);
                         if (language) {
                             language = language[1];
                             language = language.trim(); //去除首尾空格
