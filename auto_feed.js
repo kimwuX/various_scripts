@@ -7881,21 +7881,22 @@ function auto_feed() {
             descr = descr.cloneNode(true);
 
             try{
-                var codemain = descr.getElementsByClassName('codemain');
-                var codetop = descr.getElementsByClassName('codetop');
-                if (codetop.length > 0) {
-                    try{descr.removeChild(codetop[0]);} catch(err){codetop[0].parentNode.removeChild(codetop[0])}
-                }
-                if (codemain.length>0) {
-                    codemain[0].innerHTML = '[quote]{mediainfo}[/quote]'.format({ 'mediainfo': codemain[0].innerHTML });
-                }
+                //mod by kim.wu
+                Array.from(descr.getElementsByClassName('codetop')).forEach(el => {
+                    el.parentNode.removeChild(el);
+                });
+                Array.from(descr.getElementsByClassName('codemain')).forEach(el => {
+                    el.innerHTML = '[quote]{mediainfo}[/quote]'.format({ 'mediainfo': el.innerHTML });
+                });
 
-                if ((origin_site == 'PTer' || origin_site == 'FRDS' || origin_site == 'Audiences') && descr.getElementsByTagName('table')[0]){
-                    var descr_table = descr.getElementsByTagName('table')[0];
-                    if (descr_table.textContent.match(/general/i)){
-                        descr_table.parentNode.removeChild(descr_table);
-                        raw_info.full_mediainfo = $('div.codemain:contains("General"):first').text();
-                    }
+                //mod by kim.wu
+                if (origin_site == 'PTer' || origin_site == 'FRDS' || origin_site == 'Audiences') {
+                    Array.from(descr.getElementsByTagName('table')).forEach(el => {
+                        if (el.textContent.match(/General/i)){
+                            el.parentNode.removeChild(el);
+                        }
+                    });
+                    raw_info.full_mediainfo = $('div.codemain:contains("General"):first').text();
                 }
             }catch(err){
                 console.log(err);
@@ -11383,8 +11384,11 @@ function auto_feed() {
 
         raw_info.descr = raw_info.descr.replace(/\n\n+/g, '\n\n').replace('https://dbimg.audiences.me/?', '').replace('https://imgproxy.pterclub.com/douban/?t=', '');
 
-        console.log(raw_info.torrent_name);
-        console.log(raw_info.torrent_url);
+        //test by kim.wu
+        //console.log(raw_info);
+        //console.log(raw_info.descr);
+        //console.log(raw_info.torrent_name);
+        //console.log(raw_info.torrent_url);
         //获取跳转的字符串
         var jump_str = dictToString(raw_info);
 
@@ -12742,6 +12746,10 @@ function auto_feed() {
             }
         }
 
+        //test by kim.wu
+        //console.log(raw_info);
+        //console.log(raw_info.descr);
+
         if (forward_site == "HDSky") {
             var tmp_small_descr = raw_info.small_descr.split('| 类别：');
             if (tmp_small_descr.length == 1) {
@@ -13728,10 +13736,10 @@ function auto_feed() {
                 if (forward_site == 'PTer') {
                     try{
                         raw_info.descr.match(/\[quote\][\s\S]*?\[\/quote\]/g).map((e)=> {
-                            if (e.match(/General.{0,2}\nUnique/)) {
+                            if (e.match(/General\s+(?!Information)/)) { //mod by kim.wu
                                 var ee = e.replace('[quote]', '[hide=mediainfo]').replace('[/quote]', '[/hide]');
                                 raw_info.descr = raw_info.descr.replace(e, ee);
-                            } else if (e.match(/Disc Title|Disc Info/)) {
+                            } else if (e.match(/Disc Title|Disc Label|Disc Info/)) { //mod by kim.wu
                                 var ee = e.replace('[quote]', '[hide=bdinfo]').replace('[/quote]', '[/hide]');
                                 raw_info.descr = raw_info.descr.replace(e, ee);
                             }
@@ -13740,7 +13748,7 @@ function auto_feed() {
                 } else if (forward_site == 'Audiences') {
                     try{
                         raw_info.descr.match(/\[quote\][\s\S]*?\[\/quote\]/g).map((e)=> {
-                            if (e.match(/General.{0,2}\nUnique|Disc Title|Disc Info/)) {
+                            if (e.match(/General\s+(?!Information)|Disc Title|Disc Label|Disc Info/)) { //mod by kim.wu
                                 var ee = e.replace('[quote]', '[Mediainfo]').replace('[/quote]', '[/Mediainfo]');
                                 raw_info.descr = raw_info.descr.replace(e, ee);
                             }
@@ -14459,6 +14467,11 @@ function auto_feed() {
                 var index = processing_dict[raw_info.source_sel];
                 processing_box.val(index);
             }
+
+            //mod by kim.wu
+            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
+                $('select[name="team_sel"]').val(8);
+            }
         }
 
         else if (forward_site == 'CMCT'){
@@ -14470,8 +14483,9 @@ function auto_feed() {
                 browsecat.val(index);
             }
 
-            if (raw_info.type == '剧集') {
-                if (raw_info.name.match(/S\d+[^E]/i)) {
+            //mod by kim.wu
+            if (['剧集', '动漫', '纪录'].indexOf(raw_info.type) != -1) {
+                if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                     $('input[name="pack"]').attr('checked', true);
                 }
             }
@@ -14555,8 +14569,9 @@ function auto_feed() {
 
             var pic_str = raw_info.imgs_cmct ? raw_info.imgs_cmct: cmctimgs;
             pic_info = '';
-            pic_str.match(/\[img\]http[^\[\]]*?(jpg|png|webp|jpeg)/g).forEach((item)=>{
-                item = item.replace(/\[.*\]/g, '');
+            //mod by kim.wu
+            pic_str.match(/\[img\]http.*?\[\/img\]/g).forEach((item)=>{
+                item = item.replace(/\[.*?\]/g, '');
                 if (item.match(/imgbox/)) {
                     pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
                 } else if (item.match(/pixhost/)) {
@@ -14847,27 +14862,32 @@ function auto_feed() {
                     switch (raw_info.source_sel){
                         case '大陆': case '台湾': case '香港': case '港台':
                             //是否合集
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i) && (!raw_info.name.match(/E\d{2,3}/i))) {
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 browsecat.val(90);
                             } else {
                                 if (raw_info.standard_sel == '720p'){
                                     browsecat.val(76);
                                 } else if (raw_info.standard_sel == '1080p' || raw_info.standard_sel == '1080i'){
                                     browsecat.val(75);
+                                } else if (raw_info.standard_sel == '4K'){ //mod by kim.wu
+                                    browsecat.val(108);
                                 }
                             }
 
                             break;
 
                         case '日本':
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i)) {
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 browsecat.val(88);
                             } else {
                                 browsecat.val(73);
                             }
                             break;
                         case '韩国':
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i)) {
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 browsecat.val(99);
                             } else {
                                 browsecat.val(74);
@@ -14875,20 +14895,24 @@ function auto_feed() {
                             break;
 
                         case '欧美':
-                            if (raw_info.name.match(/(S\d{2}E\d{2})/i)) {
+                            //mod by kim.wu
+                            if (!(raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/))) {
                                 if (raw_info.standard_sel == '720p'){
                                     browsecat.val(69);
                                 } else if (raw_info.standard_sel == '1080p' || raw_info.standard_sel == '1080i'){
                                     browsecat.val(70);
+                                } else if (raw_info.standard_sel == '4K'){ //mod by kim.wu
+                                    browsecat.val(108);
                                 }
                             } else {
                                 browsecat.val(87);
                             }
                             break;
                     }
-                    if (raw_info.standard_sel == '4K'){
-                        browsecat.val(108);
-                    }
+                    //mod by kim.wu
+                    //if (raw_info.standard_sel == '4K'){
+                    //    browsecat.val(108);
+                    //}
                     break;
                 case '综艺':
                     if (raw_info.source_sel == '日本'){
@@ -14900,7 +14924,14 @@ function auto_feed() {
                     }
                     break;
 
-                case '动漫': browsecat.val(58); break;
+                //mod by kim.wu
+                case '动漫':
+                    if (raw_info.medium_sel == 'Blu-ray' || raw_info.medium_sel == 'UHD') {
+                        browsecat.val(111);
+                    } else {
+                        browsecat.val(58);
+                    }
+                    break;
                 case '音乐': browsecat.val(83); break;
                 case 'MV': browsecat.val(59); break;
                 case '体育': browsecat.val(57); break;
@@ -14927,7 +14958,8 @@ function auto_feed() {
                     }
                     break;
                 case '剧集':
-                    if (raw_info.name.match(/(S\d{2}[^E]|complete)/i) && !raw_info.name.match(/E\d+/)){
+                    //mod by kim.wu
+                    if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                         browsecat.val(405);
                     } else {
                         browsecat.val(412);
@@ -15040,7 +15072,8 @@ function auto_feed() {
                     switch (raw_info.source_sel){
                         case '大陆': case '台湾': case '香港': case '港台':
                             //是否合集
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i) && (!raw_info.name.match(/E\d{2,3}/i))) { //合集
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 $('#browsecat').val('22');
                             } else {
                                 $('#browsecat').val('25');
@@ -15048,14 +15081,16 @@ function auto_feed() {
                             break;
 
                         case '日本':
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i)) {
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 $('#browsecat').val('23');
                             } else {
                                 $('#browsecat').val('24');
                             }
                             break;
                         case '韩国':
-                            if (raw_info.name.match(/(complete|S\d{2}[^E])/i)) {
+                            //mod by kim.wu
+                            if (raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/)) {
                                 $('#browsecat').val('23');
                             } else {
                                 $('#browsecat').val('24');
@@ -15064,7 +15099,8 @@ function auto_feed() {
 
                         case '欧美':
                             //单集
-                            if (raw_info.name.match(/(S\d{2}E\d{2})/i)) {
+                            //mod by kim.wu
+                            if (!(raw_info.name.match(/\b(Complete|S\d{1,2})\b/i) || raw_info.small_descr.match(/全\d+集/))) {
                                 $('#browsecat').val('13');
                             } else {
                                 $('#browsecat').val('21');
