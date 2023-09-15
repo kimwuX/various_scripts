@@ -1782,16 +1782,17 @@ function walkDOM(n) {
                     raw_info.descr = raw_info.descr + '[img]' + n.src + '[/img]';
                 }
             }
-        } else if (n.nodeName=='DIV' && site_url.match(/pthome|audiences/i) && n.className == 'codemain') {
-            if (raw_info.name.match(/-ADE|-ADWeb/) && raw_info.descr.match(/General/)) {
-                n.innerHTML = '';
-            } else if (n.parentNode.className == 'hide' || site_url.match(/pthome/i)) {
-                if (!n.innerHTML.match(/^\[quote\]/)) {
-                    n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
-                }
-            } else {
-                n.innerHTML = '';
-            }
+        //mod by kim.wu
+        //} else if (n.nodeName=='DIV' && site_url.match(/pthome|audiences/i) && n.className == 'codemain') {
+        //    if (raw_info.name.match(/-ADE|-ADWeb/) && raw_info.descr.match(/General/)) {
+        //        n.innerHTML = '';
+        //    } else if (n.parentNode.className == 'hide' || site_url.match(/pthome/i)) {
+        //        if (!n.innerHTML.match(/^\[quote\]/)) {
+        //            n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
+        //        }
+        //    } else {
+        //        n.innerHTML = '';
+        //    }
         } else if (n.nodeName=='TT' && site_url.match(/cinematik/i)) {
             n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
         } else if (n.nodeName=='TD' && site_url.match(/cinematik/i) && n.style.border == "1px dotted rgb(0, 0, 0)") {
@@ -14614,7 +14615,9 @@ function auto_feed() {
                 descr_box[1].value = descr_box[1].value.substring(0, descr_box[1].value.indexOf('Report created by')); //删除reporty by, cmct媒体信息不支持ReportBy
             }
             //mod by kim.wu
-            descr_box[2].value = raw_info.extra_text;
+            setTimeout(function() {
+                descr_box[2].value = raw_info.extra_text;
+            }, 1000);
             var clear = document.createElement('input');
             clear.type = 'button';
             clear.value = " 清空附加信息 ";
