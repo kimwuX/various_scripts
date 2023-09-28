@@ -1791,17 +1791,15 @@ function walkDOM(n) {
                     raw_info.descr = raw_info.descr + '[img]' + n.src + '[/img]';
                 }
             }
-        //mod by kim.wu
-        //} else if (n.nodeName=='DIV' && site_url.match(/pthome|audiences/i) && n.className == 'codemain') {
-        //    if (raw_info.name.match(/-ADE|-ADWeb/) && raw_info.descr.match(/General/)) {
-        //        n.innerHTML = '';
-        //    } else if (n.parentNode.className == 'hide' || site_url.match(/pthome/i)) {
-        //        if (!n.innerHTML.match(/^\[quote\]/)) {
-        //            n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
-        //        }
-        //    } else {
-        //        n.innerHTML = '';
-        //    }
+        } else if (n.nodeName=='DIV' && site_url.match(/pthome|audiences/i) && n.className == 'codemain') {
+            //mod by kim.wu
+            if (n.parentNode.className == 'show') {
+                n.innerHTML = '';
+            } else if (n.parentNode.className == 'hide' || site_url.match(/pthome/i)) {
+                if (!n.innerHTML.match(/^\[quote\]/)) {
+                    n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
+                }
+            }
         } else if (n.nodeName=='TT' && site_url.match(/cinematik/i)) {
             n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
         } else if (n.nodeName=='TD' && site_url.match(/cinematik/i) && n.style.border == "1px dotted rgb(0, 0, 0)") {
