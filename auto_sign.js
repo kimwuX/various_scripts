@@ -39,6 +39,7 @@
 // @match       *://www.tjupt.org/*
 // @match       *://rousi.zip/*
 // @match       *://ptchdbits.co/*
+// @match       *://ubits.club/*
 // @exclude     */showup.php*
 // @exclude     */bakatest.php*
 // @exclude     */attendance.php*
