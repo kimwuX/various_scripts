@@ -14593,6 +14593,16 @@ function auto_feed() {
                 var index = source_dict[raw_info.source_sel];
                 source_box.val(index);
             }
+            //mod by kim.wu
+            var reg_region = raw_info.descr.match(/(地.{0,5}?区|国.{0,5}?家|产.{0,5}?地)：?([^\r\n]+)/);
+            if (reg_region) {
+                var region = reg_region[2].trim();
+                if (region.match(/^(苏联|俄罗斯|俄国)/)) {
+                    source_box.val(8);
+                } else if (region.match(/^(泰国)/)) {
+                    source_box.val(9);
+                }
+            }
 
             //mod by kim.wu
             //var poster = document.getElementsByName('url_poster')[0];
@@ -16636,7 +16646,8 @@ function auto_feed() {
                             case '韩国':
                                 $('#specificcat5').attr('checked','true'); break;
                             case '欧美':
-                                var reg_region = raw_info.descr.match(/(地.{0,5}?区|国.{0,5}?家|产.{0,5}?地)([^\r\n]+)/);
+                                //mod by kim.wu
+                                var reg_region = raw_info.descr.match(/(地.{0,5}?区|国.{0,5}?家|产.{0,5}?地)：?([^\r\n]+)/);
                                 if (reg_region && reg_region[2].trim().match(/^英国/)) {
                                     $('#specificcat6').attr('checked','true');
                                 } else {
