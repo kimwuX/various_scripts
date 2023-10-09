@@ -15,11 +15,9 @@
 
         if ($("input[value='放弃考核']").length > 0) {
             $("input[value='放弃考核']")[0].click();
-        }
-        else if ($("a:contains('这里')").length > 0) {
+        } else if ($("a:contains('这里')").length > 0) {
             $("a:contains('这里')")[0].click();
-        }
-        else if ($("a:contains('返回上一页')").length > 0) {
+        } else if ($("a:contains('返回上一页')").length > 0) {
             $("a:contains('返回上一页')")[0].click();
         }
     }, 1000 + Math.random() * 2000);

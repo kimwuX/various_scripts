@@ -60,31 +60,44 @@
     }
 
     setTimeout(function() {
-        let site_url = decodeURI(location.href)
 
-        let res
-        if (site_url.search(/haidan\.video/i) != -1) {
-            res = $('#modalBtn').filter(function() {
+        let res, host = location.host
+        if (host.search(/haidan/i) != -1) {
+            res = $('.userinfo #modalBtn').filter(function() {
                 return isSignable($(this).prop('value'))
             })
-        }
-        else {
-            res = $('a').filter(function() {
-                return isSignable($(this).text()) && !/(usercp|details|forums|messages)\.php/i.test($(this).prop('href'))
+        } else if (host.search(/totheglory/i) != -1) {
+            res = $('.bottom a').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else if (host.search(/hdchina/i) != -1) {
+            res = $('.userinfort a').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else if (host.search(/hdcity/i) != -1) {
+            res = $('.button-group a').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else {
+            res = $('#info_block a').filter(function() {
+                return isSignable($(this).text())// && !/(usercp|details|forums|messages)\.php/i.test($(this).prop('href'))
             })
         }
 
         if (res && res.length > 0) {
-            let t1 = new Date()
-            let v1 = GM_getValue(location.host)
-            if (!v1 || new Date(v1).toDateString() != t1.toDateString()) {
+            //console.log(res[0])
+            if (host.search(/ptchdbits/i) != -1) {
+                let t1 = new Date()
+                let v1 = GM_getValue(host)
+                if (!v1 || new Date(v1).toDateString() != t1.toDateString()) {
+                    res[0].click()
+                    GM_setValue(host, t1.toDateString())
+                    console.log(t1.toLocaleTimeString() + ' Signed.')
+                } else {
+                    console.log("Aleady Signed.")
+                }
+            } else {
                 res[0].click()
-                //console.log(res[0])
-                GM_setValue(location.host, t1.toDateString())
-                console.log(t1.toLocaleDateString() + ' Signed.')
-            }
-            else {
-                console.log("Aleady Signed.")
             }
         }
     }, 1000)
