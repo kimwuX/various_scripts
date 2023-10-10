@@ -56,23 +56,27 @@
 (function () {
 
     function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡/.test(str) && !/已|成功|查看|記錄/.test(str)
+        return /签\s*到|簽\s*到|打\s*卡/.test(str) && !/已|获得|成功|查看|記錄/.test(str)
     }
 
     setTimeout(function() {
 
         let res, host = location.host
-        if (host.search(/haidan/i) != -1) {
-            res = $('.userinfo #modalBtn').filter(function() {
-                return isSignable($(this).prop('value'))
-            })
-        } else if (host.search(/totheglory/i) != -1) {
+        if (host.search(/totheglory/i) != -1) {
             res = $('.bottom a').filter(function() {
                 return isSignable($(this).text())
             })
         } else if (host.search(/hdchina/i) != -1) {
             res = $('.userinfort a').filter(function() {
                 return isSignable($(this).text())
+            })
+        } else if (host.search(/btschool/i) != -1) {
+            res = $('.outer>p a').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else if (host.search(/haidan/i) != -1) {
+            res = $('.userinfo #modalBtn').filter(function() {
+                return isSignable($(this).prop('value'))
             })
         } else if (host.search(/hdcity/i) != -1) {
             res = $('.button-group a').filter(function() {
