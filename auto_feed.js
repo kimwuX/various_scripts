@@ -3383,7 +3383,8 @@ function get_search_name(name) {
             search_name = name.split(name.match(/(19|20)\d{2}/g).pop())[0];
         }
     }
-    search_name = search_name.replace(/repack|Extended|cut/ig, '');
+    //mod by kim.wu
+    search_name = search_name.replace(/\b(repack|Extended|cut)\b/ig, '');
     search_name = search_name.split(/aka/i)[0];
     //mod by kim.wu
     return search_name.trim();
@@ -11640,23 +11641,6 @@ function auto_feed() {
         feedback.style.color = 'DarkOrange';
         forward_r.appendChild(feedback);
 
-        //mod by kim.wu
-        forward_r.innerHTML = forward_r.innerHTML + ' | ';
-        var img_host1 = document.createElement('a');
-        img_host1.innerHTML = '图床1';
-        img_host1.id = 'img_host1';
-        img_host1.href = 'https://s3.pterclub.com';
-        img_host1.target = '_blank';
-        forward_r.appendChild(img_host1);
-        
-        forward_r.innerHTML = forward_r.innerHTML + ' | ';
-        var img_host2 = document.createElement('a');
-        img_host2.innerHTML = '图床2';
-        img_host2.id = 'img_host2';
-        img_host2.href = 'https://www.picgo.net/';
-        img_host2.target = '_blank';
-        forward_r.appendChild(img_host2);
-
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var get_img = document.createElement('a');
         get_img.innerHTML = '提取图片';
@@ -11664,6 +11648,31 @@ function auto_feed() {
         get_img.href = used_setting_host_list[setting_host] + '#dealimg';
         get_img.target = '_blank';
         forward_r.appendChild(get_img);
+
+        //mod by kim.wu
+        forward_r.innerHTML = forward_r.innerHTML + ' | ';
+        var img_host1 = document.createElement('a');
+        img_host1.innerHTML = 'ImgBB';
+        img_host1.id = 'img_host1';
+        img_host1.href = 'https://imgbb.com/';
+        img_host1.target = '_blank';
+        forward_r.appendChild(img_host1);
+        
+        forward_r.innerHTML = forward_r.innerHTML + ' | ';
+        var img_host2 = document.createElement('a');
+        img_host2.innerHTML = 'imgbox';
+        img_host2.id = 'img_host2';
+        img_host2.href = 'https://imgbox.com/';
+        img_host2.target = '_blank';
+        forward_r.appendChild(img_host2);
+        
+        forward_r.innerHTML = forward_r.innerHTML + ' | ';
+        var img_host3 = document.createElement('a');
+        img_host3.innerHTML = 'PiXhost';
+        img_host3.id = 'img_host3';
+        img_host3.href = 'https://pixhost.to/';
+        img_host3.target = '_blank';
+        forward_r.appendChild(img_host3);
 
         //添加常用链接跳转
         if (used_common_sites.length > 0){
