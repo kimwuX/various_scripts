@@ -15856,7 +15856,8 @@ function auto_feed() {
             } catch (err) {
                 alert(err);
             }
-            $('select[name="source_sel"]').val(7);
+            //mod by kim.wu
+            //$('select[name="source_sel"]').val(7);
             check_team(raw_info, 'team_sel');
         }
 
