@@ -14607,7 +14607,8 @@ function auto_feed() {
             switch (raw_info.codec_sel){
                 case 'H265': case 'X265': codec_box.val(1); break;
                 case 'H264': case 'X264': codec_box.val(2); break;
-                case 'XVID': codec_box.val(3); break;
+                //mod by kim.wu
+                case 'VC-1': codec_box.val(3); break;
                 case 'MPEG-2': case 'MPEG-4': codec_box.val(4);
             }
 
@@ -15415,9 +15416,10 @@ function auto_feed() {
                     case 'APE': audiocodec_box.val(2); break;
                     case 'WAV': audiocodec_box.val(22);
                 }
-                if (raw_info.name.match(/Atmos/i)){
-                    audiocodec_box.val(22);
-                }
+                //mod by kim.wu
+                //if (raw_info.name.match(/Atmos/i)){
+                //    audiocodec_box.val(22);
+                //}
             } else {
                 switch (raw_info.audiocodec_sel){
                     case 'DTS-HD': case 'DTS-HDMA': case 'DTS-HDHR':
