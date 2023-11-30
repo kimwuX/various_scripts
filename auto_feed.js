@@ -2114,7 +2114,7 @@ function deal_with_title(title){
 function deal_with_subtitle(subtitle){
     subtitle = subtitle.replace(/\[checked by.*?\]/gi, '').replace(/autoup/i, '').replace(/ +/, ' ').trim();
     //mod by kim.wu
-    subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
+    //subtitle = subtitle.replace(/^\[(((?!diy).)+)\]/i, "$1 ");
     subtitle = subtitle.replace(/【/g, '[').replace(/】/g, ']');
     subtitle = subtitle.replace(/\s*\/\s*/g, '/');
     return subtitle.trim();
