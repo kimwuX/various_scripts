@@ -1177,7 +1177,7 @@ const reg_team_name = {
     'Agsv': /AGSV(E|WEB|REMUX|Rip|TV|DIY|MUSIC)?$/i,
 };
 //mod by kim.wu
-const thanks_str = "[quote][b][color=Blue]转自{site}，感谢原制作者发布。[/color][/b][/quote]\n\n{descr}";
+const thanks_str = "[quote][b][color=Blue]转载自[i]{site}[/i]，感谢分享。[/color][/b][/quote]\n\n{descr}";
 
 //设置依托界面站点列表
 const setting_host_list = {
@@ -1782,6 +1782,10 @@ function walkDOM(n) {
         } else if (n.nodeName == 'FIELDSET' || n.nodeName == 'BLOCKQUOTE') {
             if (!site_url.match(/hudbt/i) || n.nodeName != 'BLOCKQUOTE'){
                 n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
+            }
+            //mod by kim.wu
+            if (n.nodeName == 'FIELDSET' && n.textContent.match(/感谢原制作者发布|感谢分享/)) {
+                n.innerHTML = '';
             }
             if (n.nodeName == 'FIELDSET' && n.textContent.match(/(温馨提示|郑重声明|您的保种|商业盈利|相关推荐|自动发布|仅供测试宽带|不用保种|本站仅负责连接|感谢发布者|转载请注意礼节)/g)) {
                 n.innerHTML = '';
@@ -10352,14 +10356,18 @@ function auto_feed() {
                     var authors = ['lolihouse', 'jsum','Raws', 'KoushinRip', 'ANK','VCB-Studio', 'VCB','LittlePox', 'LittleBakas','ANE','Reinforce', 'SweetDreamDay','Moozzi2','mawen1250']
                     authors.forEach((item)=>{
                         if (author.match(item)) {
-                            alert(item)
+                            //mod by kim.wu
+                            //alert(item)
                             raw_info.name += `-${author}@U2`;
                         }
                     });
                 }
                 //mod by kim.wu
-                raw_info.descr = thanks_str.format({'site': origin_site, 'descr': raw_info.descr});
+                //raw_info.descr = '[quote]转自U2, 对原作者表示感谢[/quote]\n\n' + raw_info.descr;
             }
+
+            //mod by kim.wu
+            raw_info.descr = "[quote][b][color=Blue]转载自[i]U2[/i]，感谢原发布者分享。[/color][/b][/quote]\n\n" + raw_info.descr;
 
             raw_info.small_descr += ' ' + raw_info.animate_info.match(/\[.*?\]/g)[0].replace(/\[|\]/g, '');
             raw_info.type = '动漫';
@@ -11555,8 +11563,7 @@ function auto_feed() {
                 raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
             }
         }
-        //test by kim.wu
-        //raw_info.descr = raw_info.descr.replace(/\[quote\].*?转自.*?感谢.*?\[\/quote\]/, '');
+        raw_info.descr = raw_info.descr.replace(/\[quote\].*?转自.*?感谢.*?\[\/quote\]/, '');
 
         if (origin_site == 'HaresClub') {
             console.log($('div[class="layui-col-md2 layui-col-sm2 layui-col-xs2"]:first').html())
