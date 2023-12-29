@@ -14990,9 +14990,7 @@ function auto_feed() {
                 descr_box[1].value = descr_box[1].value.substring(0, descr_box[1].value.indexOf('Report created by')); //删除reporty by, cmct媒体信息不支持ReportBy
             }
             //mod by kim.wu
-            setTimeout(function() {
-                descr_box[2].value = raw_info.extra_text;
-            }, 1000);
+            descr_box[3].value = raw_info.extra_text;
             var clear = document.createElement('input');
             clear.type = 'button';
             clear.value = " 清空附加信息 ";
