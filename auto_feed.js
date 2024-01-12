@@ -1600,6 +1600,8 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
                     e = e.replace('{imdbid}', '{search_name}');
                 } else if (e.search(/totheglory\.im/i) > -1) {
                     e = e.replace('imdb{imdbno}', '{search_name}');
+                } else if (e.indexOf('iwannaseethis={imdbid}&search_area=4') > -1) {
+                    e = ereplace('iwannaseethis={imdbid}&search_area=4', 'iwannaseethis={search_name}&search_area=0');
                 } else if (e.indexOf('search={imdbid}&search_area=4') > -1) {
                     e = e.replace('search={imdbid}&search_area=4', 'search={search_name}&search_area=0');
                 } else if (e.match(/imdbid|imdbno/)) {
@@ -3347,7 +3349,9 @@ function set_jump_href(raw_info, mode) {
                         forward_url = used_site_info[key].url + 'torrents.php?action=advanced&searchstr=&searchtags=&tags_type=1&groupdesc=&imdbid={url}'.format({'url': url});
                     } else if (key == 'HDPost' || key == 'ACM' || key == 'BLU' || key == 'JPTV' || key == 'Monika' || key == 'KIMOJI') {
                         forward_url = used_site_info[key].url + 'torrents?imdbId={imdbid}#page/1'.format({'imdbid': url});
-                    } else if (key == 'BTSchool') {//mod by kim.wu
+                    } else if (key == 'HDCity') {//mod by kim.wu
+                        forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&iwannaseethis={url}&search_area=4&search_mode=0'.format({'url': url});
+                    } else if (key == 'BTSchool') {
                         forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={name}&search_area=0&search_mode=0'.format({'name': search_name});
                     } else {
                         forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={url}&search_area=4&search_mode=0'.format({'url': url});
@@ -3397,6 +3401,8 @@ function set_jump_href(raw_info, mode) {
                         forward_url = used_site_info[key].url + 'torrents.php?searchstr={name}&tags_type=0&order=time&sort=desc&group_results=1&cleardefault=Clear+default&action=basic&searchsubmit=1'.format({'name': search_name});
                     } else if (key == 'RED') {
                         forward_url = used_site_info[key].url + 'torrents.php?searchstr={name}'.format({'name': search_name});
+                    } else if (key == 'HDCity') {//mod by kim.wu
+                        forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&iwannaseethis={name}&search_area=0&search_mode=0'.format({'name': search_name});
                     } else {
                         forward_url = used_site_info[key].url + 'torrents.php?incldead=0&spstate=0&inclbookmarked=0&search={name}&search_area=0&search_mode=0'.format({'name': search_name});
                     }
