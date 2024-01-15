@@ -8100,7 +8100,8 @@ function auto_feed() {
                 });
                 var codemain = descr.getElementsByClassName('codemain');
                 Array.from(codemain).map((e, index)=>{
-                    if (!e.innerHTML.match(/<table>/)) {
+                    //mode by kim.wu
+                    if (!(e.parentNode.nodeName == 'FIELDSET' || e.innerHTML.match(/<table>/))) {
                         try{e.innerHTML = '[quote]{mediainfo}[/quote]'.format({ 'mediainfo': e.innerHTML.trim() });} catch(err){}
                     }
                 });
@@ -8118,9 +8119,12 @@ function auto_feed() {
                 console.log(err);
             }
 
-            //mod by kim.wu
-            raw_info.descr = walkDOM(descr).trimStart();
+            raw_info.descr = walkDOM(descr);
             raw_info.descr = raw_info.descr.replace(/\[\/img\]\n\n/g, '[/img]\n');
+            //mod by kim.wu
+            raw_info.descr = raw_info.descr.replace(/\[quote\]\s+/g, '[quote]');
+            raw_info.descr = raw_info.descr.replace(/(\S) *(\[quote\])/g, '$1\n\n$2');
+            raw_info.descr = raw_info.descr.trimStart();
 
             if (origin_site == 'Audiences') {
                 if (raw_info.descr.match(/(\[img\].*?6170004c2ab3f51d91c7782a.*?\[\/img\][\s\S]*?)(\[quote\].*General[\s\S]*?\[\/quote\])/)) {
