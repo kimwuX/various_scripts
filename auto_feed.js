@@ -1184,7 +1184,8 @@ const reg_team_name = {
     'Agsv': /AGSV(E|WEB|REMUX|Rip|TV|DIY|MUS)?$/i,
 };
 //mod by kim.wu
-const thanks_str = "[quote][b][color=Blue]转载自[i]{site}[/i]，感谢分享。[/color][/b][/quote]\n\n{descr}";
+const thanks_str = "[quote][b][color=Blue]转自[i]{site}[/i]，感谢分享。[/color][/b][/quote]\n\n{descr}";
+const thanks_reg = /\[quote\].*?转载?自.+?感谢.*?\[\/quote\]/i;
 
 //设置依托界面站点列表
 const setting_host_list = {
@@ -1794,7 +1795,7 @@ function walkDOM(n) {
                 n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
             }
             //mod by kim.wu
-            if (n.nodeName == 'FIELDSET' && n.textContent.match(/感谢原制作者发布|感谢分享/)) {
+            if (n.nodeName == 'FIELDSET' && n.textContent.match(/感谢原制作者发布/)) {
                 n.innerHTML = '';
             }
             if (n.nodeName == 'FIELDSET' && n.textContent.match(/(温馨提示|郑重声明|您的保种|商业盈利|相关推荐|自动发布|仅供测试宽带|不用保种|本站仅负责连接|感谢发布者|转载请注意礼节)/g)) {
@@ -1808,7 +1809,9 @@ function walkDOM(n) {
             n.nextSibling.innerHTML = '[quote]' + n.nextSibling.innerHTML + '[/quote]';
         } else if (n.nodeName == 'DIV' && n.className == 'quoted' && site_url.match(/digitalcore/)) {
             n.innerHTML = '[quote]' + n.innerHTML + '[/quote]';
-        } else if (n.nodeName == 'B' || n.nodeName == 'STRONG') { //mod by kim.wu
+        } else if (n.nodeName == 'I') { //mod by kim.wu
+            n.innerHTML = '[i]' + n.innerHTML + '[/i]';
+        } else if (n.nodeName == 'B' || n.nodeName == 'STRONG') {
             n.innerHTML = '[b]' + n.innerHTML + '[/b]';
         } else if (n.nodeName == 'DIV' && site_url.match(/npupt/) && n.className == 'well small') {
             n.innerHTML = '';
@@ -8115,7 +8118,8 @@ function auto_feed() {
                 console.log(err);
             }
 
-            raw_info.descr = walkDOM(descr);
+            //mod by kim.wu
+            raw_info.descr = walkDOM(descr).trimStart();
             raw_info.descr = raw_info.descr.replace(/\[\/img\]\n\n/g, '[/img]\n');
 
             if (origin_site == 'Audiences') {
@@ -10463,7 +10467,7 @@ function auto_feed() {
             }
 
             //mod by kim.wu
-            raw_info.descr = "[quote][b][color=Blue]转载自[i]U2[/i]，感谢原发布者分享。[/color][/b][/quote]\n\n" + raw_info.descr;
+            raw_info.descr = thanks_str.format({'site': 'U2', 'descr': raw_info.descr});
 
             raw_info.small_descr += ' ' + raw_info.animate_info.match(/\[.*?\]/g)[0].replace(/\[|\]/g, '');
             raw_info.type = '动漫';
@@ -11700,12 +11704,23 @@ function auto_feed() {
         }
 
         //判断官种表达感谢
-        for (var key in reg_team_name) {
-            if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
-                raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
-            }
-        }
-        raw_info.descr = raw_info.descr.replace(/\[quote\].*?转自.*?感谢.*?\[\/quote\]/, '');
+        //mod by kim.wu
+        //for (var key in reg_team_name) {
+        //    if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
+        //        raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
+        //    }
+        //}
+        //raw_info.descr = raw_info.descr.replace(/\[quote\].*?转自.*?感谢.*?\[\/quote\]/, '');
+        if (raw_info.descr.search(thanks_reg) == -1) {
+            let site = origin_site;
+            for (var key in reg_team_name) {
+                if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
+                    site = key;
+                    break;
+                }
+            } 
+            raw_info.descr = thanks_str.format({'site': site, 'descr': raw_info.descr});
+        } 
 
         if (origin_site == 'HaresClub') {
             console.log($('div[class="layui-col-md2 layui-col-sm2 layui-col-xs2"]:first').html())
