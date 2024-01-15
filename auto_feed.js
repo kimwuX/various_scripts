@@ -88,7 +88,7 @@
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1268106
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      2.0.5.5
+// @version      2.0.5.6
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -284,18 +284,18 @@ function disableother(select,target){
 function get_group_name(name, torrent_info) {
     name = name.replace(/\[.*?\]|web-dl|dts-hd|Blu-ray|MPEG-2|MPEG-4/ig, '');
     name = name.split(/\.mkv|\.mp4|\.iso|\.avi/)[0];
-    if (name.match(/(KJNU|tomorrow505|KG)$/)) {
-        return name.match(/(KJNU|tomorrow505|KG)$/)[1];
+    if (name.match(/(KJNU|tomorrow505|KG|BMDru|BobDobbs|Dusictv|AFKI)$/i)) {
+        return name.match(/(KJNU|tomorrow505|KG|BMDru|BobDobbs|Dusictv|AFKI)$/i)[1];
     }
     try{
         tmp_name = name.match(/-(.*)/)[1].split(/-/).pop();
-        if (tmp_name.match(/x264|x265|h264|h265/i)){
+        if (tmp_name.match(/AC3|[\. ]DD[\. \+p]|AAC|x264|x265|h.264|h.265|NTSC|PAL|DVD9|DVD5/i)){
             if (torrent_info.match(/Scene/)) {
                 name = name.split('-')[0];
             } else {
-                tmp_name = tmp_name.split(/AC3|[\. ]DD[\. \+]|AAC|x264|x265|h264|h265/i);
+                tmp_name = tmp_name.split(/AC3|[\. ]DD[\. \+p]|AAC|x264|x265|h.264|h.265|NTSC|PAL|DVD9|DVD5/i);
                 if (tmp_name.length > 1) {
-                    name = tmp_name[1].replace(/\.| /g, '');
+                    name = tmp_name.pop();
                 } else {
                     name = 'Null';
                 }
@@ -304,23 +304,28 @@ function get_group_name(name, torrent_info) {
             name = tmp_name;
         }
     } catch(err) {
-        name = name.split(/AC3|[\. ]DD[\. \+]|AAC|x264|x265|h264|h265/i);
+        name = name.split(/AC3|[\. ]DD[\. \+p]|AAC|x264|x265|h.264|h.265|NTSC|PAL|DVDRip|DVD9|DVD5/i);
         if (name.length > 1) {
-            name = name[1].replace(/\.| /g, '');
+            name = name.pop();
         } else {
             name = 'Null';
         }
     }
+    name = name.trim();
     if (!name || name.match(/\)|^\d\d/)) name = 'Null';
     if (name == 'Z0N3') name = 'D-Z0N3';
-    if (name.match(/CultFilms/)) name = 'CultFilms';
+    if (name == 'AVC.ZONE') name = 'ZONE';
+    if (name.match(/CultFilms/)) name = 'CultFilms™';
     if (name.match(/™/) && !name.match(/CultFilms/)) {
         name = 'Null';
     }
     if (name.search('.nfo')) {
         name = name.replace('.nfo', '');
     }
-    if (name.length == 1) {
+    if (name.match(/[_\.! ]/) || name.match(/Extras/i)) {
+        name = 'Null';
+    }
+    if (name.length == 1 || name.match(/^\d+$/)) {
         name = 'Null';
     }
     return name;
@@ -819,7 +824,7 @@ if (site_url.match(/^https:\/\/nebulance.io\/torrents.php\?id=\d+#seperator#/)) 
 ********************************************************************************************************************/
 
 //提供可用的获取豆瓣信息两个api，从0-1选择。主要应用于外站，另一个是自动爬取豆瓣页面
-const apis = ['https://api.iyuu.cn/App.Movie.Ptgen', 'https://ptgen.tju.pt/infogen', 'https://hudbt.autofeed.workers.dev/'];
+const apis = ['https://api.iyuu.cn/App.Movie.Ptgen', 'https://ptgen.tju.pt/infogen'];
 var api_chosen = GM_getValue('api_chosen') === undefined ? 3: GM_getValue('api_chosen');
 var imdb2db_chosen = GM_getValue('imdb2db_chosen') === undefined ? 0: GM_getValue('imdb2db_chosen');
 
@@ -2626,16 +2631,14 @@ function get_full_size_picture_urls(raw_info, imgs, container, need_img_label, c
                     item = item.replace('thumbs2', 'images2').replace('t.png', 'o.png');
                 } else if (item.match(/pixhost/)) {
                     item = item.replace('//t', '//img').replace('thumbs', 'images');
-                } else if (item.match(/shewang.net|pterclub.com|beyondhd.co\/images/)) {
+                } else if (item.match(/shewang.net|pterclub.com|img4k.net|img.hdhome.org|img.hdchina.org/)) {
                     item = item.replace(/th.png/, 'png').replace(/md.png/, 'png');
+                } else if (item.match(/beyondhd.co\/(images|cache)/)) {
+                    item = item.replace(/th.png/, 'png').replace(/md.png/, 'png').replace('/t/', '/i/');
                 } else if (item.match(/tu.totheglory.im/)) {
                     item = item.replace(/_thumb.png/, '.png');
-                } else if (item.match(/img.hdchina.org/)) {
-                    item = item.replace(/md.png/, 'png');
                 } else if (item.match(/cinematik/)) {
-                    item = '[img]' + item.replace(/thu/, 'big');
-                } else if (item.match(/img4k.net|img.hdhome.org/)) {
-                    item = item.replace(/md.png/, 'png');
+                    item = item.replace(/thu/, 'big');
                 }
                 if (need_img_label) {
                     img_info += '\n' + `[img]${item}[/img]`;
@@ -2737,7 +2740,7 @@ var skip_img = [
 function get_mediainfo_picture_from_descr(descr){
     var info = {'mediainfo': '', 'pic_info': ''};
     var img_info = '';
-    var cmctinfos = '';
+    var mediainfo = '';
     var img_urls = descr.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/ig);
     var index_of_info = 0;
     if (descr.match(/◎译.{2,10}名|◎片.{2,10}名/)) {
@@ -2754,43 +2757,50 @@ function get_mediainfo_picture_from_descr(descr){
     } catch(err) { img_info = ''; }
     descr = descr + '\n\n' + img_info;
 
-    //获取mediainfo,这里可以扩展匹配不同情形
-    if (descr.match(/DISC INFO:|.MPLS|Video Codec|Disc Label/i)){
-        cmctinfos = descr.match(/\[quote.*?\][\s\S]*?(DISC INFO|.MPLS|Video Codec|Disc Label)[\s\S]*?\[\/quote\]/i)[0];
-    } else if (descr.match(/General|RELEASE.NAME|RELEASE DATE|Unique ID|RESOLUTiON|Bitrate|帧　率|音频码率|视频码率/i)){
-        cmctinfos = descr.match(/\[quote.*?\][\s\S]*?(General|RELEASE.NAME|RELEASE DATE|Unique ID|RESOLUTiON|Bitrate|帧　率|音频码率|视频码率)[\s\S]*?\[\/quote\]/i)[0];
-    }
-    cmctinfos = cmctinfos.replace(/\[quote.*?\]/ig, '[quote]');
-    while (cmctinfos.match(/\[quote\]/i)) {
-        cmctinfos = cmctinfos.slice(cmctinfos.search(/\[quote\]/)+7);
-    }
-    cmctinfos = cmctinfos.replace(/\[\/quote\]/i, '');
-    cmctinfos = cmctinfos.replace(/\[\/?(font|size|quote).{0,80}?\]/ig, '');
-    //获取图片
-
-    cmctimgs = descr.split(/\[\/quote\]/).pop();
-    cmctimgs = cmctimgs.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/g);
     try {
-        if (cmctimgs){
-            cmctimgs = cmctimgs.filter((item)=>{
+        //获取mediainfo,这里可以扩展匹配不同情形
+        if (descr.match(/DISC INFO:|.MPLS|Video Codec|Disc Label/i)){
+            mediainfo = descr.match(/\[quote.*?\][\s\S]*?(DISC INFO|.MPLS|Video Codec|Disc Label)[\s\S]*?\[\/quote\]/i)[0];
+        } else if (descr.match(/General|RELEASE.NAME|RELEASE DATE|Unique ID|RESOLUTiON|Bitrate|帧　率|音频码率|视频码率/i)){
+            mediainfo = descr.match(/\[quote.*?\][\s\S]*?(General|RELEASE.NAME|RELEASE DATE|Unique ID|RESOLUTiON|Bitrate|帧　率|音频码率|视频码率)[\s\S]*?\[\/quote\]/i)[0];
+        }
+    } catch (err) {
+        if (descr.match(/\n.*DISC INFO:[\s\S]*kbps.*/)) {
+            mediainfo = descr.match(/\n.*DISC INFO:[\s\S]*kbps.*/)[0].trim();
+        }
+    }
+
+    mediainfo = mediainfo.replace(/\[quote.*?\]/ig, '[quote]');
+    while (mediainfo.match(/\[quote\]/i)) {
+        mediainfo = mediainfo.slice(mediainfo.search(/\[quote\]/)+7);
+    }
+    mediainfo = mediainfo.replace(/\[\/quote\]/i, '');
+    mediainfo = mediainfo.replace(/\[\/?(font|size|quote).{0,80}?\]/ig, '');
+    //获取图片
+    var imgs = descr.split(/\[\/quote\]/).pop();
+    imgs = imgs.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/g);
+    try {
+        if (imgs){
+            imgs = imgs.filter((item)=>{
                 if (skip_img.indexOf(item) < 0) {
                     return item;
                 }
             }).join(' ');
         } else {
-            cmctimgs = '';
+            imgs = '';
         }
     } catch(err) {
-        cmctimgs = '';
+        imgs = '';
     }
-    info.mediainfo = cmctinfos.trim();
-    info.pic_info = cmctimgs.trim();
+    info.mediainfo = mediainfo.trim();
+    info.pic_info = imgs.trim();
     return info;
 }
 function fill_raw_info(raw_info, forward_site){
 
     raw_info.descr = raw_info.descr.replace(/%3A/g, ':').replace(/%2F/g, "/");
-    raw_info.descr = raw_info.descr.replace('[quote][/quote]', '').replace(/\n\n+/, '\n\n');
+    raw_info.descr = raw_info.descr.replace('[quote][/quote]', '').replace('[b][/b]', '').replace(/\n\n+/, '\n\n');
+    raw_info.descr = raw_info.descr.replace('https://pic.imgdb.cn/item/6170004c2ab3f51d91c77825.png', 'https://img93.pixhost.to/images/86/435614074_c5134549f13c2c087d67c9fa4089c49e-removebg-preview.png');
     //标题肯定都有，副标题可能没有，从简介获取
     if (raw_info.small_descr == ''){
         raw_info.small_descr = get_small_descr_from_descr(raw_info.descr, raw_info.name);
@@ -4565,7 +4575,7 @@ if (site_url.match(/^https?:\/\/passthepopcorn.me\/torrents.php.*/) && extra_set
     const delimiter = ' / ';
     const blockedgroup = 'TBB';
     const moviesearchtitle = 'Browse Torrents ::';
-    const douban_prex = 'https://api.iyuu.cn/ptgen/?imdb=tt';
+    const douban_prex = used_setting_host_list[setting_host] + '#ptgen?tt';
 
     function formatText(str, color){
         var style = [];
@@ -4640,8 +4650,9 @@ if (site_url.match(/^https?:\/\/passthepopcorn.me\/torrents.php.*/) && extra_set
                         url: req,
                         onload: function(res) {
                             var response = JSON.parse(res.responseText);
+                            console.log(response)
                             if (response.length > 0) {
-                                a.href = 'https://api.iyuu.cn/ptgen/?imdb=' + response[0].id;
+                                a.href = used_setting_host_list[setting_host] + '#ptgen?' + response[0].id;
                             } else {
                                 a.href = douban_prex + imdb_id;
                             }
@@ -4668,7 +4679,12 @@ if (site_url.match(/^https?:\/\/passthepopcorn.me\/torrents.php.*/) && extra_set
             imdb_urls[movie.GroupId] = movie.ImdbId;
             movie.GroupingQualities.forEach(function(torrentgroup){
                 torrentgroup.Torrents.forEach(function(torrent){
-                    releases[torrent.TorrentId] = torrent.ReleaseGroup;
+                    if (torrent.ReleaseGroup) {
+                        releases[torrent.TorrentId] = torrent.ReleaseGroup;
+                    } else {
+                        var groupname = get_group_name(torrent.ReleaseName, '');
+                        releases[torrent.TorrentId] = groupname;
+                    }
                 });
             });
         });
@@ -4691,7 +4707,7 @@ if (site_url.match(/^https?:\/\/passthepopcorn.me\/torrents.php.*/) && extra_set
             var obsConfig = {childList: true, characterData: false, attributes: false, subtree: false};
 
             targetNodes.each(function (){
-                myObserver.observe (this, obsConfig);
+                myObserver.observe(this, obsConfig);
             });
 
             function mutationHandler (mutationRecords) {
@@ -4718,7 +4734,13 @@ if (site_url.match(/^https?:\/\/passthepopcorn.me\/torrents.php.*/) && extra_set
     } else{
         $('table#torrent-table a.torrent-info-link').each(function(){
             var groupname = $(this).parent().parent().data('releasegroup');
-            setGroupName(groupname, this);
+            if (groupname) {
+                setGroupName(groupname, this);
+            } else {
+                var release_name = $(this).parent().parent().data('releasename');
+                groupname = get_group_name(release_name, '');
+                setGroupName(groupname, this);
+            }
         });
     }
 
@@ -5678,7 +5700,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         $('#signin').append(`<b>&nbsp;&nbsp;&nbsp;</b><a href="#", target="_blank" id="begin_sign"><font color="red"><b>→开始签到←</b></font></a>`);
         $('#signin').append(`<br><div id="ksortable"></div>`);
 
-        var unsupported_sites = ['digitalcore', 'HD-Only'];
+        var unsupported_sites = ['digitalcore', 'HD-Only', 'WT-Sakura', 'HOU', 'OMG', 'TorrentLeech'];
 
         for (index=0; index < site_order.length; index++) {
             var key = site_order[index];
@@ -6414,7 +6436,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         $table.append(`<tr style="display:none;"><td width="1%" class="rowhead nowrap" valign="top" align="right">PTGen</td><td width="99%" class="rowfollow" valign="top" align="left" id="ptgen"></td></tr>`);
         $('#ptgen').append(`<label><b>输入豆瓣/IMDB链接查询:</b></label><input type="text" name="url" style="width: 380px; margin-left:5px">`);
         $('#ptgen').append(`<input type="button" id="go_ptgen" value="获取信息" style="margin-left:15px"><input type="button" id="douban2ptp" value="海报转存PTPimg" style="margin-left:15px"><br><br>`);
-        $('#ptgen').append(`<textarea name="douban_info" style="width:720px" rows="20"></textarea><br>`);
+        $('#ptgen').append(`<textarea name="douban_info" style="width:720px" rows="30"></textarea><br>`);
 
         $('#go_ptgen').click(function(){
             var raw_info = {'url': '', 'dburl': '', 'descr': ''};
@@ -6575,30 +6597,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
 
         $('#getsource').click((e)=>{
             var origin_str = $('#picture').val();
-            pic_info = '';
-            origin_str.match(/\[img\]http[^\[\]]*?(jpg|png|webp)/ig).forEach((item)=>{
-                item = item.replace(/\[.*\]/g, '');
-                if (item.match(/imgbox/)) {
-                    pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
-                } else if (item.match(/pixhost/)) {
-                    pic_info += '[img]' + item.replace('//t', '//img').replace('thumbs', 'images') + '[/img]\n';
-                } else if (item.match(/pterclub.com|beyondhd.co\/(images|cache)|z4a.net\/images/)) {
-                    pic_info += '[img]' + item.replace(/th.png/g, 'png').replace(/md.png/g, 'png').replace(/t\/mages/, 'i/mages') + '[/img]\n';
-                } else if (item.match(/tu.totheglory.im/)) {
-                    pic_info += '[img]' + item.replace(/_thumb.png/, '.png') + '[/img]\n';
-                } else if (item.match(/img.hdchina.org/)) {
-                    pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                } else if (item.match(/cinematik/)) {
-                    pic_info += '[img]' + item.replace(/thu/, 'big') + '[/img]\n';
-                } else if (item.match(/img4k.net|img.hdhome.org/)) {
-                    pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                } else {
-                    pic_info += '[img]' + item + '[/img]\n';
-                }
-            });
-            if (pic_info) {
-                $('#result').val(pic_info);
-            }
+            get_full_size_picture_urls(null, origin_str, $('#result'), true);
         });
 
         $('#enter2space').click((e)=>{
@@ -6722,9 +6721,12 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             function getibbdoc(url) {
                 var p = new Promise((resolve, reject)=>{
                     getDoc(url,null,function(doc){
-                        console.log(doc)
-                        var source_img_url = $('#embed-code-2', doc).val();
-                        resolve(source_img_url);
+                        if (doc == 'error') {
+                            reject('error');
+                        } else {
+                            var source_img_url = $('#embed-code-2', doc).val();
+                            resolve(source_img_url);
+                        }
                     });
                 })
                 return p;
@@ -6732,7 +6734,6 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             function getpostdoc(url) {
                 var p = new Promise((resolve, reject)=>{
                     getDoc(url,null,function(doc){
-                        console.log(doc)
                         var source_img_url = $('#download', doc).attr('href').split('?')[0];
                         resolve(source_img_url);
                     });
@@ -6740,27 +6741,38 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
                 return p;
             }
             var origin_str = $('#picture').val();
-            var imgbb_urls = origin_str.match(/https?:\/\/i.ibb.co[^\[\]]*?(jpg|png)/ig);
+            var imgbb_urls = origin_str.match(/\[url=.*?\]\[img\]https?:\/\/i.ibb.co[^\[\]]*?(jpg|png)\[\/img\]\[\/url\]/ig);
             if (imgbb_urls === null) {
-                // alert("没有监测到imgbb链接");
+                alert("没有监测到imgbb缩略图链接");
             } else {
-                var imgbb_tasks = [];
+                var flag = false;
                 imgbb_urls.map(item=>{
-                    var imgbb_show_url = 'https://ibb.co/' + item.match(/https:\/\/i.ibb.co\/(.*?)\//)[1];
-                    var imgbb_p = getibbdoc(imgbb_show_url);
-                    imgbb_tasks.push(imgbb_p);
-                })
-                Promise.all(imgbb_tasks).then((data)=>{
-                    for (i=0; i<data.length; i++) {
-                        origin_str = origin_str.replace(imgbb_urls[i], data[i]);
+                    var a = item.match(/https:\/\/ibb.co\/(.*?)\]/)[1];
+                    var b = item.match(/https:\/\/i.ibb.co\/(.*?)\//)[1];
+                    if (a == b) {
+                        flag = true;
                     }
-                    origin_str = origin_str.match(/\[img\]https?:.*?(jpg|png)\[\/img\]/ig).join('\n');
-                    $('#result').val(origin_str);
-                })
+                });
+                if (flag) {
+                    var imgbb_tasks = [];
+                    imgbb_urls.map(item=>{
+                        var imgbb_show_url = 'https://ibb.co/' + item.match(/https:\/\/i.ibb.co\/(.*?)\//)[1];
+                        var imgbb_p = getibbdoc(imgbb_show_url);
+                        imgbb_tasks.push(imgbb_p);
+                    })
+                    Promise.all(imgbb_tasks).then((data)=>{
+                        for (i=0; i<data.length; i++) {
+                            origin_str = origin_str.replace(imgbb_urls[i], `[img]${data[i]}[/img]`);
+                        }
+                        get_full_size_picture_urls(null, origin_str, $('#result'), true);
+                    })
+                } else {
+                    get_full_size_picture_urls(null, origin_str, $('#result'), true);
+                }
             }
             var postimg_urls = origin_str.match(/https?:\/\/i.postimg.cc[^\[\]]*?(jpg|png)/ig);
             if (postimg_urls === null) {
-                // alert("没有监测到imgbb链接");
+                // alert("没有监测到postimg链接");
             } else {
                 var imgpost_tasks = [];
                 postimg_urls.map(item=>{
@@ -8676,8 +8688,8 @@ function auto_feed() {
         }
 
         if (origin_site == 'SpeedApp') {
-            $('div.cover-overlay-bottom:first').after(`
-                <div class="row card card-custom rounded-lg card-smoke backdrop-blur card-body d-flex flex-row" style="padding-left:55px; padding-right:55px; padding-bottom: 100px; margin-top:25px; border-radius: 10px; height:800px">
+            $('div.row:eq(1)').after(`
+                <div class="row card card-custom rounded-lg card-smoke backdrop-blur card-body d-flex flex-row" style="margin-bottom:20px; margin-left:1px; margin-right:1px;">
                     <table id="mytable">
                     </table>
                 </div>
@@ -12283,13 +12295,18 @@ function auto_feed() {
                         return;
                     }
                 }
+                if (raw_info.name.match(/BMDru/)) {
+                    if (!confirm('该小组作品被PTP认定为劣质资源，确定发布？')) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
                 if (raw_info.url){
                     var url = 'https://passthepopcorn.me/torrents.php?searchstr=' + raw_info.url.match(/tt\d+/)[0];
                     GM_xmlhttpRequest({
                         method: 'GET',
                         url: url,
                         onload: function(res) {
-                            console.log(res)
                             var upload_url = 'https://passthepopcorn.me/upload.php';
                             if (res.finalUrl.match(/id=\d+/)) {
                                 upload_url += '?group' + res.finalUrl.match(/id=\d+/)[0];
@@ -12334,7 +12351,6 @@ function auto_feed() {
                         method: 'GET',
                         url: url,
                         onload: function(res) {
-                            console.log(res)
                             doc = res.responseText;
                             var upload_url = 'https://secret-cinema.pw/upload.php';
                             if ($('div.torrent_card_container', doc).length) {
@@ -12375,7 +12391,6 @@ function auto_feed() {
                         method: 'GET',
                         url: url,
                         onload: function(res) {
-                            console.log(res)
                             doc = res.responseText;
                             console.log(doc)
                             var upload_url = 'http://tv-vault.me/upload.php';
@@ -12426,7 +12441,6 @@ function auto_feed() {
                         method: 'GET',
                         url: url,
                         onload: function(res) {
-                            console.log(res)
                             doc = res.responseText;
                             if ($('div.overlay-container', doc).length) {
                                 upload_url += '?movie_id=' + $('div.overlay-container', doc).find('a').attr('href').match(/\d+/)[0];
@@ -12468,7 +12482,6 @@ function auto_feed() {
                         if ($('#torrent_table', doc).length) {
                             var table = $('#torrent_table', doc);
                             ids = table.find('tr.group').map((index, e)=>{
-                                console.log(e)
                                 var imdburl = $(e).find('a:contains(IMDb:)').attr('href');
                                 console.log(imdburl)
                                 if (imdbid && imdburl.match(imdbid)) {
@@ -12979,10 +12992,10 @@ function auto_feed() {
                     } else{
                         tmp_url = tmp_url.match(/tt\d+/)[0];
                     }
-                    url = 'https://api.iyuu.cn/ptgen/?imdb=' + tmp_url;
+                    url = used_setting_host_list[setting_host] + '#ptgen?' + tmp_url;
                     window.open(url, '_blank');
                 }, function() {
-                    url = 'https://api.iyuu.cn/ptgen/?imdb=' + tmp_url.match(/tt\d+/)[0];
+                    url = used_setting_host_list[setting_host] + '#ptgen?' + tmp_url.match(/tt\d+/)[0];
                     window.open(url, '_blank');
                 });
             }, false);
@@ -14180,17 +14193,18 @@ function auto_feed() {
                 }
                 container.css({'height': '600px'});
                 var tmp_descr = raw_info.descr.replace(infos.mediainfo, '');
-                tmp_descr = tmp_descr.replace(/\[quote\][\s\S]{0,80}\[\/quote\]/g, '');
+                tmp_descr = tmp_descr.replace(/\[quote\][\s\S]{0,80}\[\/quote\]/g, '').replace(/ +\n/g, '\n');
                 if (raw_info.full_mediainfo) {
                     tmp_descr = tmp_descr.replace(/\[quote\][\s\S]{0,80}(General|Disc)[\s\S]{50,30000}?\[\/quote\]/g, '');
                 }
+                tmp_descr = tmp_descr.replace('[img]https://i.ibb.co/8KwqmMK/Shark-PT-More-Screenshot.png[/img]', '');
                 raw_info.descr = tmp_descr;
                 for (var key in reg_team_name) {
                     if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
                         raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
                     }
                 }
-                $('textarea[name="descr"]').val(raw_info.descr.trim().replace(/\n{2,15}/g, '\n\n').replace(/\]\n\n\[/g, '\]\n\['));
+                $('textarea[name="descr"]').val(raw_info.descr.trim().replace(/\n\n+/g, '\n\n').replace(/\]\n\n\[/g, '\]\n\['));
             } catch(Err) {
                 if (raw_info.full_mediainfo){
                     container.val(raw_info.full_mediainfo);
@@ -22357,11 +22371,13 @@ function auto_feed() {
 
             try {
                 infos = get_mediainfo_picture_from_descr(raw_info.descr);
-                if (raw_info.full_mediainfo) {
-                    $('#release_desc').val(raw_info.full_mediainfo + '\n\n' + infos.pic_info);
-                } else {
-                    $('#release_desc').val(infos.mediainfo + '\n\n' + infos.pic_info);
-                }
+                get_full_size_picture_urls(null, infos.pic_info, $('#nowhere'), true, function(data){
+                    if (raw_info.full_mediainfo) {
+                        $('#release_desc').val(raw_info.full_mediainfo + '\n\n' + data.trim());
+                    } else {
+                        $('#release_desc').val(infos.mediainfo + '\n\n' + data.trim());
+                    }
+                });
             } catch (err) {
                 raw_info.descr = raw_info.descr.replace(/\[\/?.{1,20}\]\n?/g, '');
                 $('#release_desc').val(raw_info.descr);
@@ -22379,7 +22395,6 @@ function auto_feed() {
                 $('#container').val('m2ts');
             }
             $('#container')[0].dispatchEvent(evt);
-
             $('#preview_button').before(`<font color="red">由于PTP预览可以自动勾选字幕并且看图床是否正确显示，请先勾选预览后返回发布。<br><br></font>`);
         }
 
@@ -22518,17 +22533,10 @@ function auto_feed() {
                 } else {
                     descr = descr.format({'mediainfo': infos.mediainfo})
                 }
-                var pic_info = '';
-                infos.pic_info.match(/http[^\[\]]*?(jpg|png)/g).forEach((item)=>{
-                    if (item.match(/imgbox/)) {
-                        pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
-                    } else {
-                        pic_info += '[img]' + item + '[/img]\n';
-                    }
-                });
-                descr = descr.format({'poster': pic_info});
-                // descr = descr.format({'poster': infos.pic_info.replace(/ /g, '\n')});
-                container.val(descr);
+                get_full_size_picture_urls(null, infos.pic_info, $('#nowhere'), true, function(data) {
+                    descr = descr.format({'poster': data.trim()});
+                    container.val(descr);
+                })
             } catch(err) {
                 if (raw_info.full_mediainfo){
                     descr = descr.format({'mediainfo': raw_info.full_mediainfo})
@@ -22604,26 +22612,7 @@ function auto_feed() {
                     descr = descr.format({'poster': infos.pic_info});
                 } else {
                     $('#noimg').show();
-                    var pic_info = '';
-                    infos.pic_info.match(/\[img\]http[^\[\]]*?(jpg|png)/g).forEach((item)=>{
-                        item = item.replace(/\[.*\]/g, '');
-                        if (item.match(/imgbox/)) {
-                            pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
-                        } else if (item.match(/pixhost/)) {
-                            pic_info += '[img]' + item.replace('//t', '//img').replace('thumbs', 'images') + '[/img]\n';
-                        } else if (item.match(/pterclub.com|beyondhd.co\/images/)) {
-                            pic_info += '[img]' + item.replace(/th.png/, 'png') + '[/img]\n';
-                        } else if (item.match(/tu.totheglory.im/)) {
-                            pic_info += '[img]' + item.replace(/_thumb.png/, '.png') + '[/img]\n';
-                        } else if (item.match(/img.hdchina.org/)) {
-                            pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                        } else if (item.match(/img4k.net/)) {
-                            pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                        } else {
-                            pic_info += '[img]' + item + '[/img]\n';
-                        }
-                    });
-                    $('#t1').val(pic_info);
+                    get_full_size_picture_urls(null, infos.pic_info, $('#t1'), true);
                     descr = descr.format({'poster': `[img]URL SCREENSHOT HERE[/img]\n[img]URL SCREENSHOT HERE[/img]\n[img]URL SCREENSHOT HERE[/img]`});
                 }
                 container.val(descr);
@@ -22784,18 +22773,20 @@ function auto_feed() {
                     });
                 } else {
                     try{
-                        descr.match(/Text.*?\nID[\s\S]*?Forced/g).map(function(item){
+                        descr.match(/Text.*?\nID[\s\S]*?\nForced/g).map(function(item){
                             try{
                                 var e = item.match(/Language.*?:(.*)/)[1].trim().toLowerCase();
-                                e = e.replace(/\(.*?\)/, '');
+                                e = e.replace(/\(.*?\)/, '').trim();
                                 if (e == 'chinese' && item.match(/Simplified|简体/i)) {
                                     subtitles.push('chinese_simplified');
-                                } else if (e == 'chinese' && item.match(/Traditional|繁體/i)) {
+                                } else if (e == 'chinese' && item.match(/Traditional|繁體|繁体/i)) {
                                     subtitles.push('chinese_traditional');
                                 } else {
                                     subtitles.push(e);
                                 }
-                            } catch(err) {}
+                            } catch(err) {
+                                console.log(err)
+                            }
                         });
                     } catch(err) {
                         if (descr.match(/Subtitle.*?:(.*)/i)) {
@@ -22991,26 +22982,9 @@ function auto_feed() {
                     if (raw_info.comparisons) {
                         pic_info = raw_info.comparisons.replace(/\[quote\][\s\S]*?\[\/quote\]/g, '').replace(/\n\n+/, '\n').trim();
                     } else {
-                        try {
-                            infos.pic_info.match(/\[img\]http[^\[\]]*?(jpg|png)/g).forEach((item)=>{
-                                item = item.replace(/\[.*\]/g, '');
-                                if (item.match(/imgbox/)) {
-                                    pic_info += '[img]' + item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '[/img]\n';
-                                } else if (item.match(/pixhost/)) {
-                                    pic_info += '[img]' + item.replace('//t', '//img').replace('thumbs', 'images') + '[/img]\n';
-                                } else if (item.match(/pterclub.com|beyondhd.co\/images/)) {
-                                    pic_info += '[img]' + item.replace(/th.png/, 'png') + '[/img]\n';
-                                } else if (item.match(/tu.totheglory.im/)) {
-                                    pic_info += '[img]' + item.replace(/_thumb.png/, '.png') + '[/img]\n';
-                                } else if (item.match(/img.hdchina.org/)) {
-                                    pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                                } else if (item.match(/img4k.net/)) {
-                                    pic_info += '[img]' + item.replace(/md.png/, 'png') + '[/img]\n';
-                                } else {
-                                    pic_info += '[img]' + item + '[/img]\n';
-                                }
-                            });
-                        } catch (err) {}
+                        get_full_size_picture_urls(null, infos.pic_info, $('nowhere'), true, function(data){
+                            pic_info = data.trim();
+                        });
                         $('#description-container').next().find('td:eq(1)').append(`<a href="#" id="go_imgbox">辅助转存原始图：转至PIXHOST</a>`);
                         $('#go_imgbox').click(function(e) {
                             e.preventDefault();
@@ -23233,12 +23207,14 @@ function auto_feed() {
                         } catch (err) {}
                     }
                 });
+                if (raw_info.descr.match(/(Title|Language).*?Traditional/)) {
+                    $('#chinese_traditional').attr('checked', true);
+                }
                 $('#other_subtitles').removeClass('hidden');
             } else {
                 $('#type_of_subtitles').append(`<input type="button" value="辅助" id="help" style="border: none;" />`);
                 $('#help').click(()=>{
                     var subtitles = get_subtitles_from_descr(raw_info.full_mediainfo ? raw_info.full_mediainfo: ($('textarea[name="mediainfo[]"]').val()+$('#release_desc').val()))
-                    //console.log(subtitles);
                     if (subtitles.length) {
                         $('#mixed_subtitles').attr('checked', true);
                         $('#other_subtitles').removeClass('hidden');
@@ -23248,6 +23224,9 @@ function auto_feed() {
                                 $('#'+item.toLowerCase()).next().css("color", "DarkOrange")
                             } catch (err) {}
                         })
+                    }
+                    else {
+                        $('#no_subtitles').attr('checked', true);
                     }
                 })
             }
@@ -23628,9 +23607,7 @@ function auto_feed() {
             var search_name = get_search_name(raw_info.name);
             getJson('https://api.tvmaze.com/search/shows?q='+search_name, null, (data)=>{
                 if (data.length) {
-
                     $('#tvmaze>td:last').append(`</br></br><font color="red" size="1">请点击对应剧照填充id:</font></br>`);
-
                     GM_addStyle(
                         `div.img {
                             margin: 5px;
@@ -23708,34 +23685,7 @@ function auto_feed() {
                 } else {
                     $('#mediainfo').val(infos.mediainfo.replace(/\[.*?\]/g, ''));
                 }
-                var pic_info = '';
-                infos.pic_info.match(/\[img\]http[^\[\]]*?(jpg|png)/g).forEach((item)=>{
-                    item = item.replace(/\[.*\]/g, '');
-                    if (item.match(/imgbox/)) {
-                        pic_info += item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '\n';
-                    } else if (item.match(/pixhost/)) {
-                        pic_info += item.replace('//t', '//img').replace('thumbs', 'images') + '\n';
-                    } else if (item.match(/pterclub.com|beyondhd.co\/images/)) {
-                        pic_info += item.replace(/th.png/, 'png') + '\n';
-                    } else if (item.match(/tu.totheglory.im/)) {
-                        pic_info += item.replace(/_thumb.png/, '.png') + '\n';
-                    } else if (item.match(/img.hdchina.org/)) {
-                        pic_info += item.replace(/md.png/, 'png') + '\n';
-                    } else if (item.match(/img4k.net/)) {
-                        pic_info += item.replace(/md.png/, 'png') + '\n';
-                    } else {
-                        pic_info += item + '\n';
-                    }
-                });
-                $('#screenshots').val(pic_info);
-                // $('#screenshots').css({'height': '100px'});
-                // if (pic_info) {
-                //     var img_box = $(`<div><font color="red">这里展示了所有的图片，请保留除缩略图最多两张！！</font></br></div>`)
-                //     pic_info.match(/http.*?(jpg|png)/g).map((item)=>{
-                //         img_box.append(`<img src=${item} style="max-width:600px" />`);
-                //     });
-                //     $('#screenshots').after(img_box);
-                // }
+                get_full_size_picture_urls(null, infos.pic_info, $('#screenshots'), false);
             } catch(err) {
                 if (raw_info.full_mediainfo){
                     $('#mediainfo').val(raw_info.full_mediainfo);
@@ -24405,15 +24355,7 @@ function auto_feed() {
                 } else {
                     $('textarea[name="mediainfo"]').val(infos.mediainfo.replace(/\[.*?\]/g, ''));
                 }
-                var pic_info = '';
-                infos.pic_info.match(/http[^\[\]]*?(jpg|png)/g).forEach((item)=>{
-                    if (item.match(/imgbox/)) {
-                        pic_info += item.replace('thumbs2', 'images2').replace('t.png', 'o.png') + '\n';
-                    } else if (item.match(/ptpimg|.*/)) {
-                        pic_info += '[img]' + item + '[/img]' + '\n';
-                    }
-                });
-                $('textarea[name="descr"]').val(pic_info);
+                get_full_size_picture_urls(null, infos.pic_info, $('textarea[name="descr"]'), true);
                 $('textarea[name="descr"]').css({'height': '100px'});
             } catch(err) {
                 if (raw_info.full_mediainfo){
@@ -25141,7 +25083,6 @@ function auto_feed() {
                     descr = descr.format({'BDInfo': raw_info.descr});
                 }
 
-                console.log(raw_info.descr)
                 if (raw_info.medium_sel == 'DVD') {
                     if (raw_info.name.match('NTSC') || raw_info.descr.match('NTSC')) {
                         descr = descr.format({'format': 'NTSC'});
@@ -25246,7 +25187,6 @@ function auto_feed() {
                             }
                             if (raw_info.descr.match(/Audio:[\s\S]{0,20}Codec/i)) {
                                 var audio_info = raw_info.descr.match(/Audio:[\s\S]{0,300}-----------([\s\S]*)/i)[1].split(/subtitles|\[.*quote\]/i)[0].trim();
-                                // alert(audio_info)
                                 descr = descr.format({'audio': audio_info.split('\n').map(e=>{
                                     var info = e.split(/  /).filter(function(e){return e;});
                                     return `${info[1].trim()} ${info[0].replace('Audio', '').replace(/Master/, 'MA').trim()} ${info[3].split('/')[0].trim()}`
@@ -25276,10 +25216,12 @@ function auto_feed() {
                 $('input[name="name"]').val(torrent_name);
 
                 descr = descr.format({'year': year});
-                var img_urls = raw_info.descr.match(/\[img\].*?\[\/img\]/g);
-                if (img_urls && img_urls.length) {
-                    descr = descr.format({'screenshots': img_urls.join('\n\n')});
-                }
+                try{
+                    var infos = get_mediainfo_picture_from_descr(raw_info.descr);
+                    get_full_size_picture_urls(null, infos.pic_info, $('#nowhere'), true, function(data) {
+                        descr = descr.format({'screenshots': data.trim()});
+                    })
+                } catch (err) {}
 
                 if (raw_info.descr.match(/Total.*?Bitrate:(.*)/i)) {
                     descr = descr.format({'bitrate': raw_info.descr.match(/Total.*?Bitrate:(.*)/i)[1].trim()});
@@ -25367,7 +25309,6 @@ function auto_feed() {
         }
 
         var page = parseInt(title.split(' ').pop());
-
         if (page == 1) {
             $('input[name=title]').val(raw_info.url);
         } else if (page == 2) {
@@ -25404,13 +25345,11 @@ function auto_feed() {
                 }
 
                 var poster = await getPoster(poster_url);
-                // console.log($('div[class*=Media__PosterContainer] > div > a', doc).length)
                 descr = descr.format({'poster': poster});
                 descr = descr.format({'title': $('h1:eq(0)', doc).text().trim()});
                 descr = descr.format({'genres': Array.from($('div[data-testid*=genres]', doc).find('a')).map(function(e){
                     return $(e).text();
                 }).join(', ').replace(/, Read all/g, '')});
-
                 descr = descr.format({'date': $('li.ipc-metadata-list__item:contains("Release date")', doc).find('div').find('li').text()});
                 descr = descr.format({'score': $('div[data-testid*=aggregate-rating__score]:eq(0)', doc).text()});
                 descr = descr.format({'imdb_url': raw_info.url});
@@ -25426,8 +25365,6 @@ function auto_feed() {
                     return $(e).text();
                 }).join(', ');
                 descr = descr.format({'cast': actors});
-
-                console.log(descr)
                 var imdb_descr = $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).text().trim();
                 if (imdb_descr.match(/Read all/)){
                     var full_descr_url = 'https://www.imdb.com/title/' + raw_info.url.match(/tt\d+/)[0] + '/' + $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).find('a').attr('href');
@@ -25437,15 +25374,12 @@ function auto_feed() {
                 }
                 descr = descr.format({'en_descr': imdb_descr});
 
-                var screenshots = raw_info.descr.match(/\[img\].*?\[\/img\]/g);
-                if (screenshots !== null) {
-                    descr = descr.format({'screenshots': screenshots.filter(function(e){
-                        if (!e.match(/douban/)) {
-                            return e;
-                        }
-                    }).join('\n')});
-                }
-
+                try{
+                    var infos = get_mediainfo_picture_from_descr(raw_info.descr);
+                    get_full_size_picture_urls(null, infos.pic_info, $('#nowhere'), true, function(data) {
+                        descr = descr.format({'screenshots': data.trim()});
+                    })
+                } catch (err) {}
                 $('textarea[name=descr]').val(descr);
                 var language = Array.from($('li[data-testid="title-details-languages"]', doc).find('ul').find('a')).map(function(e){
                     return $(e).text();
@@ -25496,7 +25430,6 @@ function auto_feed() {
                 $('select[name=hdrip]').val(standard_dict[raw_info.standard_sel]);
             }
 
-            // console.log(raw_info.descr);
             if (raw_info.medium_sel == 'Blu-ray' || raw_info.medium_sel == 'UHD') {
                 $('select[name=hdrip]').val('3');
                 var bluray_info = kg_bluray_base_content;
