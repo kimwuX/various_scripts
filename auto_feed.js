@@ -10417,25 +10417,38 @@ function auto_feed() {
             if ((raw_info.descr+anidb_info).match(/(19|20)\d{2}/)){
                 raw_info.name += ' ' + (raw_info.descr+anidb_info).match(/(19|20)\d{2}/)[0];
             }
-            if (raw_info.animate_info.match(/\[movie\]/i)) {
-                raw_info.name += ' MOVIE'
-            }
+            //mod by kim.wu
+            //if (raw_info.animate_info.match(/\[movie\]/i)) {
+            //    raw_info.name += ' MOVIE'
+            //}
+            if (raw_info.descr.match(/(1080|1 080|2160|2 160) ?(p|i)/i)) {
+                raw_info.name += ' ' + raw_info.descr.match(/(1080|1 080|2160|2 160) ?(p|i)/i)[0].replace(/\s*/g, '').toLowerCase();
+            } 
             if (raw_info.animate_info.match(/BDRip|TVRip|DVDRip|BDMV|DVDISO|HQ-HDTVRip|HDTVRip/i)) {
                 raw_info.name += ' ' + raw_info.animate_info.match(/BDrip|TVRip|DVDRip|BDMV|DVDISO|HQ-HDTVRip|HDTVRip/i)[0];
+                //mod by kim.wu
+                raw_info.name = raw_info.name.replace(/BDMV/i, 'Blu-ray');
             }
-            if (raw_info.name.match(/BDMV|BDRip/)) {
-                raw_info.name += ' 1080p';
-                raw_info.standard_sel = '1080p';
-            }
+            //mod by kim.wu
+            //if (raw_info.name.match(/BDMV|BDRip/)) {
+            //    raw_info.name += ' 1080p';
+            //    raw_info.standard_sel = '1080p';
+            //}
             var release = raw_info.animate_info.match(/\[.*?\]/g).filter((e)=> { if (e.match(/disc|fin|Vol/i)) return e });
             if (release.length) {
-                raw_info.name += ' ' + release[0].replace(/\[|\]/g, '');
+                //mod by kim.wu
+                //raw_info.name += ' ' + release[0].replace(/\[|\]/g, '');
+                raw_info.small_descr += ' | ' + release[0].replace(/\[|\]/g, '');
             }
             if ((raw_info.animate_info+raw_info.descr).match(/x264|x265|h.?264|h.265|hevc|avc/i)) {
                 raw_info.name += ' ' + (raw_info.animate_info+raw_info.descr).match(/x264|x265|h.?264|h.265|hevc|AVC/i)[0];
             }
-            if ((raw_info.animate_info+raw_info.descr).match(/Truehd|DTS(.?HD.?MA.*)?|LPCM|FLAC|AC3/i)) {
-                var audio = (raw_info.animate_info+raw_info.descr).match(/Truehd|DTS(.?HD.?MA.*)?|LPCM|FLAC|AC3/i)[0];
+            //mod by kim.wu
+            if ((raw_info.animate_info+raw_info.descr).match(/Truehd|DTS(.?HD.?MA.*)?|L?PCM.*|FLAC|AC-?3/i)) {
+                var audio = (raw_info.animate_info+raw_info.descr).match(/Truehd|DTS(.?HD.?MA.*)?|L?PCM.*|FLAC|AC-?3/i)[0];
+                if (audio.match(/L?PCM.*(\d\.\d)/i)) {
+                    audio = 'LPCM ' + audio.match(/L?PCM.*(\d\.\d)/i)[1];
+                }
                 if (audio.match(/DTS(.?HD.?MA.*\d\.\d)/i)) {
                     audio = 'DTS-HDMA ' + audio.match(/\d\.\d/)[0];
                 }
@@ -10449,7 +10462,8 @@ function auto_feed() {
             var author = raw_info.animate_info.match(/\[.*?\]/g).pop().replace(/\[|\]/g, '');
             if ((raw_info.small_descr + raw_info.animate_info).match(/自抓|自购|自購|自压|自壓/)) {
                 if (author.match(/^(jp|r2j|r2_j.*|r2fr|ita|ger|uk|tw|hk|.*flac.*|scans|.*\+.*|usa|fra|movie|tv|自压|自抓|自购|自購|.*自壓.*)$/i)) {
-                    raw_info.name += '-Anonymous@U2';
+                    //mod by kim.wu
+                    raw_info.name += '-U2';
                 } else {
                     raw_info.name += `-${author}@U2`;
                 }
@@ -10472,8 +10486,8 @@ function auto_feed() {
 
             //mod by kim.wu
             raw_info.descr = thanks_str.format({'site': 'U2', 'descr': raw_info.descr});
-
-            raw_info.small_descr += ' ' + raw_info.animate_info.match(/\[.*?\]/g)[0].replace(/\[|\]/g, '');
+            raw_info.small_descr = raw_info.animate_info.match(/\[.*?\]/g)[0].replace(/\[|\]/g, '') + ' | ' + raw_info.small_descr;
+            raw_info.small_descr = raw_info.small_descr.replace(/\|\s*\|/g, '|').trim();
             raw_info.type = '动漫';
             try{raw_info.anidb = raw_info.descr.match(/https:\/\/anidb\.net\/a\d+/i)[0];}catch(err){}
             if (!raw_info.anidb){
