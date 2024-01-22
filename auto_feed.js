@@ -11989,7 +11989,11 @@ function auto_feed() {
         var check=document.createElement("input");
         check.setAttribute("type","checkbox");
         check.setAttribute("id",'search_type');
-        var check_text = document.createTextNode('查重');
+        //mod by kim.wu
+        //var check_text = document.createTextNode('查重');
+        var check_text = document.createElement("label");
+        check_text.innerHTML = '查重';
+        check_text.setAttribute("for", "search_type");
         forward_r.append(check);
         forward_r.append(check_text);
         set_jump_href(raw_info, 1);
@@ -12040,10 +12044,11 @@ function auto_feed() {
         //mod by kim.wu
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
         var img_host1 = document.createElement('a');
-        img_host1.innerHTML = 'ImgBB';
+        img_host1.innerHTML = 'PiXhost';
         img_host1.id = 'img_host1';
-        img_host1.href = 'https://imgbb.com/';
+        img_host1.href = 'https://pixhost.to/';
         img_host1.target = '_blank';
+        img_host1.style.color = 'Blue';
         forward_r.appendChild(img_host1);
         
         forward_r.innerHTML = forward_r.innerHTML + ' | ';
@@ -12052,15 +12057,8 @@ function auto_feed() {
         img_host2.id = 'img_host2';
         img_host2.href = 'https://imgbox.com/';
         img_host2.target = '_blank';
+        img_host2.style.color = 'Blue';
         forward_r.appendChild(img_host2);
-        
-        forward_r.innerHTML = forward_r.innerHTML + ' | ';
-        var img_host3 = document.createElement('a');
-        img_host3.innerHTML = 'PiXhost';
-        img_host3.id = 'img_host3';
-        img_host3.href = 'https://pixhost.to/';
-        img_host3.target = '_blank';
-        forward_r.appendChild(img_host3);
 
         //添加常用链接跳转
         if (used_common_sites.length > 0){
