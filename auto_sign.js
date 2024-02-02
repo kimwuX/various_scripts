@@ -41,7 +41,6 @@
 // @match       *://ptchdbits.co/*
 // @match       *://ubits.club/*
 // @exclude     */showup.php*
-// @exclude     */bakatest.php*
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
 // @exclude     */fun.php*
@@ -49,7 +48,7 @@
 // @grant        GM_getValue
 // @grant        GM_deleteValue
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://s1.ax1x.com/2022/05/26/XEHBt0.png
+// @icon         https://s11.ax1x.com/2024/02/02/pFQKg8P.png
 // @run-at       document-end
 // ==/UserScript==
 
@@ -92,10 +91,13 @@
             //console.log(res[0])
             if (host.search(/ptchdbits/i) != -1) {
                 let t1 = new Date()
+                if (location.pathname.search(/bakatest\.php/i) != -1 && $("*:contains('签到记录')").length > 0) {
+                    GM_setValue(host, t1.toDateString())
+                    console.log('今天已经签过到了')
+                }
                 let v1 = GM_getValue(host)
                 if (!v1 || new Date(v1).toDateString() != t1.toDateString()) {
                     res[0].click()
-                    GM_setValue(host, t1.toDateString())
                     console.log(t1.toLocaleTimeString() + ' Signed.')
                 } else {
                     console.log("Aleady Signed.")
