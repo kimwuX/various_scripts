@@ -12793,15 +12793,16 @@ function auto_feed() {
                     window.open(this.href, '_blank');
                     return;
                 }
-                raw_info.descr = '';
-                for (var key in reg_team_name) {
-                    if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
-                        raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
-                    }
-                }
-                descr = document.getElementById('kt_d');
-                descr_box = descr.cloneNode(true);
-                raw_info.descr = walkDOM(descr_box);
+                //mod by kim.wu
+                //raw_info.descr = '';
+                //for (var key in reg_team_name) {
+                //    if (raw_info.name.match(reg_team_name[key]) && !raw_info.name.match(/PandaMoon|HDSpace|HDClub|LCHD/i)) {
+                //        raw_info.descr = thanks_str.format({'site': key, 'descr': raw_info.descr});
+                //    }
+                //}
+                //descr = document.getElementById('kt_d');
+                //descr_box = descr.cloneNode(true);
+                //raw_info.descr = walkDOM(descr_box);
 
                 var reg_img = raw_info.descr.match(/\[img\]http(s*):\/\/totheglory.im\/pic\/ico_(free|half|30).gif\[\/img\].*/i);
                 if (reg_img) {
