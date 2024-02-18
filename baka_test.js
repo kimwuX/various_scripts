@@ -22,15 +22,15 @@
 
     //反序列化表单数据
     function deserializeFormData(data) {
-        var formData = {};
+        let formData = {};
 
         data.split('&').forEach(function(item) {
-            var keyValuePair = item.split('=');
+            let keyValuePair = item.split('=');
 
             if (!keyValuePair[0]) return;
 
-            var key = decodeURIComponent(keyValuePair[0]);
-            var value = decodeURIComponent(keyValuePair[1] || '');
+            let key = decodeURIComponent(keyValuePair[0]);
+            let value = decodeURIComponent(keyValuePair[1] || '');
 
             formData[key] = value;
         });
@@ -100,7 +100,7 @@
         if (next == null && arr.length > 0) {
             next = nextTime(arr[0], 0, 0, offset);
         }
-        console.log('nextListTime: ' + next);
+        //console.log('nextListTime: ' + next);
         return next;
     }
 
@@ -113,7 +113,7 @@
     //防止休眠
     function playAudio() {
 
-        var source = document.createElement('source');
+        let source = document.createElement('source');
         source.src = 'https://open.cd/attachments/202210/202210010005258775518ae99535515641dbecb5a3113e.mp3';
         //source.src = 'https://open.cd/attachments/202210/20221001000532b0ff1a4c576fc75bdaadef6c9c5e4409.mp3';
         //source.src = 'https://open.cd/attachments/202210/20221001000536089c29811d3a2f08045aa4185c32e475.mp3';
@@ -286,11 +286,10 @@
 
     function delay_signTJU() {
 
-        let now = new Date();
         //let offset = correctTime($('span#datetime').text()) || 1;
-        //let next = nextTime(8, 0, 0, 1.5);
         let arr = [6, 7, 8, 12, 18, 20, 22];
         let next = nextListTime(arr, 1.5);
+        let now = new Date();
         console.log('now: ' + now);
         console.log('next: ' + next);
         let val = next - now;
@@ -324,20 +323,6 @@
                     //document.location.reload();
                     $('div#showup a.faqlink').click();
                 });
-                //监听节点删除
-                const observer = new MutationObserver(function(mutationsList, observer) {
-                    for (let mutation of mutationsList) {
-                        if (mutation.type === 'childList') {
-                            console.log('MutationObserver: childList');
-                            //observer.disconnect();
-                            setTimeout(function() {
-                                //console.clear();
-                                signU2(training, true);
-                            }, 500);
-                        }
-                    }
-                });
-                observer.observe($('div#showup')[0], { childList: true });
             }
             delay += 3000 * (0.5 + Math.random());
             console.log('delay: ' + delay);
@@ -345,6 +330,22 @@
             if ($("*:contains('今天已签到')").length > 0) {
                 return;
             }
+        }
+        if (!partial) {
+            //监听节点删除
+            const observer = new MutationObserver(function(mutationsList, observer) {
+                for (let mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        console.log('MutationObserver: childList');
+                        //observer.disconnect();
+                        setTimeout(function() {
+                            //console.clear();
+                            signU2(training, true);
+                        }, 500);
+                    }
+                }
+            });
+            observer.observe($('div#showup')[0], { childList: true });
         }
 
         let dic_u2 = {};
@@ -360,7 +361,7 @@
 
         let id = `req=${req.val()}&hash=${hash.val()}&form=${form.val()}`;
         console.log(id);
-        if (id == null || id.length == 0) {
+        if (isEmptyString(id)) {
             return;
         }
         let a = dic_u2[id];
@@ -370,12 +371,10 @@
         p.find('input[type="submit"]').click(function() {
             let str = $(this).prop('name') + '|' + $(this).val();
             console.log(str);
-            if (a) {
-                a.push(str);
-            } else {
+            if (a == null) {
                 a = [];
-                a.push(str);
             }
+            a.push(str);
 
             //console.log(a);
             if (id && a.length > 0) {
@@ -387,6 +386,7 @@
         });
 
         //搜索
+        console.log('add search buttons.');
         p.find('input[type="submit"]').each(function() {
             let div = document.createElement('div');
             let arr = $(this).val().split(' / ').map(function(item) {
@@ -418,6 +418,7 @@
     function openSites(arr) {
 
         if (arr.length > 0) {
+            console.log(new Date().toLocaleTimeString() + ': ' + arr[0]);
             let win = window.open(arr.shift());
             setTimeout(() => {
                 win.close();
@@ -431,14 +432,14 @@
     function signOthers() {
 
         let now = new Date();
-        let tt = nextTime(6, 20 * Math.random(), 0);
+        let tt = nextTime(6, 20 * Math.random(), 60 * Math.random());
         console.log('openSites1: ' + tt);
         setTimeout(() => {
             console.log('openSites1 begin: ' + new Date());
             openSites(site_list.slice());
         }, tt - now);
 
-        tt = nextTime(22, 20 * Math.random(), 0);
+        tt = nextTime(22, 20 * Math.random(), 60 * Math.random());
         console.log('openSites2: ' + tt);
         setTimeout(() => {
             console.log('openSites2 begin: ' + new Date());
