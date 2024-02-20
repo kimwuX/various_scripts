@@ -19,6 +19,8 @@
 (function() {
 
     Date.prototype.toString = Date.prototype.toLocaleString;
+    Date.prototype.toDateString = Date.prototype.toLocaleDateString;
+    Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
 
     //反序列化表单数据
     function deserializeFormData(data) {
@@ -65,7 +67,7 @@
         let dt = new Date(time_str);
         if (isValidDate(dt)) {
             dt.setFullYear(now.getFullYear());
-            //console.log('pgtime: ' + dt);
+            //console.log('pgtime: \n' + dt);
             console.log(getLeftTimeString(now - dt) + ' faster than server.');
             return (now - dt) / 1000;
         }
@@ -100,13 +102,13 @@
         if (next == null && arr.length > 0) {
             next = nextTime(arr[0], 0, 0, offset);
         }
-        //console.log('nextListTime: ' + next);
+        //console.log('nextListTime: \n' + next);
         return next;
     }
 
     function startTicktock(tick) {
         setInterval(() => {
-            console.log(new Date().toLocaleTimeString());
+            console.log(new Date().toTimeString());
         }, tick);
     }
 
@@ -290,8 +292,8 @@
         let arr = [6, 7, 8, 12, 18, 20, 22];
         let next = nextListTime(arr, 1.5);
         let now = new Date();
-        console.log('now: ' + now);
-        console.log('next: ' + next);
+        console.log('now: \n' + now);
+        console.log('next: \n' + next);
         let val = next - now;
         console.log(getLeftTimeString(val) + ' left.');
         if (val <= 0) {
@@ -366,7 +368,7 @@
         }
         let a = dic_u2[id];
 
-        $('textarea[name="message"]').val('手滑可不自负哦~');
+        $('textarea[name="message"]').val('今日份签到');
 
         p.find('input[type="submit"]').click(function() {
             let str = $(this).prop('name') + '|' + $(this).val();
@@ -382,7 +384,7 @@
             }
             //console.log(dic_u2);
             //console.log(JSON.stringify(dic_u2));
-            GM_setValue('dic_u2', JSON.stringify(dic_u2));
+            //GM_setValue('dic_u2', JSON.stringify(dic_u2));
         });
 
         //搜索
@@ -418,14 +420,18 @@
     function openSites(arr) {
 
         if (arr.length > 0) {
-            console.log(new Date().toLocaleTimeString() + ': ' + arr[0]);
+            console.log(new Date().toTimeString() + ': \n' + arr[0]);
+            let t = 30000;
+            if (arr[0].search(/ourbits/i) != -1) {
+                t = 60000;
+            }
             let win = window.open(arr.shift());
             setTimeout(() => {
                 win.close();
                 openSites(arr);
-            }, 30000);
+            }, t);
         } else {
-            console.log('openSites done: ' + new Date());
+            console.log('openSites done: \n' + new Date());
         }
     }
 
@@ -433,16 +439,16 @@
 
         let now = new Date();
         let tt = nextTime(6, 20 * Math.random(), 60 * Math.random());
-        console.log('openSites1: ' + tt);
+        console.log('openSites1: \n' + tt);
         setTimeout(() => {
-            console.log('openSites1 begin: ' + new Date());
+            console.log('openSites1 begin: \n' + new Date());
             openSites(site_list.slice());
         }, tt - now);
 
         tt = nextTime(22, 20 * Math.random(), 60 * Math.random());
-        console.log('openSites2: ' + tt);
+        console.log('openSites2: \n' + tt);
         setTimeout(() => {
-            console.log('openSites2 begin: ' + new Date());
+            console.log('openSites2 begin: \n' + new Date());
             openSites(site_list.slice());
         }, tt - now);
     }
