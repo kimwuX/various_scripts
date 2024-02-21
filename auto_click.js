@@ -6,6 +6,7 @@
 // @author       kim.wu
 // @match        https://www.baidu.com/*
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @icon         https://www.baidu.com/favicon.ico
 // @run-at       document-end
 // ==/UserScript==
 

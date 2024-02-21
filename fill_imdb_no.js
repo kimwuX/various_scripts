@@ -6,6 +6,7 @@
 // @author       kim.wu
 // @match       *://hdhome.org/torrents.php*
 // @require      https://code.jquery.com/jquery-2.1.1.min.js
+// @icon         https://s11.ax1x.com/2024/02/21/pFtlF8U.png
 // @run-at       document-end
 // ==/UserScript==
 
@@ -18,7 +19,7 @@
         let m = /tt(\d+)/.exec($(this).prop('href'))
         if (m && m.length > 1) {
             if (m[1].length < 7) {
-                let n = ('0000000' + m[1]).slice(-7)
+                let n = m[1].padStart(7, '0')
                 n = $(this).prop('href').replace(m[1], n)
                 $(this).prop('href', n)
             }

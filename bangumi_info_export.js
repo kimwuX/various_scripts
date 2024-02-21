@@ -8,6 +8,7 @@
 // @match       *://bangumi.tv/subject/*
 // @match       *://chii.in/subject/*
 // @grant        GM_setClipboard
+// @icon         https://bgm.tv/img/ico/ico_ios.png
 // ==/UserScript==
 
 ////////////////////////////////////////////////////////////////

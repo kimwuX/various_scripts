@@ -221,7 +221,7 @@
             delay += 3000 * (0.5 + Math.random());
             console.log('delay: ' + delay);
         } else {
-            if ($("*:contains('签到记录')").length > 0 || $("*:contains('验证码错误')").length > 0) {
+            if ($("*:contains('签到记录')").length > 0) {
                 document.location.reload();
                 return;
             }
@@ -288,9 +288,15 @@
 
     function delay_signTJU() {
 
+        let err = $("a:contains('重新进行验证')");
+        if (err.length > 0) {
+            err[0].click();
+            return;
+        }
+
         //let offset = correctTime($('span#datetime').text()) || 1;
         let arr = [6, 7, 8, 12, 18, 20, 22];
-        let next = nextListTime(arr, 1.5);
+        let next = nextListTime(arr, 2);
         let now = new Date();
         console.log('now: \n' + now);
         console.log('next: \n' + next);
@@ -499,8 +505,8 @@
         'https://pt.btschool.club/',
         'https://greatposterwall.com/',
         'https://pt.keepfrds.com/',
-        'https://www.hddolby.com/',
-        //'https://www.torrentleech.org/',
+        //'https://www.hddolby.com/',
+        'https://www.torrentleech.org/',
         'https://hd-space.org/',
         'https://pt.eastgame.org/',
         'https://www.hitpt.com/',
