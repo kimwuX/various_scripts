@@ -6,7 +6,7 @@
 // @author       kim.wu
 // @match       *://www.bilibili.com/video/*
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://www.baidu.com/favicon.ico
+// @icon         https://www.bilibili.com/favicon.ico
 // @run-at       document-end
 // ==/UserScript==
 
@@ -16,13 +16,21 @@
         console.log('bili_login: pause');
         console.log(this);
 
-        setTimeout((vd) => {
+        let t = Date.now();
+        let id = setInterval(vd => {
+            //console.log(`bili_login: ${Date.now() - t}`);
+            if (Date.now() - t > 15000) { //timeout
+                clearInterval(id);
+            }
+
             $('.bili-mini-close-icon').each(function() {
                 console.log(this);
                 this.click();
                 vd.play();
+
+                clearInterval(id);
             });
-        }, 1000, this);
+        }, 200, this);
     });
 
 })();
