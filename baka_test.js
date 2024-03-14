@@ -288,9 +288,18 @@
 
     function delay_signTJU() {
 
+        //验证码超时，请点击重新进行验证
         let err = $("a:contains('重新进行验证')");
         if (err.length > 0) {
             err[0].click();
+            return;
+        }
+        //有未读的站点公告，请先阅读并确认
+        if ($('input#confirm-read-button').length > 0) {
+            $('input#readed').prop("checked", true);
+            setTimeout(function() {
+                $('input#confirm-read-button').click();
+            }, 12000);
             return;
         }
 
