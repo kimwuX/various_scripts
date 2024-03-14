@@ -6593,6 +6593,8 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         var imgs_to_deal = descr.match(/(\[url=.*?\])?\[img\].*?(png|jpg|webp)\[\/img\](\[\/url\])?/ig);
         try {
             if (imgs_to_deal) {
+                //mod by kim.wu
+                imgs_to_deal = imgs_to_deal.filter(item => { return item.search(/doubanio\.com/i) == -1; });
                 $('#picture').val(imgs_to_deal.join('\n'));
             }
         } catch (err) {}
@@ -6698,12 +6700,14 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
                         new_urls = new_urls.toString().split(',');
                         var urls_append = '';
                         if (new_urls.length > 1) {
-                            for (var i=0; i<=new_urls.length-2; i+=2) {
-                                urls_append += `${new_urls[i]} ${new_urls[i+1]}\n`
-                            }
-                            if (new_urls.length % 2 == 1) {
-                                urls_append += new_urls[new_urls.length-1] + '\n';
-                            }
+                            //mod by kim.wu
+                            urls_append = new_urls.join(' \n') + '\n';
+                            //for (var i=0; i<=new_urls.length-2; i+=2) {
+                            //    urls_append += `${new_urls[i]} ${new_urls[i+1]}\n`
+                            //}
+                            //if (new_urls.length % 2 == 1) {
+                            //    urls_append += new_urls[new_urls.length-1] + '\n';
+                            //}
                         } else {
                             urls_append = new_urls[0] + '\n';
                         }
