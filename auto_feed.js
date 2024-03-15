@@ -88,7 +88,7 @@
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1268106
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      2.0.5.9
+// @version      2.0.6.0
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -363,7 +363,7 @@ if (location.href.match(/^https:\/\/greatposterwall.com\/torrents.php.*/)) {
                     show_files(tid, 'detail');
                 });
             } else {
-                $(e).prev().find('span.TorrentTitle ').append(`/<span style="font-weight:bold;color:#20B2AA">${torrent_name}</span>`);
+                $(e).prev().find('span.TorrentTitle ').append(` / <span style="font-weight:bold;color:#20B2AA">${torrent_name}</span>`);
             }
         });
     } else {
@@ -1143,12 +1143,8 @@ const default_show_search_urls = {
     'HDB': 0,
     'HDT': 0,
     'UHD': 0,
-    'LHD': 1
 };
 var show_search_urls = GM_getValue('show_search_urls') === undefined ? default_show_search_urls : JSON.parse(GM_getValue('show_search_urls'));
-if (!show_search_urls.hasOwnProperty('LHD')) {
-    show_search_urls['LHD'] = default_show_search_urls['LHD'];
-}
 
 //设置依托界面站点列表
 const setting_host_list = {
@@ -1540,11 +1536,13 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
     var text = '快速搜索：';
     var brs = '</br></br>';
     var font_color = 'red';
+    var font_size = '';
 
     if (mode == 1) {
         div_style = '';  font_color = 'green'; text = ''; brs = '</br>';
     } else if (mode == 2) {
         div_style = ''; brs = '</br>';
+        font_size = 'size = 2px';
     } else if (mode == 3) {
         div_style = ''; font_color = 'green'; text = ''; brs = '';
     }
@@ -1612,7 +1610,7 @@ function add_search_urls(container, imdbid, imdbno, search_name, mode) {
         }
     }
     site_search_lists = site_search_lists.format({'imdbid': imdbid, 'imdbno': imdbno, 'search_name': search_name});
-    container.append(`${brs}<div ${div_style} class="search_urls"><font size="2px" color=${font_color}>${text}${site_search_lists}</font></div>`);
+    container.append(`${brs}<div ${div_style} class="search_urls"><font ${font_size} color=${font_color}>${text}${site_search_lists}</font></div>`);
     container.find('.disabled').attr("disabled",true).click(e=>{
         e.preventDefault();
         alert('当前影视没有IMDB信息！！');
@@ -5859,6 +5857,9 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
                         } else if ($('#content', doc).length) {
                             console.log(`开始签到${e}：`, $('#content', doc).find('p[class="register-now-info register-info"]').text().trim());
                             $(`input[kname=${e}]`).parent().find('a').css({"color": "red"});
+                        } else if (e == "PTT" && $("table.main").length) {
+                            console.log(`开始签到${e}：`, $("table.main").text().trim());
+                            $(`input[kname=${e}]`).parent().find('a').css({"color": "red"});
                         } else {
                             console.log(`开始签到${e}：`, '失败！！！');
                             $(`input[kname=${e}]`).parent().find('a').css({"color": "blue"});
@@ -5899,15 +5900,19 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
             if (used_signin_sites.indexOf('HDChina') > -1) {
                 getDoc('https://hdchina.org/', null, function(doc){
                     var data = encodeURI('csrf=' + $('head', doc).find('meta[name="x-csrf"]').attr("content"));
-                    postData('https://hdchina.org/plugin_sign-in.php?cmd=signin', data, function(docc) {
-                        if (docc.match(/该页面必须在登录后才能访问|Contact your hosting provider letting them know your web server is not responding|522: Connection timed out/)) {
-                            console.log(`开始签到瓷器：`, '失败，请重新登录！！！');
-                            $(`input[kname=HDChina]`).parent().find('a').css({"color": "blue"});
-                        } else {
-                            $(`input[kname=HDChina]`).parent().find('a').css({"color": "red"});
-                            console.log(`开始签到瓷器：`, docc);
-                        }
-                    });
+                    if ($('head', doc).find('meta[name="x-csrf"]').attr("content") === undefined) {
+                        $(`input[kname=HDChina]`).parent().find('a').css({"color": "blue"});
+                    } else {
+                        postData('https://hdchina.org/plugin_sign-in.php?cmd=signin', data, function(docc) {
+                            if (docc.match(/该页面必须在登录后才能访问|Contact your hosting provider letting them know your web server is not responding|522: Connection timed out/)) {
+                                console.log(`开始签到瓷器：`, '失败，请重新登录！！！');
+                                $(`input[kname=HDChina]`).parent().find('a').css({"color": "blue"});
+                            } else {
+                                $(`input[kname=HDChina]`).parent().find('a').css({"color": "red"});
+                                console.log(`开始签到瓷器：`, docc);
+                            }
+                        });
+                    }
                 });
             }
             if (used_signin_sites.indexOf('PTer') > -1) {
@@ -6594,7 +6599,7 @@ if (site_url.match(/^https:\/\/.*?usercp.php\?action=personal(#setting|#ptgen|#m
         try {
             if (imgs_to_deal) {
                 //mod by kim.wu
-                imgs_to_deal = imgs_to_deal.filter(item => { return item.search(/doubanio\.com/i) == -1; });
+                imgs_to_deal = imgs_to_deal.filter(item => { return item.search(/doubanio\.com|media-amazon\.com/i) == -1; });
                 $('#picture').val(imgs_to_deal.join('\n'));
             }
         } catch (err) {}
@@ -11506,7 +11511,7 @@ function auto_feed() {
             raw_info.medium_sel = 'Encode';
         }
 
-        if (origin_site == 'HDHome' || origin_site == 'MTeam' || origin_site == 'HDRoute') {
+        if (origin_site == 'HDHome' || origin_site == 'MTeam' || origin_site == 'HDRoute' || origin_site == 'OurBits') {
             //mod by kim.wu
             //raw_info.small_descr = raw_info.small_descr.replace(/【|】/g, " ");
             //raw_info.small_descr = raw_info.small_descr.replace(/diy/i, "【DIY】");
@@ -11515,24 +11520,35 @@ function auto_feed() {
             var img_info = '';
             if (raw_info.name.match(/DIY/i)){
                 var img_urls = raw_info.descr.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/ig);
-                for (i=0; i<img_urls.length; i++){
-                    if (raw_info.descr.indexOf(img_urls[i])<10){
-                    } else{
-                        raw_info.descr = raw_info.descr.replace(img_urls[i], '');
-                        img_info += img_urls[i].match(/\[img\].*?\[\/img\]/)[0];
+                try {
+                    for (i=0; i<img_urls.length; i++){
+                        if (raw_info.descr.indexOf(img_urls[i])<10){
+                        } else{
+                            raw_info.descr = raw_info.descr.replace(img_urls[i], '');
+                            img_info += img_urls[i].match(/\[img\].*?\[\/img\]/)[0];
+                        }
                     }
-                }
+                } catch (Err) {}
             }
 
             raw_info.descr = raw_info.descr.replace(/\n{3,10}/g, '\n\n');
 
             //圆盘补quote
             var tem_str = "";
-            if (raw_info.descr.match(/DISC INFO/i)) {
-                tem_str = raw_info.descr.slice(raw_info.descr.indexOf('DISC INFO') - 10, raw_info.descr.length);
+            if (raw_info.descr.match(/DISC.INFO/i)) {
+                var disc_info = raw_info.descr.match(/.*?DISC.INFO/i)[0];
+                tem_str = raw_info.descr.slice(raw_info.descr.indexOf(disc_info) - 10, raw_info.descr.length);
                 if (!tem_str.match(/quote/i)) {
-                    raw_info.descr = raw_info.descr.replace("DISC INFO", "[img]https://images2.imgbox.com/04/6b/Ggp5ReQb_o.png[/img]\n\n[quote]\rDISC INFO");
-                    raw_info.descr = raw_info.descr + "\r" + "[/quote]";
+                    var img_urls = tem_str.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/ig);
+                    var t_img_info = '';
+                    try {
+                        for (i=0; i<img_urls.length; i++){
+                            raw_info.descr = raw_info.descr.replace(img_urls[i], '');
+                            t_img_info += img_urls[i].match(/\[img\].*?\[\/img\]/)[0];
+                        }
+                    } catch (err) {}
+                    raw_info.descr = raw_info.descr.replace(disc_info, `[img]https://images2.imgbox.com/04/6b/Ggp5ReQb_o.png[/img]\n\n[quote]\r${disc_info}`);
+                    raw_info.descr = raw_info.descr.trim() + "\r" + "[/quote]\n" + t_img_info;
                 }
             }
             raw_info.descr = raw_info.descr + '\n\n' + img_info;
@@ -11569,6 +11585,12 @@ function auto_feed() {
             raw_info.audiocodec_sel = movie_info.audiocodec_sel();
             raw_info.standard_sel = movie_info.standard_sel();
             raw_info.descr = raw_info.descr.replace(/\[size=3\]\[color=green\]\[font=Microsoft YaHei\][\s\S]*$/i, '');
+        }
+
+        if (raw_info.descr.match(/\[quote\]\[quote\]([\s\S]*?)\[\/quote\]\[\/quote\]/)) {
+            raw_info.descr = raw_info.descr.replace(/\[quote\]\[quote\]([\s\S]*?)\[\/quote\]\[\/quote\]/, function(data) {
+                return data.replace(/^\[quote\]/, '\n\n').replace(/\[\/quote\]$/, '\n');
+            });
         }
 
         switch (origin_site) {
@@ -11920,7 +11942,7 @@ function auto_feed() {
         forward_r.id = 'forward_r';
         var style = document.createElement("style");
         style.type = "text/css";
-        var text = document.createTextNode(".round_icon{ width: 14px;height: 14px;border-radius: 75%;} #douban_button {outline:none;}");
+        var text = document.createTextNode(".round_icon{ width: 11px; height: 11px; border-radius: 90%; margin-right: 2px;} #douban_button {outline:none;}");
         style.appendChild(text);
         var head = document.getElementsByTagName("head")[0];
         head.appendChild(style);
@@ -12649,7 +12671,7 @@ function auto_feed() {
                     return;
                 }
                 e.preventDefault();
-                if (if_exclusive) {
+                if (if_exclusive && search_mode) {
                     return;
                 }
                 if (search_mode == 0) {
@@ -12711,7 +12733,7 @@ function auto_feed() {
         } else if (origin_site == 'CMCT' && cmct_mode == 2) {
             $('.forward_a').click(function(e){
                 e.preventDefault();
-                if (if_exclusive) {
+                if (if_exclusive && search_mode) {
                     return;
                 }
                 if (search_mode == 0) {
@@ -12738,7 +12760,7 @@ function auto_feed() {
         } else if (origin_site == 'TTG') {
             $('.forward_a').click(function(e){
                 e.preventDefault();
-                if (if_exclusive) {
+                if (if_exclusive && search_mode) {
                     return;
                 }
                 if (search_mode == 0) {
@@ -14167,7 +14189,7 @@ function auto_feed() {
                 if (raw_info.full_mediainfo){
                     container.val(raw_info.full_mediainfo.trim());
                 } else {
-                    container.val(infos.mediainfo.trim());
+                    container.val(infos.mediainfo.replace(/\[.*?\]/g, '').trim());
                 }
                 if ($('input[name="screenshot"]').length) {
                     $('input[name="screenshot"]').val(infos.pic_info.match(/\[img\].*?\[\/img\]/g).map(i => {
@@ -21063,18 +21085,21 @@ function auto_feed() {
                                 });
                                 audio_info = [...new Set(audio_info)];
                                 descr = descr.format({'audio': audio_info.join(' / ')});
-                                console.log(audio_info)
                             }
                         } else {
                             if (raw_info.descr.match(/Subtitle:(.*)/i)) {
-                                descr = descr.format({'subtitles': raw_info.descr.match(/Subtitle:(.*)/ig).map(e=>{
+                                subtitle_info = raw_info.descr.match(/Subtitle:(.*)/ig).map(e=>{
                                     return e.replace(/Subtitle.*?:?/i, '').split('/')[0].trim();
-                                }).join('\n                     ')});
+                                });
+                                subtitle_info = [...new Set(subtitle_info)];
+                                descr = descr.format({'subtitles': subtitle_info.join(' / ')});
                             }
                             if (raw_info.descr.match(/Audio:(.*)/i)) {
-                                descr = descr.format({'audio': raw_info.descr.match(/Audio:(.*)/ig).map(e=>{
-                                    return e.replace(/Audio.*?:?/i, '').split('/').slice(0,3).join('').trim().replace('Audio', '').replace(/Master/ig, 'MA').replace(/ +/g, ' ');
-                                }).join('\n                     ')});
+                                audio_info = raw_info.descr.match(/Audio:(.*)/ig).map(e=>{
+                                    return e.replace(/Audio.*?:?/i, '').split('/')[0].trim();
+                                });
+                                audio_info = [...new Set(audio_info)];
+                                descr = descr.format({'audio': audio_info.join(' / ')});
                             }
                         }
                     } catch(err) {}
@@ -21109,28 +21134,17 @@ function auto_feed() {
                             return $(e).text();
                         }).join(', ')});
                         descr = descr.format({'runtime': $('li.ipc-metadata-list__item:contains("Runtime")', doc).text().split(' ')[1]});
-                        var genre = Array.from($('div[class*=GenresAndPlot]', doc).find('a')).map(function(e){
-                            return $(e).text().trim();
-                        });
-                        var genre_selected = false;
-                        genre.map(function(e){
-                            if ($('select[name="type"]').find(`option:contains(${e.trim()})`).length) {
-                                if (!genre_selected){
-                                    genre_selected = true;
-                                    $('select[name="type"]').find(`option:contains(${e.trim()})`).attr('selected', true);
-                                }
-                            }
-                        });
                         var imdb_descr = $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).text().trim();
-                        if (imdb_descr.match(/Read All/)){
+                        if (imdb_descr.match(/Read All/i)){
                             var full_descr_url = 'https://www.imdb.com/title/' + raw_info.url.match(/tt\d+/)[0] + '/' + $('span[data-testid="plot-xs_to_m"]:eq(0)', doc).find('a').attr('href');
+                            console.log(full_descr_url)
                             imdb_descr = await getFullDescr(full_descr_url);
                         } else if (imdb_descr.match(/Add a Plot/)) {
                             imdb_descr =  `No data from IMDB: ${raw_info.url}`;
                         }
                         descr = descr.format({'en_descr': imdb_descr});
-                        console.log(descr)
                         $('#bbcode-description').val(descr);
+                        $('#bbcode-description').css('height', '400px');
                         $('#bbcode-description')[0].dispatchEvent(event);
                     }
                     formatDescr();
@@ -25332,6 +25346,7 @@ function auto_feed() {
             $('input[name=title]').val(raw_info.url);
         } else if (page == 2) {
             var descr = kg_intro_base_content;
+            GM_deleteValue('kg_info');
             async function formatDescr() {
                 raw_info.url = $('input[name=link]').val();
                 var aka_url = 'https://www.imdb.com/title/{imdbid}/releaseinfo?ref_=tt_dt_dt'.format({'imdbid': raw_info.url.match(/tt\d+/)[0]});
@@ -25568,6 +25583,7 @@ function auto_feed() {
             }
             raw_info.name = raw_info.name.replace(/ +/g, ' ');
             if ($('#table_manual_upload_2').css('display') == 'table') {
+                GM_deleteValue('btn_info');
                 try{
                     var announce = $('input[value*="announce"]').val();
                     addTorrent(raw_info.torrent_url, raw_info.torrent_name, 'BTN', announce);
@@ -26197,6 +26213,7 @@ function auto_feed() {
             raw_info = fill_raw_info(raw_info, 'AVZ');
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
+            GM_deleteValue('avz_info');
         } else {
             return;
         }
@@ -26209,6 +26226,7 @@ function auto_feed() {
             raw_info.descr = raw_info.descr.replace(/ /g, ' ');
             raw_info.full_mediainfo = raw_info.full_mediainfo.replace(/ /g, ' ');
             console.log(raw_info);
+            GM_deleteValue('task_info');
             $('input[name=imdb]').val(raw_info.url);
 
             name = raw_info.name;
