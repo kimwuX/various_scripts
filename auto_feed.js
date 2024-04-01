@@ -11605,18 +11605,19 @@ function auto_feed() {
 
             //DIY图文换序兼顾圆盘补quote
             var img_info = '';
-            if (raw_info.name.match(/DIY/i)){
-                var img_urls = raw_info.descr.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/ig);
-                try {
-                    for (i=0; i<img_urls.length; i++){
-                        if (raw_info.descr.indexOf(img_urls[i])<10){
-                        } else{
-                            raw_info.descr = raw_info.descr.replace(img_urls[i], '');
-                            img_info += img_urls[i].match(/\[img\].*?\[\/img\]/)[0];
-                        }
-                    }
-                } catch (Err) {}
-            }
+            //mod by kim.wu
+            //if (raw_info.name.match(/DIY/i)){
+            //    var img_urls = raw_info.descr.match(/(\[url=.*?\])?\[img\].*?\[\/img\](\[\/url\])?/ig);
+            //    try {
+            //        for (i=0; i<img_urls.length; i++){
+            //            if (raw_info.descr.indexOf(img_urls[i])<10){
+            //            } else{
+            //                raw_info.descr = raw_info.descr.replace(img_urls[i], '');
+            //                img_info += img_urls[i].match(/\[img\].*?\[\/img\]/)[0];
+            //            }
+            //        }
+            //    } catch (Err) {}
+            //}
 
             raw_info.descr = raw_info.descr.replace(/\n{3,10}/g, '\n\n');
 
