@@ -11645,6 +11645,13 @@ function auto_feed() {
             }
         }
 
+        //mod by kim.wu
+        if (origin_site == 'UBits') {
+            if (raw_info.descr.match(/^(\[img\].*?\[\/img\])\s*(\[quote\][\s\S]*?\[\/quote\])/im)) {
+                raw_info.descr = raw_info.descr.replace(/^(\[img\].*?\[\/img\])\s*(\[quote\][\s\S]*?\[\/quote\])/im, '$2\n\n$1');
+            }
+        }
+
         if (origin_site == 'PTer'){
             raw_info.descr = raw_info.descr.replace(/https:\/\/pterclub.com\/link.php\?sign=.*?&target=/ig, '');
         }
