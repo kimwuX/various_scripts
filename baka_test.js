@@ -524,7 +524,8 @@
         'https://rousi.zip/',
         'https://ubits.club/',
         'https://www.nicept.net/',
-        'https://www.skyey2.com/'
+        'https://www.skyey2.com/',
+        'https://www.smzdm.com/'
     ];
 
 })();

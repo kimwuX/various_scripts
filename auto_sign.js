@@ -40,6 +40,7 @@
 // @match       *://rousi.zip/*
 // @match       *://ptchdbits.co/*
 // @match       *://ubits.club/*
+// @match       *://www.smzdm.com/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
@@ -79,6 +80,10 @@
             })
         } else if (host.search(/hdcity/i) != -1) {
             res = $('.button-group a').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else if (host.search(/smzdm/i) != -1) {
+            res = $('a.J_punch').filter(function() {
                 return isSignable($(this).text())
             })
         } else {
