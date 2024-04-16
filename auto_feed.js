@@ -10486,8 +10486,9 @@ function auto_feed() {
                     raw_info.source_sel = '日本';
                 }
             }
-            if ((raw_info.descr+anidb_info).match(/(19|20)\d{2}/)){
-                raw_info.name += ' ' + (raw_info.descr+anidb_info).match(/(19|20)\d{2}/)[0];
+            //mod by kim.wu
+            if (anidb_info.match(/(19|20)\d{2}/)){
+                raw_info.name += ' ' + anidb_info.match(/(19|20)\d{2}/)[0];
             }
             //mod by kim.wu
             //if (raw_info.animate_info.match(/\[movie\]/i)) {
