@@ -305,7 +305,7 @@
 
         //let offset = correctTime($('span#datetime').text()) || 1;
         let arr = [6, 7, 8, 12, 18, 20, 22];
-        let next = nextListTime(arr, 2);
+        let next = nextListTime(arr, 3);
         let now = new Date();
         console.log('now: \n' + now);
         console.log('next: \n' + next);
@@ -524,8 +524,7 @@
         'https://rousi.zip/',
         'https://ubits.club/',
         'https://www.nicept.net/',
-        'https://www.skyey2.com/',
-        'https://www.smzdm.com/'
+        'https://www.skyey2.com/'
     ];
 
 })();
