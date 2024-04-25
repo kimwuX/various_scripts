@@ -225,6 +225,30 @@
                 document.location.reload();
                 return;
             }
+            //刷新，题库未收录
+            setTimeout(() => {
+                let ta = [];
+                try {
+                    $('input[name="ban_robot"]').each(function() {
+                        ta.push($(this).parent().text());
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
+                //console.log(ta);
+
+                if (id && ta.length > 0) {
+                    let dic_tmp = {};
+                    if (GM_getValue('dic_tmp')) {
+                        dic_tmp = JSON.parse(GM_getValue('dic_tmp'));
+                    }
+                    dic_tmp[id] = ta;
+                    //console.log(dic_tmp);
+                    //console.log(JSON.stringify(dic_tmp));
+                    GM_setValue('dic_tmp', JSON.stringify(dic_tmp));
+                }
+                document.location.reload();
+            }, 60000);
         }
 
         let dic_tju = {};
