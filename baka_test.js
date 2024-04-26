@@ -11,6 +11,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
+// @grant        GM_openInTab
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://s11.ax1x.com/2024/02/02/pFQmm9K.png
 // @run-at       document-end
@@ -191,20 +192,20 @@
             GM_setValue('dic_chd', JSON.stringify(dic_chd));
         });
 
+        let chk = false;
         if (a) {
-            let chk = false;
             $('input[name="choice[]"]').each(function() {
                 if (a.indexOf($(this).val()) != -1) {
                     $(this).prop("checked", true);
                     chk = true;
                 }
             });
-            //提交
-            if (chk) {
-                setTimeout(function() {
-                    $('input[name="submit"]').click();
-                }, delay);
-            }
+        }
+        //提交
+        if (chk) {
+            setTimeout(function() {
+                $('input[name="submit"]').click();
+            }, delay);
         }
     }
 
@@ -292,8 +293,8 @@
             GM_setValue('dic_tju', JSON.stringify(dic_tju));
         });
 
+        let chk = false;
         if (a) {
-            let chk = false;
             $('input[name="ban_robot"]').each(function() {
                 //if (a.indexOf($(this).val().split('&').pop()) != -1) {
                 if (a.indexOf($(this).parent().text()) != -1) {
@@ -301,12 +302,12 @@
                     chk = true;
                 }
             });
-            //提交
-            if (chk) {
-                setTimeout(function() {
-                    $('input[name="submit"]').click();
-                }, delay);
-            }
+        }
+        //提交
+        if (chk) {
+            setTimeout(function() {
+                $('input[name="submit"]').click();
+            }, delay);
         }
     }
 
@@ -437,21 +438,27 @@
             $(this).after(div);
         });
 
+        let answer;
         if (a) {
-            let answer;
             p.find('input[type="submit"]').each(function() {
                 let str = $(this).prop('name') + '|' + $(this).val();
                 if (a.indexOf(str) != -1) {
                     answer = $(this);
                 }
             });
-            if (answer) {
-                console.log(answer);
-                answer.css('color', 'blue');
-                //提交
-                //setTimeout(function() {
-                //    answer.click();
-                //}, delay);
+        }
+        if (answer) {
+            console.log(answer);
+            answer.css('color', 'blue');
+            //提交
+            //setTimeout(function() {
+            //    answer.click();
+            //}, delay);
+        } else {
+            if (new Date().getHours() > 20) {
+                let i = Math.floor(Math.random()*4);
+                //console.log(p.find('input[type="submit"]').eq(i));
+                p.find('input[type="submit"]').eq(i).click();
             }
         }
     }
@@ -461,10 +468,11 @@
         if (arr.length > 0) {
             console.log(new Date().toTimeString() + ': \n' + arr[0]);
             let t = 30000;
-            if (arr[0].search(/ourbits/i) != -1) {
+            if (arr[0].search(/hdsky|open|ourbits/i) != -1) {
                 t = 60000;
             }
-            let win = window.open(arr.shift());
+            //let win = window.open(arr.shift());
+            let win = GM_openInTab(arr.shift());
             setTimeout(() => {
                 win.close();
                 openSites(arr);
