@@ -485,19 +485,16 @@
     function signOthers() {
 
         let now = new Date();
-        let tt = nextTime(6, 20 * Math.random(), 60 * Math.random());
-        console.log('openSites1: \n' + tt);
-        setTimeout(() => {
-            console.log('openSites1 begin: \n' + new Date());
-            openSites(site_list.slice());
-        }, tt - now);
-
-        tt = nextTime(22, 20 * Math.random(), 60 * Math.random());
-        console.log('openSites2: \n' + tt);
-        setTimeout(() => {
-            console.log('openSites2 begin: \n' + new Date());
-            openSites(site_list.slice());
-        }, tt - now);
+        let arr = [6, 8, 12, 18, 22];
+        for (let i = 0; i < arr.length; i++) {
+            let idx = i;
+            let tt = nextTime(arr[idx], 20 * Math.random(), 60 * Math.random());
+            console.log(`openSites${idx + 1}: \n` + tt);
+            setTimeout(() => {
+                console.log(`openSites${idx + 1} begin: \n` + new Date());
+                openSites(site_list.slice());
+            }, tt - now);
+        }
     }
 
     setTimeout(function() {
