@@ -96,16 +96,20 @@
             //console.log(res[0])
             if (host.search(/ptchdbits/i) != -1) {
                 let t1 = new Date()
-                if (location.pathname.search(/bakatest\.php/i) != -1 && $("*:contains('签到记录')").length > 0) {
-                    GM_setValue(host, t1.toDateString())
-                    console.log('今天已经签过到了')
-                }
                 let v1 = GM_getValue(host)
-                if (!v1 || new Date(v1).toDateString() != t1.toDateString()) {
-                    res[0].click()
-                    console.log(t1.toLocaleTimeString() + ' Signed.')
-                } else {
+                if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
                     console.log("Aleady Signed.")
+                } else {
+                    if (location.pathname.search(/bakatest\.php/i) != -1) {
+                        let els = $("font").filter(function() { return /连续\d+天签到/.test($(this).text()) })
+                        if (els.length > 0) {
+                            GM_setValue(host, t1.toLocaleString())
+                            console.log('今天已经签过到了')
+                        }
+                    } else {
+                        //console.log(t1.toLocaleTimeString() + ' Signed.')
+                        res[0].click()
+                    }
                 }
             } else {
                 res[0].click()

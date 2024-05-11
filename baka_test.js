@@ -152,16 +152,11 @@
             delay += 3000 * (0.5 + Math.random());
             console.log('delay: ' + delay);
         } else {
-            if ($("*:contains('今天已经签过到了')").length > 0) {
+            let els = $("font").filter(function() { return /连续\d+天签到/.test($(this).text()) })
+            if (els.length > 0) {
                 return;
             }
         }
-
-        //阻止提交表单
-        //$('form').submit(function(event) {
-        //    event.preventDefault();
-        //    console.log($(this).serialize());
-        //});
 
         let dic_chd = {};
         if (GM_getValue('dic_chd')) {
@@ -474,7 +469,9 @@
             //let win = window.open(arr.shift());
             let win = GM_openInTab(arr.shift());
             setTimeout(() => {
-                win.close();
+                if (win && !win.closed) {
+                    win.close();
+                }
                 openSites(arr);
             }, t);
         } else {
@@ -543,7 +540,7 @@
         'https://pt.btschool.club/',
         'https://greatposterwall.com/',
         'https://pt.keepfrds.com/',
-        //'https://www.hddolby.com/',
+        'https://www.hddolby.com/',
         'https://www.torrentleech.org/',
         'https://hd-space.org/',
         'https://pt.eastgame.org/',
