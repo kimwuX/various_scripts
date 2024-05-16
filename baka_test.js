@@ -13,7 +13,7 @@
 // @grant        GM_deleteValue
 // @grant        GM_openInTab
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://s11.ax1x.com/2024/02/02/pFQmm9K.png
+// @icon         https://img95.pixhost.to/images/777/468772954_2.png
 // @run-at       document-end
 // ==/UserScript==
 
@@ -325,7 +325,7 @@
 
         //let offset = correctTime($('span#datetime').text()) || 1;
         let arr = [6, 7, 8, 12, 18, 20, 22];
-        let next = nextListTime(arr, 3);
+        let next = nextListTime(arr, 3 + 3 * Math.random());
         let now = new Date();
         console.log('now: \n' + now);
         console.log('next: \n' + next);

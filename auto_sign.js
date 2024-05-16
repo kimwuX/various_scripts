@@ -49,7 +49,7 @@
 // @grant        GM_getValue
 // @grant        GM_deleteValue
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://s11.ax1x.com/2024/02/02/pFQKg8P.png
+// @icon         https://img95.pixhost.to/images/777/468772956_1.png
 // @run-at       document-end
 // ==/UserScript==
 
