@@ -1864,8 +1864,8 @@ const reg_team_name = {
 
 function add_thanks(descr) {
     //mod by kim.wu
-    const thanks_str = "[quote][b][color=blue]转自[i]{site}[/i]，感谢分享。[/color][/b][/quote]\n\n{descr}";
-    const thanks_reg = /\[quote\].*?转载?自.+?感谢.*?\[\/quote\]/i;
+    const thanks_str = "[quote][b][color=blue]转载于[i]{site}[/i]，对发布者表示感谢。[/color][/b][/quote]\n\n{descr}";
+    const thanks_reg = /\[quote\].*?转载?[自于].+感谢.*\[\/quote\]/i;
     if (descr.search(thanks_reg) == -1) {
         let site = raw_info.origin_site;
         for (var key in reg_team_name) {

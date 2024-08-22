@@ -40,6 +40,7 @@
 // @match       *://rousi.zip/*
 // @match       *://ptchdbits.co/*
 // @match       *://ubits.club/*
+// @match       *://hhanclub.top/*
 // @match       *://www.smzdm.com/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
@@ -82,6 +83,10 @@
             res = $('.button-group a').filter(function() {
                 return isSignable($(this).text())
             })
+        } else if (host.search(/hhanclub/i) != -1) {
+            res = $('#user-info-panel a').filter(function() {
+                return isSignable($(this).text())
+            })
         } else if (host.search(/smzdm/i) != -1) {
             res = $('a.J_punch').filter(function() {
                 return isSignable($(this).text())
@@ -94,9 +99,9 @@
 
         if (res && res.length > 0) {
             //console.log(res[0])
+            let t1 = new Date()
+            let v1 = GM_getValue(host)
             if (host.search(/ptchdbits/i) != -1) {
-                let t1 = new Date()
-                let v1 = GM_getValue(host)
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
                     console.log("Aleady Signed.")
                 } else {
@@ -110,6 +115,13 @@
                         //console.log(t1.toLocaleTimeString() + ' Signed.')
                         res[0].click()
                     }
+                }
+            } else if (host.search(/hhanclub/i) != -1) {
+                if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
+                    console.log("Aleady Signed.")
+                } else {
+                    GM_setValue(host, t1.toLocaleString())
+                    res[0].click()
                 }
             } else {
                 res[0].click()
