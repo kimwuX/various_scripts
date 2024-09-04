@@ -92,7 +92,7 @@
 // @require      https://greasyfork.org/scripts/444988-music-helper/code/music-helper.js?version=1268106
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      2.0.7.2
+// @version      2.0.7.3
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -2495,7 +2495,7 @@ String.prototype.standard_sel = function() {
 //获取类型
 String.prototype.get_type = function() {
     var result = this.toString();
-    if (result.match(/(Movie|电影|UHD原盘|films|電影)/i)) {
+    if (result.match(/(Movie|电影|UHD原盘|films|電影|剧场)/i)) {
         result = '电影';
     } else if (result.match(/(Animation|动漫|動畫|动画|Anime|Cartoons)/i)) {
         result = '动漫';
@@ -14633,6 +14633,17 @@ function auto_feed() {
                     if (labels.zz){ document.getElementsByName('cnsub')[0].checked=true; }
                     if (labels.diy){ document.getElementsByName('diy')[0].checked=true; }
                     break;
+                case 'CMCT':
+                    if (labels.zz){ document.getElementById('subtitlezh').checked=true; }
+                    if (!labels.diy && raw_info.descr.match(/mpls/i)){ document.getElementById('untouched').checked=true; }
+                    if (labels.hdr10) {document.getElementById('hdr10').checked=true; }
+                    if (labels.hdr10plus) { document.getElementById('hdr10plus').checked=true; }
+                    if (raw_info.descr.match(/HDR Vivid/)) { document.getElementById('hdrvivid').checked=true; }
+                    if (raw_info.small_descr.match(/特效字幕/)) { document.getElementById('subtitlesp').checked=true; }
+                    if (labels.db) { document.getElementById('dovi').checked=true; }
+                    if (raw_info.name.match(/(\.| )3D(\.| )/)) { document.getElementById('3d').checked=true; }
+                    if (raw_info.name.match(/HLG/)) { document.getElementById('hlg').checked=true; }
+                    break;
                 case 'OurBits':
                     if (labels.gy){ document.getElementById('tagGY').checked=true; }
                     if (labels.yy){ document.getElementById('tagGY').checked=true; }
@@ -15554,11 +15565,20 @@ function auto_feed() {
 
         else if (forward_site == 'CMCT'){
             var browsecat = $('#browsecat');
-            var type_dict = {'电影': 501, '剧集': 502, '动漫': 504, '综艺': 505, '音乐': 508, '纪录': 503,
+            var type_dict = {'电影': 501, '剧集': 502, '综艺': 505, '音乐': 508, '纪录': 503,
                              '体育': 506, '软件': 509, '学习': 509, '': 509, 'MV': 507, '书籍': 509};
             if (type_dict.hasOwnProperty(raw_info.type)){
                 var index = type_dict[raw_info.type];
                 browsecat.val(index);
+            }
+
+            if (raw_info.type == '动漫') {
+                $('#animation').attr('checked', true);
+                if (raw_info.name.match(/S\d+|E\d+/i)) {
+                    browsecat.val(502);
+                } else {
+                    browsecat.val(501);
+                }
             }
 
             //mod by kim.wu
@@ -20609,8 +20629,15 @@ function auto_feed() {
             try {
                 if (raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)){
                     var cover = raw_info.descr.match(/\[img\](\S*?)\[\/img\]/i)[1];
-                    $('input[name="cover"]').val(cover);
-                    $('input[name="cover"]').after(`<div><img src=${cover} id="cover" style="max-width:120px;" /><span>海报预览，默认显示第一张图片为海报，如果不是请自行更换。</span></div>`);
+                    //mod by kim.wu
+                    var ipt_cover;
+                    if (site_url.match(/add_offer/)) {
+                        ipt_cover = $('input[name="picture"]');
+                    } else {
+                        ipt_cover = $('input[name="cover"]');
+                    }
+                    ipt_cover.val(cover);
+                    ipt_cover.after(`<div><img src=${cover} id="cover" style="max-width:120px;" /><span>海报预览，默认显示第一张图片为海报，如果不是请自行更换。</span></div>`);
                 }
             } catch (err) {}
         }

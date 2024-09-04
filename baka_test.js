@@ -315,13 +315,13 @@
             return;
         }
         //有未读的站点公告，请先阅读并确认
-        if ($('input#confirm-read-button').length > 0) {
-            $('input#readed').prop("checked", true);
-            setTimeout(function() {
-                $('input#confirm-read-button').click();
-            }, 12000);
-            return;
-        }
+        // if ($('input#confirm-read-button').length > 0) {
+        //     $('input#readed').prop("checked", true);
+        //     setTimeout(function() {
+        //         $('input#confirm-read-button').click();
+        //     }, 12000);
+        //     return;
+        // }
 
         //let offset = correctTime($('span#datetime').text()) || 1;
         let arr = [6, 7, 8, 12, 18, 20, 22];
