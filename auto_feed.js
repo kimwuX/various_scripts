@@ -8406,7 +8406,8 @@ function auto_feed() {
 
             //ourbits没有简介的话补充简介
             if (origin_site == 'OurBits') {
-                raw_info.descr = raw_info.descr.replace(/Mediainfo|Screenshot|BDInfo|screenshot/g, '');
+                //mod by kim.wu
+                raw_info.descr = raw_info.descr.replace(/Mediainfo|Screenshot|screenshot/g, '');
                 try{
                     var imdbnew2 = document.getElementsByClassName("imdbnew2")[0];
                     raw_info.url = match_link('imdb', imdbnew2.innerHTML);
@@ -14544,7 +14545,8 @@ function auto_feed() {
                     });
                 }
                 container.css({'height': '600px'});
-                var tmp_descr = raw_info.descr.replace(infos.mediainfo, '');
+                //mod by kim.wu
+                var tmp_descr = raw_info.descr.replace(infos.mediainfo, '').replace(/\[quote\]\s*\[\/quote\]\s*/g, '');
                 if (forward_site == '影') {
                     tmp_descr = tmp_descr.replace(/(\[url=.*\])?\[img\].*?\[\/img\](\[\/url\])?/g, '');
                     $('textarea[name="descr"]').css({'height': '400px'});
@@ -20613,13 +20615,18 @@ function auto_feed() {
             GM_setClipboard(raw_info.descr.trim());
             $('#editor-container').css('height', '600px');
             var descr_html = '';
-            raw_info.descr.trim().split('\n').forEach((e,index)=>{
-                if (e) {
-                    descr_html += `<p>${e}</p>`;
-                } else {
-                    descr_html += '<p><br></p>';
-                }
-            });
+            //mod by kim.wu
+            //raw_info.descr.trim().split('\n').forEach((e,index)=>{
+            //    if (e) {
+            //        descr_html += `<p>${e}</p>`;
+            //    } else {
+            //        descr_html += '<p><br></p>';
+            //    }
+            //});
+            var reg_q = raw_info.descr.match(/\[quote\]((?!quote|Unique\s+ID|Disc\s+Title|Disc\s+Label)[\s\S])*\[\/quote\]/g);
+            if (reg_q) {
+                descr_html = '<p>' + reg_q.join('</p><p>') + '</p>';
+            }
             descr_html = descr_html.replace(/\[url=(.+?)\](.+?)\[\/url\]/ig, '<a href="$1">$2</a>');
             if (site_url.match(/add_offer/)) {
                 contentEditor.setHtml(descr_html.trim());
