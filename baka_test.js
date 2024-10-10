@@ -309,9 +309,15 @@
     function delay_signTJU() {
 
         //验证码超时，请点击重新进行验证
-        let err = $("a:contains('重新进行验证')");
-        if (err.length > 0) {
-            err[0].click();
+        let err1 = $("a:contains('重新进行验证')");
+        if (err1.length > 0) {
+            err1[0].click();
+            return;
+        }
+        //补签弥补连续天数
+        let err2 = $("a:contains('补签弥补连续天数')");
+        if (err2.length > 0) {
+            err2[0].click();
             return;
         }
         //有未读的站点公告，请先阅读并确认

@@ -39,11 +39,11 @@
         console.log('check_notice.');
         let host = location.host;
         if (host.search(/hhanclub/i) != -1) {
-            //handleCommon($('#notify_confirm'), $('#confirm_notify_select'));
+            handleCommon($('#notify_confirm'), $('#confirm_notify_select'));
         } else if (host.search(/m-team/i) != -1) {
-            //handleCommon($('.ant-modal-root .ant-btn'));
+            handleCommon($('.ant-modal-root .ant-btn'));
         } else if (host.search(/tjupt/i) != -1) {
-            //handleCommon($('#confirm-read-button'), $('#readed'));
+            handleCommon($('#confirm-read-button'), $('#readed'));
         } else if (host.search(/springsunday/i) != -1) {
             handleCommon($('.news-modal-main #NewsModalCloseBtn'));
         }

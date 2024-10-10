@@ -12428,8 +12428,10 @@ function auto_feed() {
                         raw_info.descr = raw_info.descr.replace(raw_info.extra_text, '');
                     }
                 } catch (err){}
-                raw_info.descr = '[img]' + img_address + '[/img]\n\n' + raw_info.descr + '\n\n';
-                if (raw_info.extra_text) { raw_info.descr = '[quote]\n' + raw_info.extra_text + '\n[/quote]\n\n' + raw_info.descr; }
+                //mod by kim.wu
+                img_address = img_address.replace('https://images.weserv.nl/?url=', '');
+                raw_info.descr = '[img]' + img_address + '[/img]\n\n' + raw_info.descr.trim() + '\n\n';
+                if (raw_info.extra_text) { raw_info.descr = '[quote]' + raw_info.extra_text + '[/quote]\n\n' + raw_info.descr; }
                 try{
                     var $html = $('td').filter('.douban_info').html();
                     if ($html.match(/https:\/\/www.imdb.com\/title\/tt\d+/)){
