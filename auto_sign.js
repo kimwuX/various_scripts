@@ -41,7 +41,9 @@
 // @match       *://ptchdbits.co/*
 // @match       *://ubits.club/*
 // @match       *://hhanclub.top/*
+// @match       *://lemonhd.club/*
 // @match       *://www.smzdm.com/*
+// @match       *://ikunshare.com/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
@@ -89,6 +91,10 @@
             })
         } else if (host.search(/smzdm/i) != -1) {
             res = $('a.J_punch').filter(function() {
+                return isSignable($(this).text())
+            })
+        } else if (host.search(/ikunshare/i) != -1) {
+            res = $('button#checkInButton').filter(function() {
                 return isSignable($(this).text())
             })
         } else {

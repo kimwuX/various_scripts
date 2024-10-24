@@ -9,6 +9,8 @@
 // @match       *://tjupt.org/*
 // @match       *://www.tjupt.org/*
 // @match       *://springsunday.net/*
+// @match       *://pterclub.com/*
+// @exclude     */blank.htm*
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://img99.pixhost.to/images/274/509385792_5.png
 // @run-at       document-end
@@ -46,6 +48,9 @@
             handleCommon($('#confirm-read-button'), $('#readed'));
         } else if (host.search(/springsunday/i) != -1) {
             handleCommon($('.news-modal-main #NewsModalCloseBtn'));
+        } else if (host.search(/pterclub/i) != -1) {
+            let pb = $('input[name="confirm-news"]');
+            handleCommon(pb.siblings('button'), pb);
         }
     }, 3000);
 
