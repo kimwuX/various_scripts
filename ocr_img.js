@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         验证码识别
 // @namespace    http://www.kimwu.com/
-// @version      1.0
+// @version      1.0.0
 // @description  自动识别验证码
 // @author       kim.wu
 // @match       *://open.cd/plugin_sign-in.php

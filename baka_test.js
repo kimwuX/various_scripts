@@ -11,7 +11,6 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
-// @grant        GM_openInTab
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://img95.pixhost.to/images/777/468772954_2.png
 // @run-at       document-end
@@ -113,32 +112,6 @@
         }, tick);
     }
 
-    //防止休眠
-    function playAudio() {
-
-        let source = document.createElement('source');
-        source.src = 'https://open.cd/attachments/202210/202210010005258775518ae99535515641dbecb5a3113e.mp3';
-        //source.src = 'https://open.cd/attachments/202210/20221001000532b0ff1a4c576fc75bdaadef6c9c5e4409.mp3';
-        //source.src = 'https://open.cd/attachments/202210/20221001000536089c29811d3a2f08045aa4185c32e475.mp3';
-        source.type = 'audio/mpeg';
-
-        let audio = new Audio();
-        audio.appendChild(source);
-        audio.style = 'width: 100%';
-        audio.controls = true;
-        audio.autoplay = true;
-        //audio.muted = true;
-        audio.loop = true;
-
-        let td = document.createElement('td');
-        td.appendChild(audio);
-
-        let tr = document.createElement('tr');
-        tr.appendChild(td);
-
-        $('td#nav_block').parent().after(tr);
-    }
-
     function signCHD(training) {
 
         let delay = 0;
@@ -212,13 +185,13 @@
             $('form').submit(function(event) {
                 event.preventDefault();
                 console.log($(this).serialize());
-                document.location.reload();
+                location.reload();
             });
             delay += 3000 * (0.5 + Math.random());
             console.log('delay: ' + delay);
         } else {
             if ($("*:contains('签到记录')").length > 0) {
-                document.location.reload();
+                location.reload();
                 return;
             }
             //刷新，题库未收录
@@ -243,7 +216,7 @@
                     //console.log(JSON.stringify(dic_tmp));
                     GM_setValue('dic_tmp', JSON.stringify(dic_tmp));
                 }
-                document.location.reload();
+                location.reload();
             }, 60000);
         }
 
@@ -346,12 +319,10 @@
             startTicktock(1000);
         } else {
             setTimeout(() => {
-                document.location.reload();
+                location.reload();
             }, val - 90000);
             startTicktock(300000);
         }
-        signOthers();
-        playAudio();
     }
 
     function signU2(training, partial) {
@@ -363,7 +334,7 @@
                 $('td.outer form').first().submit(function(event) {
                     event.preventDefault();
                     console.log($(this).serialize());
-                    //document.location.reload();
+                    //location.reload();
                     $('div#showup a.faqlink').click();
                 });
             }
@@ -464,42 +435,6 @@
         }
     }
 
-    function openSites(arr) {
-
-        if (arr.length > 0) {
-            console.log(new Date().toTimeString() + ': \n' + arr[0]);
-            let t = 30000;
-            if (arr[0].search(/hdsky|open|ourbits/i) != -1) {
-                t = 60000;
-            }
-            //let win = window.open(arr.shift());
-            let win = GM_openInTab(arr.shift());
-            setTimeout(() => {
-                if (win && !win.closed) {
-                    win.close();
-                }
-                openSites(arr);
-            }, t);
-        } else {
-            console.log('openSites done: \n' + new Date());
-        }
-    }
-
-    function signOthers() {
-
-        let now = new Date();
-        let arr = [6, 8, 12, 18, 22];
-        for (let i = 0; i < arr.length; i++) {
-            let idx = i;
-            let tt = nextTime(arr[idx], 20 * Math.random(), 60 * Math.random());
-            console.log(`openSites${idx + 1}: \n` + tt);
-            setTimeout(() => {
-                console.log(`openSites${idx + 1} begin: \n` + new Date());
-                openSites(site_list.slice());
-            }, tt - now);
-        }
-    }
-
     setTimeout(function() {
 
         //刷题
@@ -519,47 +454,5 @@
         }
 
     }, 1000);
-
-    let site_list = [
-        'https://u2.dmhy.org/',
-        'https://hdsky.me/',
-        'https://open.cd/',
-        //'https://www.tjupt.org/',
-        'https://ptchdbits.co/',
-        'https://kp.m-team.cc/',
-        'https://springsunday.net/',
-        'https://pt.hd4fans.org/',
-        'https://totheglory.im/',
-        'https://www.pttime.org/',
-        'https://hdtime.org/',
-        //'https://hdchina.org/',
-        'https://pterclub.com/',
-        'https://hdarea.club/',
-        'https://pthome.net/',
-        'https://ourbits.club/',
-        'https://pt.soulvoice.club/',
-        'https://www.haidan.video/',
-        'https://hdcity.city/',
-        'https://pt.sjtu.edu.cn/',
-        'https://hdatmos.club/',
-        'https://hdhome.org/',
-        'https://pt.btschool.club/',
-        'https://greatposterwall.com/',
-        'https://pt.keepfrds.com/',
-        'https://www.hddolby.com/',
-        'https://www.torrentleech.org/',
-        'https://hd-space.org/',
-        'https://pt.eastgame.org/',
-        'https://www.hitpt.com/',
-        'https://audiences.me/',
-        'https://dicmusic.com/',
-        'https://rousi.zip/',
-        'https://ubits.club/',
-        'https://hhanclub.top/',
-        'https://lemonhd.club/',
-        'https://www.nicept.net/',
-        'https://www.skyey2.com/',
-        'https://ikunshare.com/'
-    ];
 
 })();

@@ -8,7 +8,6 @@
 // @match       *://hdhome.org/*
 // @match       *://hdchina.org/*
 // @match       *://pterclub.com/*
-// @match       *://lemonhd.org/*
 // @match       *://pthome.net/*
 // @match       *://pt.soulvoice.club/*
 // @match       *://pt.btschool.club/*
@@ -42,6 +41,8 @@
 // @match       *://ubits.club/*
 // @match       *://hhanclub.top/*
 // @match       *://lemonhd.club/*
+// @match       *://qingwapt.com/*
+// @match       *://new.qingwa.pro/*
 // @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*
 // @exclude     */showup.php*
