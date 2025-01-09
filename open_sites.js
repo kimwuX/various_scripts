@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  指定时段自动打开网页，方便后续自动签到
 // @author       kim.wu
-// @match       *://localhost
+// @match       *://kim.local/
 // @grant        GM_openInTab
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://img101.pixhost.to/images/125/547184887_6.png
