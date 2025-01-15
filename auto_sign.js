@@ -43,8 +43,10 @@
 // @match       *://lemonhd.club/*
 // @match       *://qingwapt.com/*
 // @match       *://new.qingwa.pro/*
+// @match       *://zmpt.cc/*
 // @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*
+// @match       *://www.wnflb2023.com/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
@@ -99,6 +101,10 @@
             res = $('button#checkInButton').filter(function() {
                 return isSignable($(this).text())
             })
+        } else if (host.search(/wnflb2023/i) != -1) {
+            res = $('img#fx_checkin_b').filter(function() {
+                return isSignable($(this).attr('alt'))
+            }).parent()
         } else {
             res = $('#info_block a').filter(function() {
                 return isSignable($(this).text())// && !/(usercp|details|forums|messages)\.php/i.test($(this).prop('href'))

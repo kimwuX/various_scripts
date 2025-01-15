@@ -47,14 +47,14 @@ function registerMenu() {
         menu_ID[i] = GM_registerMenuCommand(
             `${menu_All[i][2] ? '✅' : '❌'} ${menu_All[i][1]}`,
             function(){
-                menu_switch(menu_All[i][2], menu_All[i][0], menu_All[i][1])
+                menuSwitch(menu_All[i][2], menu_All[i][0], menu_All[i][1])
             }
         );
     }
 }
 
 // 菜单开关
-function menu_switch(menuStatus, key, tips) {
+function menuSwitch(menuStatus, key, tips) {
 
     let dic = vault.menu ? JSON.parse(vault.menu) : {};
     if (menuStatus) {
@@ -70,7 +70,7 @@ function menu_switch(menuStatus, key, tips) {
 }
 
 // 返回菜单值
-function menu_value(menuName) {
+function getMenuValue(menuName) {
     for (let menu of menu_All) {
         if (menu[0] == menuName) {
             return menu[2]
@@ -101,13 +101,13 @@ function saveVault() {
         if (vault.date && new Date(vault.date).toDateString() == t1.toDateString()) {
             console.log("Aleady shouted.")
         } else {
-            if (menu_value('sh_up')) {
+            if (getMenuValue('sh_up')) {
                 setTimeout(() => {
                     $('input#shbox_text').val("蛙总，求上传")
                     $('input#hbsubmit').click()
                 }, 0)
             }
-            if (menu_value('sh_down')) {
+            if (getMenuValue('sh_down')) {
                 setTimeout(() => {
                     $('input#shbox_text').val("蛙总，求下载")
                     $('input#hbsubmit').click()

@@ -143,9 +143,11 @@
         'https://hhanclub.top/',
         'https://lemonhd.club/',
         'https://qingwapt.com/',
+        'https://zmpt.cc/',
         'https://www.nicept.net/',
         'https://www.skyey2.com/',
-        'https://ikunshare.com/'
+        'https://ikunshare.com/',
+        'https://www.wnflb2023.com/'
     ];
 
 })();

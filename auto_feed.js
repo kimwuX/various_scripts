@@ -11911,7 +11911,8 @@ function auto_feed() {
             temp = raw_info.name;
             raw_info.name = raw_info.small_descr;
             raw_info.small_descr = temp;
-            raw_info.small_descr = raw_info.small_descr.replace(/免费|50%/g, "");
+            //mod by kim.wu
+            raw_info.small_descr = raw_info.small_descr.replace(/\[(2X)?\s*(免费|50%|30%|中性.*)?\]/ig, "");
             raw_info.small_descr = raw_info.small_descr.trim(); //去除首尾空格
             raw_info.medium_sel = 'Encode';
         }
@@ -14358,6 +14359,13 @@ function auto_feed() {
         }
         if (raw_info.origin_site == 'BHD' && raw_info.name.match(/-FraMeSToR/)) {
             raw_info.name = raw_info.name.replace(/(BluRay)(.*?)(AVC|VC-1|HEVC)(.*?)(REMUX)/i, '$1 $5 $3 $2').replace(/ +/g, ' ').replace(' -', '-');
+        }
+        //mod by kim.wu
+        if (forward_site == 'QingWa') {
+            raw_info.name = raw_info.name.replace(/\s*\d+bit/i, '');
+            raw_info.name = raw_info.name.replace(/(19|20)(\d{2})\s+(.*?)\s+(720p|1080p|1080i|2160p|4k)/i, '$1$2 $4 $3');
+
+            raw_info.small_descr = raw_info.small_descr.replace(/^\[(.+)\]\s*(.*)/i, '$1 [$2]');
         }
         for (i = 0; i < allinput.length; i++) {
             if (allinput[i].name == 'name' && forward_site != 'GPW' && forward_site != 'OpenCD') { //填充标题
