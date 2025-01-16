@@ -16,10 +16,8 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
-
+(function () {
     function handleCommon(btn, cbx) {
-
         if (btn.length > 0) {
             console.log(btn);
             if (cbx) {
@@ -36,8 +34,7 @@
         }
     }
 
-    setTimeout(function() {
-
+    setTimeout(function () {
         console.log('check_notice.');
         let host = location.host;
         if (host.search(/hhanclub/i) != -1) {

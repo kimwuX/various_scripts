@@ -61,86 +61,86 @@
 // ==/UserScript==
 
 (function () {
-
     function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str)
+        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
-    setTimeout(function() {
-
-        let res, host = location.host
+    setTimeout(function () {
+        let res, host = location.host;
         if (host.search(/totheglory/i) != -1) {
-            res = $('.bottom a').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('.bottom a').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/hdchina/i) != -1) {
-            res = $('.userinfort a').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('.userinfort a').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/btschool/i) != -1) {
-            res = $('.outer>p a').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('.outer>p a').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/haidan/i) != -1) {
-            res = $('.userinfo #modalBtn').filter(function() {
-                return isSignable($(this).prop('value'))
-            })
+            res = $('.userinfo #modalBtn').filter(function () {
+                return isSignable($(this).prop('value'));
+            });
         } else if (host.search(/hdcity/i) != -1) {
-            res = $('.button-group a').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('.button-group a').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/hhanclub/i) != -1) {
-            res = $('#user-info-panel a').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('#user-info-panel a').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/smzdm/i) != -1) {
-            res = $('a.J_punch').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('a.J_punch').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/ikunshare/i) != -1) {
-            res = $('button#checkInButton').filter(function() {
-                return isSignable($(this).text())
-            })
+            res = $('button#checkInButton').filter(function () {
+                return isSignable($(this).text());
+            });
         } else if (host.search(/wnflb2023/i) != -1) {
-            res = $('img#fx_checkin_b').filter(function() {
-                return isSignable($(this).attr('alt'))
-            }).parent()
+            res = $('img#fx_checkin_b').filter(function () {
+                return isSignable($(this).attr('alt'));
+            }).parent();
         } else {
-            res = $('#info_block a').filter(function() {
-                return isSignable($(this).text())// && !/(usercp|details|forums|messages)\.php/i.test($(this).prop('href'))
-            })
+            res = $('#info_block a').filter(function () {
+                return isSignable($(this).text());
+            });
         }
 
         if (res && res.length > 0) {
-            //console.log(res[0])
-            let t1 = new Date()
-            let v1 = GM_getValue(host)
+            //console.log(res[0]);
+            let t1 = new Date();
+            let v1 = GM_getValue(host);
             if (host.search(/ptchdbits/i) != -1) {
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    console.log("Aleady Signed.")
+                    console.log("Aleady Signed.");
                 } else {
                     if (location.pathname.search(/bakatest\.php/i) != -1) {
-                        let els = $("font").filter(function() { return /连续\d+天签到/.test($(this).text()) })
+                        let els = $("font").filter(function () {
+                            return /连续\d+天签到/.test($(this).text());
+                        });
                         if (els.length > 0) {
-                            GM_setValue(host, t1.toLocaleString())
-                            console.log('今天已经签过到了')
+                            GM_setValue(host, t1.toLocaleString());
+                            console.log('今天已经签过到了');
                         }
                     } else {
-                        //console.log(t1.toLocaleTimeString() + ' Signed.')
-                        res[0].click()
+                        //console.log(t1.toLocaleTimeString() + ' Signed.');
+                        res[0].click();
                     }
                 }
             } else if (host.search(/hhanclub/i) != -1) {
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    console.log("Aleady Signed.")
+                    console.log("Aleady Signed.");
                 } else {
-                    GM_setValue(host, t1.toLocaleString())
-                    res[0].click()
+                    GM_setValue(host, t1.toLocaleString());
+                    res[0].click();
                 }
             } else {
-                res[0].click()
+                res[0].click();
             }
         }
-    }, 1000)
+    }, 1000);
 
-  })();
+})();

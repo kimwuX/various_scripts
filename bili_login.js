@@ -10,9 +10,8 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
-
-    $('video').on('pause', function() {
+(function () {
+    $('video').on('pause', function () {
         console.log('bili_login: pause');
         console.log(this);
 
@@ -23,7 +22,7 @@
                 clearInterval(id);
             }
 
-            $('.bili-mini-close-icon').each(function() {
+            $('.bili-mini-close-icon').each(function () {
                 console.log(this);
                 this.click();
                 vd.play();

@@ -11,14 +11,12 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
-
+(function () {
     Date.prototype.toString = Date.prototype.toLocaleString;
     Date.prototype.toDateString = Date.prototype.toLocaleDateString;
     Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
 
     function nextTime(hour, minute, second, offset) {
-
         let now = new Date();
         let next = new Date();
         next.setHours(hour, minute, second, 0);
@@ -33,7 +31,6 @@
     }
 
     function playAudio() {
-
         let source = document.createElement('source');
         source.src = 'assets/晴天-周杰伦.mp3';
         //source.type = 'audio/mpeg';
@@ -52,7 +49,6 @@
     }
 
     function openSites(arr) {
-
         if (arr.length > 0) {
             console.log(new Date().toTimeString() + ': \n' + arr[0]);
             let t = 30000;
@@ -73,7 +69,6 @@
     }
 
     function signPlan() {
-
         let now = new Date();
         let arr = [6, 8, 12, 18, 22];
         for (let i = 0; i < arr.length; i++) {
@@ -87,8 +82,7 @@
         }
     }
 
-    setTimeout(function() {
-
+    setTimeout(function () {
         console.log('open_sites.');
         signPlan();
 

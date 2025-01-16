@@ -19,105 +19,101 @@
 // @run-at       document-end
 // ==/UserScript==
 
-let menu_All = [
-    ['sh_up', '求上传喊话', true],
-    ['sh_down', '求下载喊话', true],
-], menu_ID = [];
-let vault = GM_getValue(location.host) || {};
-
-registerMenu();
-
-// 注册脚本菜单
-function registerMenu() {
-
-    for (let i = 0; i < menu_ID.length; i++) {
-        GM_unregisterMenuCommand(menu_ID[i]);
-    }
-
-    //console.log(vault);
-    let dic = vault.menu ? JSON.parse(vault.menu) : {};
-    for (const arr of menu_All) {
-        if (dic.hasOwnProperty(arr[0])) {
-            arr[2] = dic[arr[0]];
-        }
-    }
-    //console.log(menu_All);
-
-    for (let i = 0; i < menu_All.length; i++){ // 循环注册脚本菜单
-        menu_ID[i] = GM_registerMenuCommand(
-            `${menu_All[i][2] ? '✅' : '❌'} ${menu_All[i][1]}`,
-            function(){
-                menuSwitch(menu_All[i][2], menu_All[i][0], menu_All[i][1])
-            }
-        );
-    }
-}
-
-// 菜单开关
-function menuSwitch(menuStatus, key, tips) {
-
-    let dic = vault.menu ? JSON.parse(vault.menu) : {};
-    if (menuStatus) {
-        dic[key] = false;
-        GM_notification({text: `已禁用【${tips}】功能`, timeout: 3000});
-    } else {
-        dic[key] = true;
-        GM_notification({text: `已启用【${tips}】功能`, timeout: 3000});
-    }
-    vault.menu = JSON.stringify(dic);
-    saveVault();
-    registerMenu(); // 重新注册脚本菜单
-}
-
-// 返回菜单值
-function getMenuValue(menuName) {
-    for (let menu of menu_All) {
-        if (menu[0] == menuName) {
-            return menu[2]
-        }
-    }
-}
-
-function saveVault() {
-    GM_setValue(location.host, vault);
-}
-
 (function () {
+    let menu_All = [
+        ['sh_up', '求上传喊话', true],
+        ['sh_down', '求下载喊话', true],
+    ], menu_ID = [];
+    let vault = GM_getValue(location.host) || {};
+
+    registerMenu();
+
+    // 注册脚本菜单
+    function registerMenu() {
+        for (let i = 0; i < menu_ID.length; i++) {
+            GM_unregisterMenuCommand(menu_ID[i]);
+        }
+
+        //console.log(vault);
+        let dic = vault.menu ? JSON.parse(vault.menu) : {};
+        for (const arr of menu_All) {
+            if (dic.hasOwnProperty(arr[0])) {
+                arr[2] = dic[arr[0]];
+            }
+        }
+        //console.log(menu_All);
+
+        for (let i = 0; i < menu_All.length; i++) { // 循环注册脚本菜单
+            menu_ID[i] = GM_registerMenuCommand(
+                `${menu_All[i][2] ? '✅' : '❌'} ${menu_All[i][1]}`,
+                function () {
+                    menuSwitch(menu_All[i][2], menu_All[i][0], menu_All[i][1]);
+                }
+            );
+        }
+    }
+
+    // 菜单开关
+    function menuSwitch(menuStatus, key, tips) {
+        let dic = vault.menu ? JSON.parse(vault.menu) : {};
+        if (menuStatus) {
+            dic[key] = false;
+            GM_notification({ text: `已禁用【${tips}】功能`, timeout: 3000 });
+        } else {
+            dic[key] = true;
+            GM_notification({ text: `已启用【${tips}】功能`, timeout: 3000 });
+        }
+        vault.menu = JSON.stringify(dic);
+        saveVault();
+        registerMenu(); // 重新注册脚本菜单
+    }
+
+    // 返回菜单值
+    function getMenuValue(menuName) {
+        for (let menu of menu_All) {
+            if (menu[0] == menuName) {
+                return menu[2];
+            }
+        }
+    }
+
+    function saveVault() {
+        GM_setValue(location.host, vault);
+    }
 
     function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str)
+        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
-    setTimeout(function() {
-
-        let res = $('#info_block a').filter(function() {
-            return isSignable($(this).text())
-        })
+    setTimeout(function () {
+        let res = $('#info_block a').filter(function () {
+            return isSignable($(this).text());
+        });
 
         //签到优先
-        if (res && res.length > 0) return
+        if (res && res.length > 0) return;
 
-        let t1 = new Date()
+        let t1 = new Date();
         if (vault.date && new Date(vault.date).toDateString() == t1.toDateString()) {
-            console.log("Aleady shouted.")
+            console.log("Aleady shouted.");
         } else {
             if (getMenuValue('sh_up')) {
                 setTimeout(() => {
-                    $('input#shbox_text').val("蛙总，求上传")
-                    $('input#hbsubmit').click()
-                }, 0)
+                    $('input#shbox_text').val("蛙总，求上传");
+                    $('input#hbsubmit').click();
+                }, 0);
             }
             if (getMenuValue('sh_down')) {
                 setTimeout(() => {
-                    $('input#shbox_text').val("蛙总，求下载")
-                    $('input#hbsubmit').click()
-                }, 1500)
+                    $('input#shbox_text').val("蛙总，求下载");
+                    $('input#hbsubmit').click();
+                }, 1500);
             }
             setTimeout(() => {
-                vault.date = t1.toLocaleString()
-                saveVault()
+                vault.date = t1.toLocaleString();
+                saveVault();
             }, 3000);
         }
-    }, 1000)
+    }, 1000);
 
-  })();
+})();

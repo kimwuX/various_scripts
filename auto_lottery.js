@@ -14,9 +14,31 @@
 // ==/UserScript==
 
 (function () {
+    let vault = GM_getValue(location.host) || {};
+
+    function cleanVault() {
+        let rms = [];
+        let t1 = new Date().toLocaleDateString();
+        for (const key in vault) {
+            if (getDays(key, t1) > 30) {
+                rms.push(key);
+            }
+        }
+        if (rms.length > 0) {
+            for (const key of rms) {
+                delete vault[key];
+            }
+            GM_setValue(location.host, vault);
+        }
+    }
+
+    function saveToVault(key, arr) {
+        vault[key] = JSON.stringify(arr);
+        GM_setValue(location.host, vault);
+    }
 
     function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str)
+        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
     function isValidDate(date) {
@@ -30,7 +52,7 @@
         if (!isValidDate(d1) || !isValidDate(d2)) {
             return Number.MAX_SAFE_INTEGER;
         }
-        
+
         // 计算两个日期的时间差（毫秒）
         var timeDiff = Math.abs(d2.getTime() - d1.getTime());
         // 计算天数
@@ -38,68 +60,57 @@
         return days;
     }
 
-    setTimeout(function() {
-
-        let res = $('#info_block a').filter(function() {
-            return isSignable($(this).text())
-        })
+    setTimeout(function () {
+        let res = $('#info_block a').filter(function () {
+            return isSignable($(this).text());
+        });
 
         //签到优先
-        if (res && res.length > 0) return
+        if (res && res.length > 0) return;
 
-        let t1 = new Date().toLocaleDateString()
-        let vault = GM_getValue(location.host) || {}
-        
-        let rm = []
-        for (const key in vault) {
-            if (getDays(key, t1) > 30) {
-                rm.push(key)
-            }
-        }
-        if (rm.length > 0) {
-            for (const key of rm) {
-                delete vault[key]
-            }
-            GM_setValue(location.host, vault)
-        }
+        cleanVault();
+        //console.log(vault);
 
-        let arr = vault[t1] || []
-        //console.log(vault)
+        let t1 = new Date().toLocaleDateString();
+        let arr = vault[t1] ? JSON.parse(vault[t1]) : [];
         if (arr && arr.length > 0) {
-            console.log("Aleady clicked.")
-        } else if(location.href.search(/lottery\.php/i) == -1) {
-            res = $('#info_block a').filter(function() {
-                return /神游三清天/i.test($(this).text())
-            })
+            console.log("Aleady clicked.");
+        } else if (location.href.search(/lottery\.php/i) == -1) {
+            res = $('#info_block a').filter(function () {
+                return /神游三清天/i.test($(this).text());
+            });
             if (res && res.length > 0) {
-                res[0].click()
+                res[0].click();
             }
         } else {
-            let txt = $('div').filter(function() {
-                return $(this).text().match(/这是您今天第.*?次神游/);
-            }).parent()
+            arr.push(new Date().toLocaleTimeString());
+            saveToVault(t1, arr);
+
+            res = $('button.item').filter(function () {
+                return /（免费）/i.test($(this).text()) && !$(this).prop("disabled");
+            });
+            if (res && res.length > 0) {
+                res[0].click();
+            }
+        }
+
+        if (location.href.search(/lottery\.php/i) != -1) {
+            let txt = $('div').filter(function () {
+                return /这是您今天第.*?次神游/.test($(this).text());
+            }).parent();
             if (txt && txt.length > 0) {
-                let reg = txt.text().trim().match(/本次神游到了\s*(.*)/)
+                let reg = txt.text().trim().match(/本次神游到了\s*(.*)/);
                 if (reg) {
-                    arr.push(reg[1])
-                } else if(txt.text().trim().match(/本次什么都没有得到/)) {
-                    arr.push('无')
+                    arr.push(reg[1]);
+                } else if (txt.text().trim().match(/本次什么都没有得到/)) {
+                    arr.push('无');
                 }
                 if (arr.length > 0) {
-                    vault[t1] = arr
-                    GM_setValue(location.host, vault)
-                }
-            }
-
-            res = $('button.item').filter(function() {
-                return /（免费）/i.test($(this).text())
-            })
-            if (res && res.length > 0) {
-                if (!res.prop("disabled")) {
-                    res[0].click()
+                    saveToVault(t1, arr);
                 }
             }
         }
-    }, 1000)
+        //console.log(vault);
+    }, 1000);
 
-  })();
+})();

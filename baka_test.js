@@ -16,8 +16,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function() {
-
+(function () {
     Date.prototype.toString = Date.prototype.toLocaleString;
     Date.prototype.toDateString = Date.prototype.toLocaleDateString;
     Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
@@ -26,7 +25,7 @@
     function deserializeFormData(data) {
         let formData = {};
 
-        data.split('&').forEach(function(item) {
+        data.split('&').forEach(function (item) {
             let keyValuePair = item.split('=');
 
             if (!keyValuePair[0]) return;
@@ -62,7 +61,6 @@
     }
 
     function correctTime(time_str) {
-
         let now = new Date();
         let dt = new Date(time_str);
         if (isValidDate(dt)) {
@@ -75,7 +73,6 @@
     }
 
     function nextTime(hour, minute, second, offset) {
-
         let now = new Date();
         let next = new Date();
         next.setHours(hour, minute, second, 0);
@@ -90,7 +87,6 @@
     }
 
     function nextListTime(arr, offset) {
-
         let next;
         let now = new Date();
         for (let i = 0; i < arr.length; i++) {
@@ -113,11 +109,10 @@
     }
 
     function signCHD(training) {
-
         let delay = 0;
         if (training) {
             if ($("*:contains('签到记录')").length > 0) {
-                setTimeout(function() {
+                setTimeout(function () {
                     $('a[href="bakatest.php"]')[0].click();
                 }, 1000);
                 return;
@@ -125,7 +120,9 @@
             delay += 3000 * (0.5 + Math.random());
             console.log('delay: ' + delay);
         } else {
-            let els = $("font").filter(function() { return /连续\d+天签到/.test($(this).text()) })
+            let els = $("font").filter(function () {
+                return /连续\d+天签到/.test($(this).text());
+            });
             if (els.length > 0) {
                 return;
             }
@@ -143,10 +140,10 @@
         }
         let a = dic_chd[id];
 
-        $('input[name="submit"]').click(function() {
+        $('input[name="submit"]').click(function () {
             //console.log('click.');
             a = [];
-            $('input[name="choice[]"]').each(function() {
+            $('input[name="choice[]"]').each(function () {
                 if ($(this).prop('checked') == true) {
                     a.push($(this).val());
                 }
@@ -162,7 +159,7 @@
 
         let chk = false;
         if (a) {
-            $('input[name="choice[]"]').each(function() {
+            $('input[name="choice[]"]').each(function () {
                 if (a.indexOf($(this).val()) != -1) {
                     $(this).prop("checked", true);
                     chk = true;
@@ -171,18 +168,17 @@
         }
         //提交
         if (chk) {
-            setTimeout(function() {
+            setTimeout(function () {
                 $('input[name="submit"]').click();
             }, delay);
         }
     }
 
     function signTJU(training) {
-
         let delay = 0;
         if (training) {
             //阻止提交表单
-            $('form').submit(function(event) {
+            $('form').submit(function (event) {
                 event.preventDefault();
                 console.log($(this).serialize());
                 location.reload();
@@ -198,7 +194,7 @@
             setTimeout(() => {
                 let ta = [];
                 try {
-                    $('input[name="ban_robot"]').each(function() {
+                    $('input[name="ban_robot"]').each(function () {
                         ta.push($(this).parent().text());
                     });
                 } catch (error) {
@@ -237,10 +233,10 @@
         }
         let a = dic_tju[id];
 
-        $('input[name="submit"]').click(function() {
+        $('input[name="submit"]').click(function () {
             //console.log('click.');
             a = [];
-            $('input[name="ban_robot"]').each(function() {
+            $('input[name="ban_robot"]').each(function () {
                 if ($(this).prop('checked') == true) {
                     //let v = $(this).val().split('&').pop();
                     //if (v && a.indexOf(v) == -1) {
@@ -263,7 +259,7 @@
 
         let chk = false;
         if (a) {
-            $('input[name="ban_robot"]').each(function() {
+            $('input[name="ban_robot"]').each(function () {
                 //if (a.indexOf($(this).val().split('&').pop()) != -1) {
                 if (a.indexOf($(this).parent().text()) != -1) {
                     $(this).prop("checked", true);
@@ -273,14 +269,13 @@
         }
         //提交
         if (chk) {
-            setTimeout(function() {
+            setTimeout(function () {
                 $('input[name="submit"]').click();
             }, delay);
         }
     }
 
     function delay_signTJU() {
-
         //验证码超时，请点击重新进行验证
         let err1 = $("a:contains('重新进行验证')");
         if (err1.length > 0) {
@@ -326,12 +321,11 @@
     }
 
     function signU2(training, partial) {
-
         let delay = 0;
         if (training) {
             if (!partial) {
                 //阻止提交表单
-                $('td.outer form').first().submit(function(event) {
+                $('td.outer form').first().submit(function (event) {
                     event.preventDefault();
                     console.log($(this).serialize());
                     //location.reload();
@@ -347,12 +341,12 @@
         }
         if (!partial) {
             //监听节点删除
-            const observer = new MutationObserver(function(mutationsList, observer) {
+            const observer = new MutationObserver(function (mutationsList, observer) {
                 for (let mutation of mutationsList) {
                     if (mutation.type === 'childList') {
                         console.log('MutationObserver: childList');
                         //observer.disconnect();
-                        setTimeout(function() {
+                        setTimeout(function () {
                             //console.clear();
                             signU2(training, true);
                         }, 500);
@@ -382,7 +376,7 @@
 
         $('textarea[name="message"]').val('今日份签到');
 
-        p.find('input[type="submit"]').click(function() {
+        p.find('input[type="submit"]').click(function () {
             let str = $(this).prop('name') + '|' + $(this).val();
             console.log(str);
             if (a == null) {
@@ -401,9 +395,9 @@
 
         //搜索
         console.log('add search buttons.');
-        p.find('input[type="submit"]').each(function() {
+        p.find('input[type="submit"]').each(function () {
             let div = document.createElement('div');
-            let arr = $(this).val().split(' / ').map(function(item) {
+            let arr = $(this).val().split(' / ').map(function (item) {
                 return `<a href="https://www.baidu.com/s?wd=${item.trim()}" target="_blank" style="color: #008600;">${item.trim()}</a>`;
             });
             div.innerHTML = arr.join(' | ');
@@ -412,7 +406,7 @@
 
         let answer;
         if (a) {
-            p.find('input[type="submit"]').each(function() {
+            p.find('input[type="submit"]').each(function () {
                 let str = $(this).prop('name') + '|' + $(this).val();
                 if (a.indexOf(str) != -1) {
                     answer = $(this);
@@ -428,15 +422,14 @@
             //}, delay);
         } else {
             if (new Date().getHours() > 20) {
-                let i = Math.floor(Math.random()*4);
+                let i = Math.floor(Math.random() * 4);
                 //console.log(p.find('input[type="submit"]').eq(i));
                 p.find('input[type="submit"]').eq(i).click();
             }
         }
     }
 
-    setTimeout(function() {
-
+    setTimeout(function () {
         //刷题
         let training = false;
         console.log('baka_test.');
