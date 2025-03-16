@@ -103,7 +103,7 @@
         'https://u2.dmhy.org/',
         'https://hdsky.me/',
         'https://open.cd/',
-        //'https://www.tjupt.org/',
+        'https://www.tjupt.org/',
         'https://ptchdbits.co/',
         'https://kp.m-team.cc/',
         'https://springsunday.net/',
