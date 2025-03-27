@@ -1,3 +1,3 @@
-# pt_plugin
+# various_scripts
 
-pt站点增强脚本。
+一些自用脚本。
