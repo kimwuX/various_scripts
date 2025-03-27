@@ -69,3 +69,4 @@ class Menu {
         GM_setValue(location.host, this.vault);
     }
 }
+

@@ -11,12 +11,22 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
+// @grant        GM_notification
+// @grant        GM_registerMenuCommand
+// @grant        GM_unregisterMenuCommand
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/pt_plugin@master/library.js
 // @icon         https://img95.pixhost.to/images/777/468772954_2.png
 // @run-at       document-end
 // ==/UserScript==
 
 (function () {
+    let menu_All = [
+        ['simulated', '模拟答题', false],
+    ];
+    let menu = new Menu(menu_All);
+    let vault = menu.getVault();
+
     Date.prototype.toString = Date.prototype.toLocaleString;
     Date.prototype.toDateString = Date.prototype.toLocaleDateString;
     Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
@@ -128,10 +138,7 @@
             }
         }
 
-        let dic_chd = {};
-        if (GM_getValue('dic_chd')) {
-            dic_chd = JSON.parse(GM_getValue('dic_chd'));
-        }
+        let dic_chd = vault.dic ? JSON.parse(vault.dic) : {};
         console.log(dic_chd);
         let id = $('input[name="questionid"]').val();
         //console.log(id);
@@ -154,7 +161,8 @@
             }
             //console.log(dic_chd);
             //console.log(JSON.stringify(dic_chd));
-            GM_setValue('dic_chd', JSON.stringify(dic_chd));
+            vault.dic = JSON.stringify(dic_chd);
+            menu.saveVault();
         });
 
         let chk = false;
@@ -203,23 +211,19 @@
                 //console.log(ta);
 
                 if (id && ta.length > 0) {
-                    let dic_tmp = {};
-                    if (GM_getValue('dic_tmp')) {
-                        dic_tmp = JSON.parse(GM_getValue('dic_tmp'));
-                    }
+                    let dic_tmp = vault.temp ? JSON.parse(vault.temp) : {};
                     dic_tmp[id] = ta;
                     //console.log(dic_tmp);
                     //console.log(JSON.stringify(dic_tmp));
-                    GM_setValue('dic_tmp', JSON.stringify(dic_tmp));
+                    vault.temp = JSON.stringify(dic_tmp);
+                    menu.saveVault();
                 }
                 location.reload();
             }, 60000);
         }
 
-        let dic_tju = {};
-        if (GM_getValue('dic_tju')) {
-            dic_tju = JSON.parse(GM_getValue('dic_tju'));
-        }
+        let dic_tju = vault.dic ? JSON.parse(vault.dic) : {};
+        let dic_tmp = vault.temp ? JSON.parse(vault.temp) : {};
         console.log(dic_tju);
         let id;
         try {
@@ -252,9 +256,14 @@
             if (id && a.length > 0) {
                 dic_tju[id] = a.sort();
             }
+            if (id && dic_tmp[id]) {
+                delete dic_tmp[id];
+                vault.temp = JSON.stringify(dic_tmp);
+            }
             //console.log(dic_tju);
             //console.log(JSON.stringify(dic_tju));
-            GM_setValue('dic_tju', JSON.stringify(dic_tju));
+            vault.dic = JSON.stringify(dic_tju);
+            menu.saveVault();
         });
 
         let chk = false;
@@ -356,10 +365,7 @@
             observer.observe($('div#showup')[0], { childList: true });
         }
 
-        let dic_u2 = {};
-        if (GM_getValue('dic_u2')) {
-            dic_u2 = JSON.parse(GM_getValue('dic_u2'));
-        }
+        let dic_u2 = vault.dic ? JSON.parse(vault.dic) : {};
         //console.log(dic_u2);
 
         let p = $('table.captcha');
@@ -390,7 +396,8 @@
             }
             //console.log(dic_u2);
             //console.log(JSON.stringify(dic_u2));
-            //GM_setValue('dic_u2', JSON.stringify(dic_u2));
+            //vault.dic = JSON.stringify(dic_u2);
+            //menu.saveVault();
         });
 
         //搜索
@@ -431,7 +438,7 @@
 
     setTimeout(function () {
         //刷题
-        let training = false;
+        let training = menu.getMenuValue('simulated');
         console.log('baka_test.');
         let host = location.host;
         if (host.search(/ptchdbits/i) != -1) {
