@@ -17,7 +17,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_unregisterMenuCommand
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @require      https://cdn.jsdelivr.net/gh/kimwuX/pt_plugin@master/library.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
 // @icon         https://img101.pixhost.to/images/410/552674185__trumpet.png
 // @run-at       document-end
 // ==/UserScript==
@@ -29,7 +29,6 @@
         ['sh_bonus', '求魔力喊话', true],
     ];
     let menu = new Menu(menu_All);
-    let vault = menu.getVault();
 
     function isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
@@ -44,21 +43,22 @@
         if (res && res.length > 0) return;
 
         let t1 = new Date();
-        if (vault.date && new Date(vault.date).toDateString() == t1.toDateString()) {
+        let ds = menu.get_data('date');
+        if (ds && new Date(ds).toDateString() == t1.toDateString()) {
             console.log("Aleady shouted.");
         } else {
-            if (menu.getMenuValue('sh_up')) {
+            if (menu.get_menu_value('sh_up')) {
                 $('input#shbox_text').val("蛙总，求上传");
                 $('input#hbsubmit').click();
             }
             setTimeout(() => {
-                if (menu.getMenuValue('sh_down')) {
+                if (menu.get_menu_value('sh_down')) {
                     $('input#shbox_text').val("蛙总，求下载");
                     $('input#hbsubmit').click();
                 }
 
-                vault.date = t1.toLocaleString();
-                menu.saveVault();
+                menu.set_data('date', t1.toLocaleString());
+                menu.save_vault();
             }, 1500);
         }
     }
@@ -72,21 +72,22 @@
         if (res && res.length > 0) return;
 
         let t1 = new Date();
-        if (vault.date && new Date(vault.date).toDateString() == t1.toDateString()) {
+        let ds = menu.get_data('date');
+        if (ds && new Date(ds).toDateString() == t1.toDateString()) {
             console.log("Aleady shouted.");
         } else {
-            if (menu.getMenuValue('sh_up')) {
+            if (menu.get_menu_value('sh_up')) {
                 $('input#shbox_text').val("皮总，求上传");
                 $('input#hbsubmit').click();
             }
             setTimeout(() => {
-                if (menu.getMenuValue('sh_bonus')) {
+                if (menu.get_menu_value('sh_bonus')) {
                     $('input#shbox_text').val("皮总，求电力");
                     $('input#hbsubmit').click();
                 }
 
-                vault.date = t1.toLocaleString();
-                menu.saveVault();
+                menu.set_data('date', t1.toLocaleString());
+                menu.save_vault();
             }, 1500);
         }
     }
