@@ -45,6 +45,7 @@
 // @match       *://new.qingwa.pro/*
 // @match       *://zmpt.cc/*
 // @match       *://www.hitpt.com/*
+// @match       *://sewerpt.com/*
 // @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*
 // @match       *://www.wnflb2023.com/*
