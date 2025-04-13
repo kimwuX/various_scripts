@@ -139,6 +139,8 @@
         'https://qingwapt.com/',
         'https://zmpt.cc/',
         'https://sewerpt.com/',
+        'https://cspt.top/',
+        'https://www.agsvpt.com/',
         'https://www.nicept.net/',
         'https://www.skyey2.com/',
         'https://ikunshare.com/',

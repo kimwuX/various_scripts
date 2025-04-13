@@ -46,6 +46,8 @@
 // @match       *://zmpt.cc/*
 // @match       *://www.hitpt.com/*
 // @match       *://sewerpt.com/*
+// @match       *://cspt.top/*
+// @match       *://www.agsvpt.com/*
 // @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*
 // @match       *://www.wnflb2023.com/*
