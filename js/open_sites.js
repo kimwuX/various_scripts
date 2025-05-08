@@ -140,6 +140,7 @@
         'https://zmpt.cc/',
         'https://sewerpt.com/',
         'https://cspt.top/',
+        'https://pandapt.net/',
         'https://www.agsvpt.com/',
         'https://www.nicept.net/',
         'https://www.skyey2.com/',

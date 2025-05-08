@@ -4,11 +4,13 @@
 // @version      1.0.0
 // @description  自动识别验证码
 // @author       kim.wu
+// @match       */login.php*
 // @match       *://open.cd/plugin_sign-in.php
 // @match       *://hdsky.me/*
 // @exclude     */fun.php*
 // @connect      server.local
 // @connect      movie-pilot.org
+// @grant        GM_cookie
 // @grant        GM_xmlhttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/npm/js-base64@3.7.7/base64.min.js
@@ -80,6 +82,9 @@
         GM_xmlhttpRequest({
             method: "GET",
             url: url,
+            headers: {
+              "User-Agent": navigator.userAgent
+            },
             responseType: "blob",
             onerror: function(error) {
                 console.error('load image error:');
@@ -117,9 +122,27 @@
         $('#captips').text(text);
     }
 
+    function regLogin() {
+        $('img[src*="action=regimage"]').each(function() {
+            this.after(createTips());
+
+            try {
+                getImage(this.src, res => {
+                    if (res && res.result && res.result.length == 6) {
+                        $('input[name="imagestring"]').val(res.result);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
+    }
+
     function signOpenCD() {
         if ($('#frmSignin img').length > 0) {
-
             $('#frmSignin img').after(createTips());
 
             try {
@@ -176,10 +199,11 @@
 
         console.log('ocr_img.');
         //console.log(location.href);
-        let host = location.host;
-        if (host.search(/open/i) != -1) {
+        if (location.pathname.search(/login\.php/i) != -1) {
+            regLogin();
+        } else if (location.host.search(/open/i) != -1) {
             signOpenCD();
-        } else if (host.search(/hdsky/i) != -1) {
+        } else if (location.host.search(/hdsky/i) != -1) {
             signHDS();
         }
     }, 1000);

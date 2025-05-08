@@ -47,6 +47,7 @@
 // @match       *://www.hitpt.com/*
 // @match       *://sewerpt.com/*
 // @match       *://cspt.top/*
+// @match       *://pandapt.net/*
 // @match       *://www.agsvpt.com/*
 // @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*

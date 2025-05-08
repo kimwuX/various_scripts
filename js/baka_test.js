@@ -307,7 +307,7 @@
 
         //let offset = correctTime($('span#datetime').text()) || 1;
         let arr = [6, 7, 8, 12, 18, 20, 22];
-        let next = nextListTime(arr, 3 + 5 * Math.random());
+        let next = nextListTime(arr, 0 + 5 * Math.random());
         let now = new Date();
         console.log('now: \n' + now);
         console.log('next: \n' + next);
