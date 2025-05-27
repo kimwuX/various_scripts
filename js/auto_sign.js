@@ -49,8 +49,8 @@
 // @match       *://cspt.top/*
 // @match       *://pandapt.net/*
 // @match       *://www.agsvpt.com/*
-// @match       *://www.smzdm.com/*
 // @match       *://ikunshare.com/*
+// @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
 // @exclude     */showup.php*
 // @exclude     */attendance.php*
@@ -96,11 +96,7 @@
             res = $('#user-info-panel a').filter(function () {
                 return isSignable($(this).text());
             });
-        } else if (host.search(/smzdm/i) != -1) {
-            res = $('a.J_punch').filter(function () {
-                return isSignable($(this).text());
-            });
-        } else if (host.search(/ikunshare/i) != -1) {
+        } else if (host.search(/ikunshare|pting/i) != -1) {
             res = $('button#checkInButton').filter(function () {
                 return isSignable($(this).text());
             });
