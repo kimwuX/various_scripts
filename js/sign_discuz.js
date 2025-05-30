@@ -5,6 +5,7 @@
 // @description  Discuz论坛自动签到
 // @author       kim.wu
 // @match       *://iptv.cc/*
+// @match       *://ssdforum.org/*
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://www.discuz.vip/Yunnuo_website/v1/static/index/discuz/img/icon.png
 // @run-at       document-end
@@ -39,6 +40,7 @@
 
                 $('form#qiandao').first().each(function() {
                     $(this).find('li#kx').click();
+                    $(this).find('#todaysay').val('今日签到');
                     $(this).find('button').click();
                 });
             }

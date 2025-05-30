@@ -147,6 +147,7 @@
         //'https://ikunshare.com/',
         'https://pting.club/',
         'https://iptv.cc/',
+        'https://ssdforum.org/',
         'https://www.wnflb2023.com/'
     ];
 
