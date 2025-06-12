@@ -8209,9 +8209,9 @@ if(site_url.match(/^https:\/\/movie.douban.com\/subject\/\d+/i) && if_douban_jum
             if($('#info').html().match(/tt\d+/i)){
                 var imdbid = $('#info').html().match(/tt\d+/i)[0];
                 var imdbno = imdbid.substring(2);
-                var search_name = $('h1').text().trim().match(/[a-z ]{2,200}/i)[0];
-                search_name = search_name.replace(/season/i, '');
-                if (!search_name.trim()) {
+                //mod by kim.wu
+                var search_name = document.title.replace(/\(豆瓣\)$/, '').trim();
+                if (!search_name) {
                     try{
                         search_name = $('#info span.pl:contains("又名")')[0]
                         .nextSibling.textContent.trim()

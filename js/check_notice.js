@@ -49,6 +49,6 @@
             let pb = $('input[name="confirm-news"]');
             handleCommon(pb.siblings('button'), pb);
         }
-    }, 3000);
+    }, 5000);
 
 })();

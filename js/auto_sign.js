@@ -96,6 +96,8 @@
             res = $('#user-info-panel a').filter(function () {
                 return isSignable($(this).text());
             });
+        } else if (host.search(/cspt/i) != -1) {
+            res = $('a.not-attended');
         } else if (host.search(/ikunshare|pting/i) != -1) {
             res = $('button#checkInButton').filter(function () {
                 return isSignable($(this).text());
