@@ -49,7 +49,7 @@
 // @match       *://cspt.top/*
 // @match       *://pandapt.net/*
 // @match       *://www.agsvpt.com/*
-// @match       *://www.ptskit.com/*
+// @match       *://www.ptskit.org/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*

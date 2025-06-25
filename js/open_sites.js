@@ -143,7 +143,7 @@
         'https://pandapt.net/',
         'https://www.agsvpt.com/',
         'https://www.nicept.net/',
-        'https://www.ptskit.com/',
+        'https://www.ptskit.org/',
         'https://www.skyey2.com/',
         //'https://ikunshare.com/',
         'https://pting.club/',
