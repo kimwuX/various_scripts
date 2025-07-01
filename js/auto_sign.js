@@ -50,6 +50,7 @@
 // @match       *://pandapt.net/*
 // @match       *://www.agsvpt.com/*
 // @match       *://www.ptskit.org/*
+// @match       *://13city.org/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
