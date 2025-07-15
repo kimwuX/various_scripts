@@ -1,4 +1,36 @@
 /**
+ * 观察者类
+ * @author kim.wu <https://github.com/kimwuX>
+ * @class
+ */
+class Observer {
+    // 构造方法
+    constructor(callback) {
+        this.__mutation_observer(callback);
+    }
+
+    observe(target) {
+        this.__observer && this.__observer.observe(target, {childList: true, subtree: true});
+    }
+
+    disconnect() {
+        this.__observer && this.__observer.disconnect();
+    }
+
+    __mutation_observer(callback) {
+        const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+        this.__observer = new MutationObserver(mutationList =>
+            mutationList.filter(m => m.type === 'childList').forEach(m => {
+                //console.log(m);
+                try{
+                    callback(m.addedNodes, m.removedNodes);
+                } catch (err) {}
+            }
+        ));
+    }
+}
+
+/**
  * 储存类
  * @author kim.wu <https://github.com/kimwuX>
  * @class
@@ -7,6 +39,14 @@ class Vault {
     // 构造方法
     constructor() {
         this.__vault = GM_getValue(location.host) || {};
+    }
+
+    get_keys() {
+        return Object.keys(this.__vault);
+    }
+
+    delete_data(key) {
+        delete this.__vault[key];
     }
 
     get_data(key, defaultValue) {

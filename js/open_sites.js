@@ -145,6 +145,7 @@
         'https://www.nicept.net/',
         'https://www.ptskit.org/',
         'https://13city.org/',
+        'https://discfan.net/',
         'https://www.skyey2.com/',
         //'https://ikunshare.com/',
         'https://pting.club/',

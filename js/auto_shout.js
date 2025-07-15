@@ -99,6 +99,6 @@
         } else if (host.search(/zmpt/i) != -1) {
             handleZM();
         }
-    }, 1000);
+    }, 2000);
 
 })();
