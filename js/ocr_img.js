@@ -6,6 +6,8 @@
 // @author       kim.wu
 // @match       */login.php*
 // @match       */signup.php*
+// @match       */recover.php*
+// @match       */confirm_resend.php*
 // @match       *://open.cd/plugin_sign-in.php
 // @match       *://hdsky.me/*
 // @exclude     */fun.php*
@@ -200,7 +202,7 @@
 
         console.log('ocr_img.');
         //console.log(location.href);
-        if (location.pathname.search(/(login|signup)\.php/i) != -1) {
+        if (location.pathname.search(/(login|signup|recover|confirm_resend)\.php/i) != -1) {
             regLogin();
         } else if (location.host.search(/open/i) != -1) {
             signOpenCD();
