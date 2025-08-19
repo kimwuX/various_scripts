@@ -146,6 +146,7 @@
         'https://www.ptskit.org/',
         'https://13city.org/',
         'https://discfan.net/',
+        'https://piggo.me/',
         //'https://www.icc2022.com/',
         'https://www.hxpt.org/',
         'https://carpt.net/',

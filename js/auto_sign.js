@@ -51,6 +51,7 @@
 // @match       *://www.agsvpt.com/*
 // @match       *://www.ptskit.org/*
 // @match       *://13city.org/*
+// @match       *://piggo.me/*
 // @match       *://www.icc2022.com/*
 // @match       *://www.hxpt.org/*
 // @match       *://carpt.net/*
