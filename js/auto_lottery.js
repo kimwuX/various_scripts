@@ -7,6 +7,8 @@
 // @match       *://qingwapt.com/*
 // @match       *://new.qingwa.pro/*
 // @match       *://lemonhd.club/*
+// @match       *://longpt.org/*
+// @exclude     */fun.php*
 // @exclude     */shoutbox.php*
 // @exclude     *qingwa*/banner/
 // @grant        GM_setValue
@@ -20,10 +22,11 @@
 
 (function () {
     let vault = new Vault();
+    let now = new Date();
 
     function cleanVault() {
         let rms = [];
-        let t1 = new Date().toLocaleDateString();
+        let t1 = now.toLocaleDateString();
         for (const key of vault.get_keys()) {
             if (getDays(key, t1) > 30) {
                 rms.push(key);
@@ -37,8 +40,36 @@
         }
     }
 
+    function savePrize(key, value) {
+        let arr = vault.get_str_data(key, []);
+        arr.push(`${now.toLocaleDateString()}:${value}`);
+        //保留30天记录
+        while(arr.length > 30) {
+            arr.shift();
+        }
+        vault.set_str_data(key, arr);
+        vault.save_vault();
+    }
+
     function isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
+    }
+
+    function canLottery() {
+        let res = $('#info_block a').filter(function () {
+            return isSignable($(this).text());
+        });
+
+        //签到优先
+        if (res && res.length > 0) return false;
+
+        let ds = vault.get_data('date');
+        if (ds && new Date(ds).toDateString() == now.toDateString()) {
+            console.log("Aleady lottery.");
+            return false
+        }
+
+        return true;
     }
 
     function isValidDate(date) {
@@ -60,10 +91,18 @@
         return days;
     }
 
+    function matchRegExp(pattern, text) {
+        if (text && text.length > 0) {
+            return text.match(pattern);
+        }
+        return null;
+    }
+
     function qw_observer() {
         let ob = new Observer(function(list_add, list_remove) {
+            let target = $('div.layui-layer.layui-layer-page');
             list_add.forEach(node => {
-                $('div.layui-layer.layui-layer-page').each(function() {
+                target.each(function() {
                     if (node == this) {
                         console.log(node);
                         if ($(this).find('div:contains("每日福利")').length > 0) {
@@ -78,18 +117,9 @@
     }
 
     function handleQW() {
-        let res = $('#info_block a').filter(function () {
-            return isSignable($(this).text());
-        });
+        if (!canLottery()) return;
 
-        //签到优先
-        if (res && res.length > 0) return;
-
-        let t1 = new Date();
-        let ds = vault.get_data('date');
-        if (ds && new Date(ds).toDateString() == t1.toDateString()) {
-            console.log("Aleady lottery.");
-        } else if (location.href.search(/bonusshop\.php/i) == -1) {
+        if (location.href.search(/bonusshop\.php/i) == -1) {
             $('a[href*="bonusshop.php"]').each(function() {
                 this.click();
             });
@@ -99,7 +129,7 @@
                 let num = $(this).find('li[title="限购"]').text().trim();
                 console.log(num);
                 if (num == '0') {
-                    vault.set_data('date', t1.toLocaleString());
+                    vault.set_data('date', now.toLocaleString());
                     vault.save_vault();
                 } else {
                     qw_observer();
@@ -121,7 +151,7 @@
 
         cleanVault();
 
-        let t1 = new Date().toLocaleDateString();
+        let t1 = now.toLocaleDateString();
         let arr = vault.get_str_data(t1, []);
         if (arr && arr.length > 0) {
             console.log("Aleady lottery.");
@@ -133,7 +163,7 @@
                 res[0].click();
             }
         } else {
-            arr.push(new Date().toLocaleTimeString());
+            arr.push(now.toLocaleTimeString());
             vault.set_str_data(t1, arr);
             vault.save_vault();
 
@@ -164,12 +194,78 @@
         }
     }
 
+    function doLongPT() {
+        //求上传、求魔力
+        console.log("-----喊话-----");
+        $('input[placeholder="喊话"]').val("求上传").each(function () {
+            this.dispatchEvent(new Event('input'));
+        });
+        $('button:contains("喊话")').click();
+
+        setTimeout(() => {
+            let re_prize = /龙宝响应了你的请求,获得(.*?),/
+            $('p.el-message__content').each(function () {
+                console.log(this.textContent);
+                let match = matchRegExp(re_prize, this.textContent);
+                if (match) {
+                    console.log(match);
+                    savePrize('prize', match[1]);
+                }
+            });
+
+            console.log("-----参与抽奖-----");
+            $('button:contains("立即参与")').click();
+
+            vault.set_data('date', now.toLocaleString());
+            vault.save_vault();
+        }, 1500);
+    }
+
+    function long_observer() {
+        console.log("long_observer1");
+        let ob = new Observer(function(list_add, list_remove) {
+            let target = $('main.el-main > section.el-container');
+            list_add.forEach(node => {
+                target.each(function() {
+                    if (node == this) {
+                        console.log("long_observer2");
+                        console.log(node);
+                        doLongPT();
+                    }
+                });
+            });
+        });
+        ob.observe(document.body);
+    }
+
+    function handleLongPT() {
+        if (!canLottery()) return;
+
+        if (location.href.search(/plugins/i) == -1) {
+            let res = $('#nav a').filter(function () {
+                return /插件管理/i.test($(this).text());
+            });
+            if (res && res.length > 0) {
+                //console.log(res)
+                location.href = res[0].href;
+            }
+        } else {
+            if ($('button:contains("喊话")').length > 0) {
+                doLongPT();
+            } else {
+                long_observer();
+            }
+        }
+    }
+
     setTimeout(function () {
         let host = location.host;
         if (host.search(/qingwa/i) != -1) {
             handleQW();
         } else if (host.search(/lemonhd/i) != -1) {
             handleNM();
+        } else if (host.search(/longpt/i) != -1) {
+            handleLongPT();
         }
     }, 1500);
 

@@ -58,6 +58,9 @@
 // @match       *://www.ptlover.cc/*
 // @match       *://bilibili.download/*
 // @match       *://cangbao.ge/*
+// @match       *://ptsbao.club/*
+// @match       *://longpt.org/*
+// @match       *://pt.luckpt.de/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
