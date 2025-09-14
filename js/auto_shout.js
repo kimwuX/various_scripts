@@ -9,11 +9,13 @@
 // @match       *://zmpt.cc/
 // @match       *://13city.org/
 // @match       *://bilibili.download/
+// @match       *://pt.luckpt.de/
 // @match       *://qingwapt.com/index.php*
 // @match       *://new.qingwa.pro/index.php*
 // @match       *://zmpt.cc/index.php*
 // @match       *://13city.org/index.php*
 // @match       *://bilibili.download/index.php*
+// @match       *://pt.luckpt.de/index.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -33,6 +35,12 @@
         ['sh_bonus', '求魔力喊话', true],
         ['sh_vip', '求VIP喊话', true],
     ];
+    let dic_stat = {
+        'sh_up': 1,
+        'sh_down': 2,
+        'sh_bonus': 4,
+        'sh_vip': 8,
+    };
     let menu = new Menu(menu_All);
     let now = new Date();
 
@@ -100,43 +108,90 @@
         }, 1500);
     }
 
+    function analyzeZM() {
+        let res = 0;
+        let stat = menu.get_data('stat', 0);
+        let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+        console.log(user);
+        //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【3998电力】
+        let re_bonus = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+)电力】/
+        //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【10GB上传量】
+        let re_up = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+GB)上传量】/
+        $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
+            let match = matchRegExp(re_bonus, $(this).text());
+            if (match && match[1] == user) {
+                console.log(match);
+                saveToVault('bonus', formatValue(match[2], match[3]));
+
+                stat ^= dic_stat['sh_bonus'];
+                menu.set_data('stat', stat);
+                menu.save_vault();
+                res += 1;
+            }
+            match = matchRegExp(re_up, $(this).text());
+            if (match && match[1] == user) {
+                console.log(match);
+                saveToVault('up', formatValue(match[2], match[3]));
+
+                stat ^= dic_stat['sh_up'];
+                menu.set_data('stat', stat);
+                menu.save_vault();
+                res += 1;
+            }
+        });
+
+        if (stat < 1) {
+            menu.set_data('date', now.toLocaleString());
+            menu.save_vault();
+        }
+        return res > 0;
+    }
+
     function handleZM() {
         if (!canShout()) return;
 
-        if (menu.get_menu_value('sh_up')) {
-            $('input#shbox_text').val("皮总，求上传");
-            $('input#hbsubmit').click();
-        }
-        setTimeout(() => {
+        let temp = menu.get_data('temp');
+        let stat = 0;
+        if (new Date(temp).toLocaleDateString() != now.toLocaleDateString()) {
+            if (menu.get_menu_value('sh_up')) {
+                stat |= dic_stat['sh_up'];
+            }
             if (menu.get_menu_value('sh_bonus')) {
+                stat |= dic_stat['sh_bonus'];
+            }
+            menu.set_data('stat', stat);
+            menu.save_vault();
+        }
+        stat = menu.get_data('stat', 0);
+        console.log(stat);
+
+        // 上次喊话超过 1 分钟，继续喊话
+        if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
+            if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+                $('input#shbox_text').val("皮总，求上传");
+                $('input#hbsubmit').click();
+            } else if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
                 $('input#shbox_text').val("皮总，求电力");
                 $('input#hbsubmit').click();
             }
 
-            menu.set_data('date', now.toLocaleString());
+            menu.set_data('temp', now.toLocaleString());
             menu.save_vault();
-        }, 1500);
 
-        setTimeout(() => {
-            let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-            console.log(user);
-            //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【3998电力】
-            let re_bonus = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+)电力】/
-            //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【10GB上传量】
-            let re_up = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+GB)上传量】/
-            $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
-                let match = matchRegExp(re_bonus, $(this).text());
-                if (match && match[1] == user) {
-                    console.log(match);
-                    saveToVault('bonus', formatValue(match[2], match[3]));
+            let t = Date.now();
+            let id = setInterval(() => {
+                console.log(`analyzeZM: ${Date.now() - t}`);
+                if (Date.now() - t > 15000) { //timeout
+                    clearInterval(id);
                 }
-                match = matchRegExp(re_up, $(this).text());
-                if (match && match[1] == user) {
-                    console.log(match);
-                    saveToVault('up', formatValue(match[2], match[3]));
+
+                if (analyzeZM()) {
+                    clearInterval(id);
+                } else {
+                    $('input#hbsubmit').click();
                 }
-            });
-        }, 4500);
+            }, 3000);
+        }
     }
 
     function handle13City() {
@@ -225,6 +280,32 @@
         }, 6000);
     }
 
+    function handleLuck() {
+        if (!canShout()) return;
+
+        if (menu.get_menu_value('sh_bonus')) {
+            $('input#shbox_text').val("幸运池祈愿");
+            $('input#hbsubmit').click();
+        }
+
+        menu.set_data('date', now.toLocaleString());
+        menu.save_vault();
+
+        setTimeout(() => {
+            let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+            console.log(user);
+            //@xxx 幸运池听到了你的愿望，增加了800.6幸运星
+            let re_bonus = /@(\S+)\s+幸运池听到了你的愿望，增加了([\d\.]+)幸运星/
+            $('#iframe-shout-box').contents().find('div.wish-bubble-system').each(function() {
+                let match = matchRegExp(re_bonus, $(this).text());
+                if (match && match[1] == user) {
+                    console.log(match);
+                    saveToVault('bonus', match[2]);
+                }
+            });
+        }, 3000);
+    }
+
     setTimeout(function () {
         let host = location.host;
         if (host.search(/qingwa/i) != -1) {
@@ -235,6 +316,8 @@
             handle13City();
         } else if (host.search(/bilibili/i) != -1) {
             handleRailgun();
+        } else if (host.search(/luckpt/i) != -1) {
+            handleLuck();
         }
     }, 2000);
 
