@@ -10,12 +10,14 @@
 // @match       *://13city.org/
 // @match       *://bilibili.download/
 // @match       *://pt.luckpt.de/
+// @match       *://cangbao.ge/
 // @match       *://qingwapt.com/index.php*
 // @match       *://new.qingwa.pro/index.php*
 // @match       *://zmpt.cc/index.php*
 // @match       *://13city.org/index.php*
 // @match       *://bilibili.download/index.php*
 // @match       *://pt.luckpt.de/index.php*
+// @match       *://cangbao.ge/index.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -79,6 +81,23 @@
         return value;
     }
 
+    function getStatValue(key_list) {
+        let stat = 0;
+        let temp = menu.get_data('temp');
+        if (new Date(temp).toLocaleDateString() != now.toLocaleDateString()) {
+            key_list.forEach(key => {
+                if (menu.get_menu_value(key)) {
+                    stat |= dic_stat[key];
+                }
+            });
+            console.log(`reset stat to ${stat}`);
+            menu.set_data('stat', stat);
+            menu.save_vault();
+        }
+        stat = menu.get_data('stat', 0);
+        return stat;
+    }
+
     function saveToVault(key, value) {
         let arr = menu.get_str_data(key, []);
         arr.push(`${now.toLocaleDateString()}:${value}`);
@@ -113,33 +132,39 @@
         let stat = menu.get_data('stat', 0);
         let user = $('#info_block a[href*="userdetails.php"]').text().trim();
         console.log(user);
+        let rows = $('#iframe-shout-box').contents().find('td.shoutrow');
         //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【3998电力】
         let re_bonus = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+)电力】/
         //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【10GB上传量】
         let re_up = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+GB)上传量】/
-        $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
-            let match = matchRegExp(re_bonus, $(this).text());
-            if (match && match[1] == user) {
-                console.log(match);
-                saveToVault('bonus', formatValue(match[2], match[3]));
+        if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+            rows.each(function() {
+                let match = matchRegExp(re_up, $(this).text());
+                if (match && match[1] == user) {
+                    console.log(match);
+                    saveToVault('up', formatValue(match[2], match[3]));
 
-                stat ^= dic_stat['sh_bonus'];
-                menu.set_data('stat', stat);
-                menu.save_vault();
-                res += 1;
-            }
-            match = matchRegExp(re_up, $(this).text());
-            if (match && match[1] == user) {
-                console.log(match);
-                saveToVault('up', formatValue(match[2], match[3]));
+                    stat ^= dic_stat['sh_up'];
+                    menu.set_data('stat', stat);
+                    menu.save_vault();
+                    res += 1;
+                }
+            });
+        }
+        if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
+            rows.each(function() {
+                let match = matchRegExp(re_bonus, $(this).text());
+                if (match && match[1] == user) {
+                    console.log(match);
+                    saveToVault('bonus', formatValue(match[2], match[3]));
 
-                stat ^= dic_stat['sh_up'];
-                menu.set_data('stat', stat);
-                menu.save_vault();
-                res += 1;
-            }
-        });
-
+                    stat ^= dic_stat['sh_bonus'];
+                    menu.set_data('stat', stat);
+                    menu.save_vault();
+                    res += 1;
+                }
+            });
+        }
         if (stat < 1) {
             menu.set_data('date', now.toLocaleString());
             menu.save_vault();
@@ -150,21 +175,10 @@
     function handleZM() {
         if (!canShout()) return;
 
-        let temp = menu.get_data('temp');
-        let stat = 0;
-        if (new Date(temp).toLocaleDateString() != now.toLocaleDateString()) {
-            if (menu.get_menu_value('sh_up')) {
-                stat |= dic_stat['sh_up'];
-            }
-            if (menu.get_menu_value('sh_bonus')) {
-                stat |= dic_stat['sh_bonus'];
-            }
-            menu.set_data('stat', stat);
-            menu.save_vault();
-        }
-        stat = menu.get_data('stat', 0);
+        let stat = getStatValue(['sh_up', 'sh_bonus']);
         console.log(stat);
 
+        let temp = menu.get_data('temp');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
             if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
@@ -180,7 +194,7 @@
 
             let t = Date.now();
             let id = setInterval(() => {
-                console.log(`analyzeZM: ${Date.now() - t}`);
+                console.log(`handleZM: ${Date.now() - t}`);
                 if (Date.now() - t > 15000) { //timeout
                     clearInterval(id);
                 }
@@ -306,6 +320,87 @@
         }, 3000);
     }
 
+    function analyzeCBG() {
+        let res = 0;
+        let stat = menu.get_data('stat', 0);
+        let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+        console.log(user);
+        let rows = $('#iframe-shout-box').contents().find('td.shoutrow');
+        //[< 1分钟前]  系统: 响应了 xxx 的请求，奖励 3 魔力值！
+        let re_bonus = /\[< 1分钟前\]\s*系统: 响应了\s*(\S+)\s*的请求，奖励\s*(\d+)\s*魔力值/
+        //[< 1分钟前]  系统: 响应了 xxx 的请求，奖励 2 GB上传！
+        let re_up = /\[< 1分钟前\]\s*系统: 响应了 \s*(\S+)\s*的请求，奖励\s*(\d+)\s*GB上传/
+        if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+            rows.each(function() {
+                let match = matchRegExp(re_up, $(this).text());
+                if (match && match[1] == user) {
+                    console.log(match);
+                    saveToVault('up', match[2] + 'GB');
+
+                    stat ^= dic_stat['sh_up'];
+                    menu.set_data('stat', stat);
+                    menu.save_vault();
+                    res += 1;
+                }
+            });
+        }
+        if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
+            rows.each(function() {
+                let match = matchRegExp(re_bonus, $(this).text());
+                if (match && match[1] == user) {
+                    console.log(match);
+                    saveToVault('bonus', match[2]);
+
+                    stat ^= dic_stat['sh_bonus'];
+                    menu.set_data('stat', stat);
+                    menu.save_vault();
+                    res += 1;
+                }
+            });
+        }
+        if (stat < 1) {
+            menu.set_data('date', now.toLocaleString());
+            menu.save_vault();
+        }
+        return res > 0;
+    }
+
+    function handleCBG() {
+        if (!canShout()) return;
+
+        let stat = getStatValue(['sh_up', 'sh_bonus']);
+        console.log(stat);
+
+        let temp = menu.get_data('temp');
+        // 上次喊话超过 1 分钟，继续喊话
+        if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
+            if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+                $('input#shbox_text').val("阁主，求上传");
+                $('input#hbsubmit').click();
+            } else if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
+                $('input#shbox_text').val("阁主，求魔力");
+                $('input#hbsubmit').click();
+            }
+
+            menu.set_data('temp', now.toLocaleString());
+            menu.save_vault();
+
+            let t = Date.now();
+            let id = setInterval(() => {
+                console.log(`handleCBG: ${Date.now() - t}`);
+                if (Date.now() - t > 15000) { //timeout
+                    clearInterval(id);
+                }
+
+                if (analyzeCBG()) {
+                    clearInterval(id);
+                } else {
+                    $('input#hbsubmit').click();
+                }
+            }, 3000);
+        }
+    }
+
     setTimeout(function () {
         let host = location.host;
         if (host.search(/qingwa/i) != -1) {
@@ -318,6 +413,8 @@
             handleRailgun();
         } else if (host.search(/luckpt/i) != -1) {
             handleLuck();
+        } else if (host.search(/cangbao/i) != -1) {
+            handleCBG();
         }
     }, 2000);
 
