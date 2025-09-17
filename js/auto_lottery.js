@@ -66,7 +66,7 @@
         let ds = vault.get_data('date');
         if (ds && new Date(ds).toDateString() == now.toDateString()) {
             console.log("Aleady lottery.");
-            return false
+            return false;
         }
 
         return true;

@@ -52,7 +52,7 @@
         if (arr.length > 0) {
             console.log(new Date().toTimeString() + ': \n' + arr[0]);
             let t = 30000;
-            if (arr[0].search(/hdsky|open|ourbits/i) != -1) {
+            if (arr[0].search(/tjupt|hdsky|open|zmpt|cangbao/i) != -1) {
                 t = 60000;
             }
             //let win = window.open(arr.shift());
@@ -70,11 +70,12 @@
 
     function signPlan() {
         let now = new Date();
-        let arr = [6, 8, 12, 18, 22];
+        console.log(`now: ${now}`);
+        let arr = [2, 4, 6, 8, 12, 18, 20, 22];
         for (let i = 0; i < arr.length; i++) {
             let idx = i;
-            let tt = nextTime(arr[idx], 20 * Math.random(), 60 * Math.random());
-            console.log(`openSites${idx + 1}: \n` + tt);
+            let tt = nextTime(arr[idx], 0, 0, -10);
+            console.log(`openSites${idx + 1}: \n${tt}`);
             setTimeout(() => {
                 console.log(`openSites${idx + 1} begin: \n` + new Date());
                 openSites(site_list.slice());
@@ -100,11 +101,11 @@
     }, 1000);
 
     let site_list = [
+        'https://www.tjupt.org/attendance.php',
+        'https://ptchdbits.co/',
         'https://u2.dmhy.org/',
         'https://hdsky.me/',
         'https://open.cd/',
-        'https://www.tjupt.org/',
-        'https://ptchdbits.co/',
         'https://kp.m-team.cc/',
         'https://springsunday.net/',
         //'https://pt.hd4fans.org/',

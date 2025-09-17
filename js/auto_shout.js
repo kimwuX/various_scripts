@@ -61,7 +61,7 @@
         let ds = menu.get_data('date');
         if (ds && new Date(ds).toDateString() == now.toDateString()) {
             console.log("Aleady shouted.");
-            return false
+            return false;
         }
 
         return true;
@@ -195,7 +195,7 @@
             let t = Date.now();
             let id = setInterval(() => {
                 console.log(`handleZM: ${Date.now() - t}`);
-                if (Date.now() - t > 15000) { //timeout
+                if (Date.now() - t > 60000) { //timeout
                     clearInterval(id);
                 }
 
@@ -204,7 +204,7 @@
                 } else {
                     $('input#hbsubmit').click();
                 }
-            }, 3000);
+            }, 5000);
         }
     }
 
@@ -388,7 +388,7 @@
             let t = Date.now();
             let id = setInterval(() => {
                 console.log(`handleCBG: ${Date.now() - t}`);
-                if (Date.now() - t > 15000) { //timeout
+                if (Date.now() - t > 60000) { //timeout
                     clearInterval(id);
                 }
 
@@ -397,7 +397,7 @@
                 } else {
                     $('input#hbsubmit').click();
                 }
-            }, 3000);
+            }, 5000);
         }
     }
 
@@ -416,6 +416,6 @@
         } else if (host.search(/cangbao/i) != -1) {
             handleCBG();
         }
-    }, 2000);
+    }, 3000);
 
 })();
