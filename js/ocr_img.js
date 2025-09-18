@@ -22,6 +22,21 @@
 // ==/UserScript==
 
 (function () {
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---ocr_img---\n[${new Date().toLocaleTimeString()}] ${data}`);
+        }
+    }
 
     function isEmptyString(str) {
         return !(str != null && str.length > 0);
@@ -32,9 +47,9 @@
         if (isEmptyString(img64)) {
             return;
         }
-        //console.log(img64);
+        //log(img64);
         let host = count++ % 2 == 0 ? 'http://server.local:9899' : 'https://movie-pilot.org';
-        console.log(host);
+        log(host);
         GM_xmlhttpRequest({
             method: "POST",
             url: host + '/captcha/base64',
@@ -43,28 +58,28 @@
             timeout: 20000,
             responseType: "json",
             onerror: function(error) {
-                console.error('capture recognition error:');
-                console.error(error);
+                log('capture recognition error.', 2);
+                log(error, 2);
                 showTips(`识别出错！(${count})`, 'red');
                 if (count < RETRY_CNT) {
                     recoCaptcha(img64, handler, count);
                 }
             },
             onloadstart: function() {
-                console.log('capture recognition start.');
+                log('capture recognition start.');
                 showTips('正在识别验证码...');
             },
             ontimeout: function() {
-                console.log('capture recognition timeout.');
+                log('capture recognition timeout.');
                 showTips(`识别连接超时！(${count})`, 'red');
                 if (count < RETRY_CNT) {
                     recoCaptcha(img64, handler, count);
                 }
             },
             onload: function(response) {
-                console.log('capture recognition success.');
-                console.log(response.response);
-                //console.log(response.responseText);
+                log('capture recognition success.');
+                log(response.response);
+                //log(response.responseText);
                 if (handler && handler(response.response)) {
                     showTips(`识别成功。(${count})`, 'green');
                 } else {
@@ -81,7 +96,7 @@
         if (isEmptyString(url)) {
             return;
         }
-        console.log(url);
+        log(url);
         GM_xmlhttpRequest({
             method: "GET",
             url: url,
@@ -90,22 +105,22 @@
             },
             responseType: "blob",
             onerror: function(error) {
-                console.error('load image error:');
-                console.error(error);
+                log('load image error.', 2);
+                log(error, 2);
             },
             onloadstart: function() {
-                console.log('load image start.');
+                log('load image start.');
                 showTips('正在加载验证码...');
             },
             onload: function(response) {
-                console.log('load image success.');
-                //console.log(response.response);
-                //console.log(response.responseText);
+                log('load image success.');
+                //log(response.response);
+                //log(response.responseText);
                 let reader = new FileReader();
                 reader.onloadend = function() {
-                    //console.log(reader.result);
+                    //log(reader.result);
                     let img64 = reader.result.replace(/^.+,/, '');
-                    //console.log(img64);
+                    //log(img64);
                     recoCaptcha(img64, handler, 0);
                 }
                 reader.readAsDataURL(response.response);
@@ -139,7 +154,7 @@
                 });
             }
             catch (error) {
-                console.error(error);
+                log(error, 2);
             }
         });
     }
@@ -152,7 +167,7 @@
                 getImage($('#frmSignin img').prop('src'), res => {
                     if (res && res.result && res.result.length == 6) {
                         $('#imagestring').val(res.result);
-                        console.log($('#ok'));
+                        log($('#ok'));
                         $('#ok')[0].click();
                         return true;
                     }
@@ -160,7 +175,7 @@
                 });
             }
             catch (error) {
-                console.error(error);
+                log(error, 2);
             }
         }
     }
@@ -168,8 +183,9 @@
     function signHDS() {
         let t = Date.now();
         let id = setInterval(() => {
-            console.log(`ocr_img: ${Date.now() - t}`);
+            log(`interval ${Date.now() - t}`);
             if (Date.now() - t > 15000) { //timeout
+                log('timeout.');
                 clearInterval(id);
             }
 
@@ -184,7 +200,7 @@
                     getImage($('#showupimg').prop('src'), res => {
                         if (res && res.result && res.result.length == 6) {
                             $('#imagestring').val(res.result);
-                            console.log($('#showupbutton'));
+                            log($('#showupbutton'));
                             $('#showupbutton')[0].click();
                             return true;
                         }
@@ -192,16 +208,15 @@
                     });
                 }
                 catch (error) {
-                    console.error(error);
+                    log(error, 2);
                 }
             }
-        }, 200);
+        }, 1000);
     }
 
     setTimeout(function() {
-
-        console.log('ocr_img.');
-        //console.log(location.href);
+        log('ocr_img.');
+        //log(location.href);
         if (location.pathname.search(/(login|signup|recover|confirm_resend)\.php/i) != -1) {
             regLogin();
         } else if (location.host.search(/open/i) != -1) {

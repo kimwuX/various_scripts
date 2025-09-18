@@ -30,6 +30,22 @@
     Date.prototype.toDateString = Date.prototype.toLocaleDateString;
     Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
 
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---baka_test---\n[${new Date().toTimeString()}] ${data}`);
+        }
+    }
+
     //反序列化表单数据
     function deserializeFormData(data) {
         let formData = {};
@@ -74,8 +90,8 @@
         let dt = new Date(time_str);
         if (isValidDate(dt)) {
             dt.setFullYear(now.getFullYear());
-            //console.log('pgtime: \n' + dt);
-            console.log(getLeftTimeString(now - dt) + ' faster than server.');
+            //log('page time: ' + dt);
+            log(getLeftTimeString(now - dt) + ' faster than server.');
             return (now - dt) / 1000;
         }
         return 0;
@@ -107,13 +123,13 @@
         if (next == null && arr.length > 0) {
             next = nextTime(arr[0], 0, 0, offset);
         }
-        //console.log('nextListTime: \n' + next);
+        //log('nextListTime: ' + next);
         return next;
     }
 
     function startTicktock(tick) {
         setInterval(() => {
-            console.log(new Date().toTimeString());
+            log('ticktock.');
         }, tick);
     }
 
@@ -127,7 +143,7 @@
                 return;
             }
             delay += 3000 * (0.5 + Math.random());
-            console.log('delay: ' + delay);
+            log(`delay ${delay}ms.`);
         } else {
             let els = $("font").filter(function () {
                 return /连续\d+天签到/.test($(this).text());
@@ -138,28 +154,28 @@
         }
 
         let dic_chd = menu.get_str_data('dic', {});
-        console.log(dic_chd);
+        log(dic_chd);
         let id = $('input[name="questionid"]').val();
-        //console.log(id);
+        //log(id);
         if (isEmptyString(id)) {
             return;
         }
         let a = dic_chd[id];
 
         $('input[name="submit"]').click(function () {
-            //console.log('click.');
+            //log('click.');
             a = [];
             $('input[name="choice[]"]').each(function () {
                 if ($(this).prop('checked') == true) {
                     a.push($(this).val());
                 }
             });
-            //console.log(a);
+            //log(a);
             if (id && a.length > 0) {
                 dic_chd[id] = a.sort();
             }
-            //console.log(dic_chd);
-            //console.log(JSON.stringify(dic_chd));
+            //log(dic_chd);
+            //log(JSON.stringify(dic_chd));
             menu.set_str_data('dic', dic_chd);
             menu.save_vault();
         });
@@ -187,11 +203,11 @@
             //阻止提交表单
             $('form').submit(function (event) {
                 event.preventDefault();
-                console.log($(this).serialize());
+                log($(this).serialize());
                 location.reload();
             });
             delay += 3000 * (0.5 + Math.random());
-            console.log('delay: ' + delay);
+            log(`delay ${delay}ms.`);
         } else {
             if ($("*:contains('签到记录')").length > 0) {
                 location.reload();
@@ -205,15 +221,15 @@
                         ta.push($(this).parent().text());
                     });
                 } catch (error) {
-                    console.log(error);
+                    log(error, 2);
                 }
-                //console.log(ta);
+                //log(ta);
 
                 if (id && ta.length > 0) {
                     let dic_tmp = menu.get_str_data('temp', {});
                     dic_tmp[id] = ta;
-                    //console.log(dic_tmp);
-                    //console.log(JSON.stringify(dic_tmp));
+                    //log(dic_tmp);
+                    //log(JSON.stringify(dic_tmp));
                     menu.set_str_data('temp', dic_tmp);
                     menu.save_vault();
                 }
@@ -223,21 +239,21 @@
 
         let dic_tju = menu.get_str_data('dic', {});
         let dic_tmp = menu.get_str_data('temp', {});
-        console.log(dic_tju);
+        log(dic_tju);
         let id;
         try {
             id = $('table.captcha').find('img').prop('src').split('/').pop();
         } catch (error) {
-            console.log(error);
+            log(error, 2);
         }
-        console.log(id);
+        log(id);
         if (isEmptyString(id)) {
             return;
         }
         let a = dic_tju[id];
 
         $('input[name="submit"]').click(function () {
-            //console.log('click.');
+            //log('click.');
             a = [];
             $('input[name="ban_robot"]').each(function () {
                 if ($(this).prop('checked') == true) {
@@ -251,7 +267,7 @@
                     }
                 }
             });
-            //console.log(a);
+            //log(a);
             if (id && a.length > 0) {
                 dic_tju[id] = a.sort();
             }
@@ -259,8 +275,8 @@
                 delete dic_tmp[id];
                 menu.set_str_data('temp', dic_tmp);
             }
-            //console.log(dic_tju);
-            //console.log(JSON.stringify(dic_tju));
+            //log(dic_tju);
+            //log(JSON.stringify(dic_tju));
             menu.set_str_data('dic', dic_tju);
             menu.save_vault();
         });
@@ -301,10 +317,9 @@
         let arr = [0, 6, 7, 8, 12, 18, 20, 22];
         let next = nextListTime(arr, 0 + 5 * Math.random());
         let now = new Date();
-        console.log('now: \n' + now);
-        console.log('next: \n' + next);
+        log('next: ' + next);
         let val = next - now;
-        console.log(getLeftTimeString(val) + ' left.');
+        log(getLeftTimeString(val) + ' left.');
         if (val <= 0) {
             signTJU();
         } else if (val < 90000) {
@@ -327,13 +342,13 @@
                 //阻止提交表单
                 $('td.outer form').first().submit(function (event) {
                     event.preventDefault();
-                    console.log($(this).serialize());
+                    log($(this).serialize());
                     //location.reload();
                     $('div#showup a.faqlink').click();
                 });
             }
             delay += 3000 * (0.5 + Math.random());
-            console.log('delay: ' + delay);
+            log(`delay ${delay}ms.`);
         } else {
             if ($("*:contains('今天已签到')").length > 0) {
                 return;
@@ -344,7 +359,7 @@
             const observer = new MutationObserver(function (mutationsList, observer) {
                 for (let mutation of mutationsList) {
                     if (mutation.type === 'childList') {
-                        console.log('MutationObserver: childList');
+                        log('MutationObserver: childList');
                         //observer.disconnect();
                         setTimeout(function () {
                             //console.clear();
@@ -357,7 +372,7 @@
         }
 
         let dic_u2 = menu.get_str_data('dic', {});
-        //console.log(dic_u2);
+        //log(dic_u2);
 
         let p = $('table.captcha');
         let req = p.find('input[name="req"]');
@@ -365,7 +380,7 @@
         let form = p.find('input[name="form"]');
 
         let id = `req=${req.val()}&hash=${hash.val()}&form=${form.val()}`;
-        console.log(id);
+        log(id);
         if (isEmptyString(id)) {
             return;
         }
@@ -375,24 +390,24 @@
 
         p.find('input[type="submit"]').click(function () {
             let str = $(this).prop('name') + '|' + $(this).val();
-            console.log(str);
+            log(str);
             if (a == null) {
                 a = [];
             }
             a.push(str);
 
-            //console.log(a);
+            //log(a);
             if (id && a.length > 0) {
                 dic_u2[id] = a;
             }
-            //console.log(dic_u2);
-            //console.log(JSON.stringify(dic_u2));
+            //log(dic_u2);
+            //log(JSON.stringify(dic_u2));
             //menu.set_str_data('dic', dic_u2);
             //menu.save_vault();
         });
 
         //搜索
-        console.log('add search buttons.');
+        log('add search buttons.');
         p.find('input[type="submit"]').each(function () {
             let div = document.createElement('div');
             let arr = $(this).val().split(' / ').map(function (item) {
@@ -412,7 +427,7 @@
             });
         }
         if (answer) {
-            console.log(answer);
+            log(answer);
             answer.css('color', 'blue');
             //提交
             //setTimeout(function() {
@@ -421,7 +436,7 @@
         } else {
             if (new Date().getHours() > 20) {
                 let i = Math.floor(Math.random() * 4);
-                //console.log(p.find('input[type="submit"]').eq(i));
+                //log(p.find('input[type="submit"]').eq(i));
                 p.find('input[type="submit"]').eq(i).click();
             }
         }
@@ -430,7 +445,7 @@
     setTimeout(function () {
         //刷题
         let training = menu.get_menu_value('simulated');
-        console.log('baka_test.');
+        log('baka_test.');
         let host = location.host;
         if (host.search(/ptchdbits/i) != -1) {
             signCHD(training);

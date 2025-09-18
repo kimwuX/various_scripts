@@ -24,6 +24,22 @@
     let vault = new Vault();
     let now = new Date();
 
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---auto_lottery---\n[${new Date().toLocaleTimeString()}] ${data}`);
+        }
+    }
+
     function cleanVault() {
         let rms = [];
         let t1 = now.toLocaleDateString();
@@ -51,23 +67,25 @@
         vault.save_vault();
     }
 
-    function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
+    function isSignable() {
+        let re_s = /签\s*到|簽\s*到|打\s*卡|check in/i;
+        let re_d = /已|获得|成功|查看|記錄|详情/;
+        let res = $('#info_block a').filter(function () {
+            return re_s.test(this.textContent) && !re_d.test(this.textContent);
+        });
+
+        return res && res.length > 0;
     }
 
     function canLottery() {
-        let res = $('#info_block a').filter(function () {
-            return isSignable($(this).text());
-        });
-
-        //签到优先
-        if (res && res.length > 0) return false;
-
         let ds = vault.get_data('date');
         if (ds && new Date(ds).toDateString() == now.toDateString()) {
-            console.log("Aleady lottery.");
+            log("Aleady lottery.");
             return false;
         }
+
+        //签到优先
+        if (isSignable()) return false;
 
         return true;
     }
@@ -104,7 +122,7 @@
             list_add.forEach(node => {
                 target.each(function() {
                     if (node == this) {
-                        console.log(node);
+                        log(node);
                         if ($(this).find('div:contains("每日福利")').length > 0) {
                             //$(this).find('input[name="amount"]').val(5);
                             $(this).find('button').click();
@@ -124,10 +142,10 @@
                 this.click();
             });
         } else {
-            console.log($('div.item:contains("每日福利")'));
+            log($('div.item:contains("每日福利")'));
             $('div.item:contains("每日福利")').each(function() {
                 let num = $(this).find('li[title="限购"]').text().trim();
-                console.log(num);
+                log(`限购：${num}`);
                 if (num == '0') {
                     vault.set_data('date', now.toLocaleString());
                     vault.save_vault();
@@ -154,7 +172,7 @@
         let t1 = now.toLocaleDateString();
         let arr = vault.get_str_data(t1, []);
         if (arr && arr.length > 0) {
-            console.log("Aleady lottery.");
+            log("Aleady lottery.");
         } else if (location.href.search(/lottery\.php/i) == -1) {
             res = $('#info_block a').filter(function () {
                 return /神游三清天/i.test($(this).text());
@@ -196,7 +214,7 @@
 
     function doLongPT() {
         //求上传、求魔力
-        console.log("-----喊话-----");
+        log("喊话");
         $('input[placeholder="喊话"]').val("求上传").each(function () {
             this.dispatchEvent(new Event('input'));
         });
@@ -205,15 +223,15 @@
         setTimeout(() => {
             let re_prize = /龙宝响应了你的请求,获得(.*?),/
             $('p.el-message__content').each(function () {
-                console.log(this.textContent);
+                log(this.textContent);
                 let match = matchRegExp(re_prize, this.textContent);
                 if (match) {
-                    console.log(match);
+                    log(match);
                     savePrize('prize', match[1]);
                 }
             });
 
-            console.log("-----参与抽奖-----");
+            log("参与抽奖");
             $('button:contains("立即参与")').click();
 
             vault.set_data('date', now.toLocaleString());
@@ -222,14 +240,14 @@
     }
 
     function long_observer() {
-        console.log("long_observer1");
+        log("long_observer1");
         let ob = new Observer(function(list_add, list_remove) {
             let target = $('main.el-main > section.el-container');
             list_add.forEach(node => {
                 target.each(function() {
                     if (node == this) {
-                        console.log("long_observer2");
-                        console.log(node);
+                        log("long_observer2");
+                        log(node);
                         doLongPT();
                     }
                 });
@@ -246,7 +264,7 @@
                 return /插件管理/i.test($(this).text());
             });
             if (res && res.length > 0) {
-                //console.log(res)
+                //log(res)
                 location.href = res[0].href;
             }
         } else {

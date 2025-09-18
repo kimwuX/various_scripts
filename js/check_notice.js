@@ -10,6 +10,8 @@
 // @match       *://www.tjupt.org/*
 // @match       *://springsunday.net/*
 // @match       *://pterclub.com/*
+// @exclude     */shoutbox.php*
+// @exclude     */fun.php*
 // @exclude     */blank.htm*
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://img99.pixhost.to/images/274/509385792_5.png

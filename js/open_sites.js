@@ -16,6 +16,22 @@
     Date.prototype.toDateString = Date.prototype.toLocaleDateString;
     Date.prototype.toTimeString = Date.prototype.toLocaleTimeString;
 
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---open_sites---\n[${new Date().toTimeString()}] ${data}`);
+        }
+    }
+
     function nextTime(hour, minute, second, offset) {
         let now = new Date();
         let next = new Date();
@@ -50,7 +66,7 @@
 
     function openSites(arr) {
         if (arr.length > 0) {
-            console.log(new Date().toTimeString() + ': \n' + arr[0]);
+            log(arr[0]);
             let t = 30000;
             if (arr[0].search(/tjupt|hdsky|open|zmpt|cangbao/i) != -1) {
                 t = 60000;
@@ -64,34 +80,32 @@
                 openSites(arr);
             }, t);
         } else {
-            console.log('openSites done: \n' + new Date());
+            log('openSites done.');
         }
     }
 
     function signPlan() {
         let now = new Date();
-        console.log(`now: ${now}`);
         let arr = [2, 4, 6, 8, 12, 18, 20, 22];
         for (let i = 0; i < arr.length; i++) {
             let idx = i;
-            let tt = nextTime(arr[idx], 0, 0, -10);
-            console.log(`openSites${idx + 1}: \n${tt}`);
+            let tt = nextTime(arr[idx], 0, 0, -15);
+            log(`openSites${idx + 1} at ${tt}`);
             setTimeout(() => {
-                console.log(`openSites${idx + 1} begin: \n` + new Date());
+                log(`openSites${idx + 1} begin.`);
                 openSites(site_list.slice());
             }, tt - now);
         }
     }
 
     setTimeout(function () {
-        console.log('open_sites.');
+        log('open_sites.');
         signPlan();
 
         let now = new Date();
         setInterval(() => {
-            let temp = new Date();
-            console.log('live: ' + temp.toTimeString());
-            if (now.getDate() != temp.getDate()) {
+            log('heartbeat.');
+            if (now.getDate() != new Date().getDate()) {
                 location.reload();
             }
         }, 3600000);

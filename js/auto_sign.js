@@ -78,6 +78,22 @@
 // ==/UserScript==
 
 (function () {
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---auto_sign---\n[${new Date().toLocaleTimeString()}] ${data}`);
+        }
+    }
+
     function isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
@@ -125,12 +141,12 @@
         }
 
         if (res && res.length > 0) {
-            //console.log(res[0]);
+            //log(res[0]);
             let t1 = new Date();
             let v1 = GM_getValue(host);
             if (host.search(/ptchdbits/i) != -1) {
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    console.log("Aleady Signed.");
+                    log("Aleady Signed.");
                 } else {
                     if (location.pathname.search(/bakatest\.php/i) != -1) {
                         let els = $("font").filter(function () {
@@ -138,16 +154,15 @@
                         });
                         if (els.length > 0) {
                             GM_setValue(host, t1.toLocaleString());
-                            console.log('今天已经签过到了');
+                            log('今天已经签过到了');
                         }
                     } else {
-                        //console.log(t1.toLocaleTimeString() + ' Signed.');
                         res[0].click();
                     }
                 }
             } else if (host.search(/hhanclub/i) != -1) {
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    console.log("Aleady Signed.");
+                    log("Aleady Signed.");
                 } else {
                     GM_setValue(host, t1.toLocaleString());
                     res[0].click();

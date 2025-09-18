@@ -46,23 +46,41 @@
     let menu = new Menu(menu_All);
     let now = new Date();
 
-    function isSignable(str) {
-        return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
+    function log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---auto_shout---\n[${new Date().toLocaleTimeString()}] ${data}`);
+        }
+    }
+
+    function isSignable() {
+        let re_s = /签\s*到|簽\s*到|打\s*卡|check in/i;
+        let re_d = /已|获得|成功|查看|記錄|详情/;
+        let res = $('#info_block a').filter(function () {
+            return re_s.test(this.textContent) && !re_d.test(this.textContent);
+        });
+
+        return res && res.length > 0;
     }
 
     function canShout() {
-        let res = $('#info_block a').filter(function () {
-            return isSignable($(this).text());
-        });
-
-        //签到优先
-        if (res && res.length > 0) return false;
-
         let ds = menu.get_data('date');
         if (ds && new Date(ds).toDateString() == now.toDateString()) {
-            console.log("Aleady shouted.");
+            log("Aleady shouted.");
             return false;
         }
+
+        //签到优先
+        if (isSignable()) return false;
 
         return true;
     }
@@ -90,7 +108,7 @@
                     stat |= dic_stat[key];
                 }
             });
-            console.log(`reset stat to ${stat}`);
+            log(`reset stat to ${stat}`);
             menu.set_data('stat', stat);
             menu.save_vault();
         }
@@ -131,7 +149,7 @@
         let res = 0;
         let stat = menu.get_data('stat', 0);
         let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-        console.log(user);
+        //log(user);
         let rows = $('#iframe-shout-box').contents().find('td.shoutrow');
         //[< 1分钟前]  zmpt @xxx：皮总响应了你的请求，赠送/扣减 你【3998电力】
         let re_bonus = /\[< 1分钟前\]\s*zmpt\s*@(\S+)：皮总响应了你的请求，(赠送|扣减) 你【(\d+)电力】/
@@ -141,7 +159,7 @@
             rows.each(function() {
                 let match = matchRegExp(re_up, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('up', formatValue(match[2], match[3]));
 
                     stat ^= dic_stat['sh_up'];
@@ -155,7 +173,7 @@
             rows.each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('bonus', formatValue(match[2], match[3]));
 
                     stat ^= dic_stat['sh_bonus'];
@@ -165,27 +183,28 @@
                 }
             });
         }
-        if (stat < 1) {
-            menu.set_data('date', now.toLocaleString());
-            menu.save_vault();
-        }
         return res > 0;
     }
 
     function handleZM() {
-        if (!canShout()) return;
-
         let stat = getStatValue(['sh_up', 'sh_bonus']);
-        console.log(stat);
+        log(`stat is ${stat}`);
+        if (stat < 1) {
+            log("Aleady shouted.");
+            return;
+        }
+
+        //签到优先
+        if (isSignable()) return;
 
         let temp = menu.get_data('temp');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
-            if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
-                $('input#shbox_text').val("皮总，求上传");
-                $('input#hbsubmit').click();
-            } else if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
+            if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
                 $('input#shbox_text').val("皮总，求电力");
+                $('input#hbsubmit').click();
+            } else if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+                $('input#shbox_text').val("皮总，求上传");
                 $('input#hbsubmit').click();
             }
 
@@ -194,8 +213,9 @@
 
             let t = Date.now();
             let id = setInterval(() => {
-                console.log(`handleZM: ${Date.now() - t}`);
+                log(`handleZM: ${Date.now() - t}`);
                 if (Date.now() - t > 60000) { //timeout
+                    log('timeout.');
                     clearInterval(id);
                 }
 
@@ -221,13 +241,13 @@
 
         setTimeout(() => {
             let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-            console.log(user);
+            log(user);
             //[< 1分钟前]  掌管啤酒瓶的神 @xxx 掌管啤酒瓶的神听到了你的愿望，增加了-39啤酒瓶
             let re_bonus = /\[< 1分钟前\]\s*掌管啤酒瓶的神\s*@(\S+)\s+掌管啤酒瓶的神听到了你的愿望，增加了(-?\d+)啤酒瓶/
             $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('bonus', match[2]);
                 }
             });
@@ -259,7 +279,7 @@
 
         setTimeout(() => {
             let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-            console.log(user);
+            log(user);
             //[< 1分钟前]  炮姐 @xxx 炮姐很开心，已赠送你 103 魔力值！
             let re_bonus = /\[< 1分钟前\]\s*炮姐\s*@(\S+)\s+炮姐很开心，已赠送你\s*(\d+)\s*魔力值/
             //[< 1分钟前]  炮姐 @xxx 炮姐很开心，已赠送你 314572800 B上传量！
@@ -272,22 +292,22 @@
             $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('bonus', match[2]);
                 }
                 match = matchRegExp(re_up, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('up', `${parseInt(match[2])/1024/1024}MB`);
                 }
                 match = matchRegExp(re_vip1, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('vip', match[2].replace(/\s+/g, ''));
                 }
                 match = matchRegExp(re_vip2, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('vip', formatValue(match[2], match[3].replace(/\s+/g, '')));
                 }
             });
@@ -307,13 +327,13 @@
 
         setTimeout(() => {
             let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-            console.log(user);
+            log(user);
             //@xxx 幸运池听到了你的愿望，增加了800.6幸运星
             let re_bonus = /@(\S+)\s+幸运池听到了你的愿望，增加了([\d\.]+)幸运星/
             $('#iframe-shout-box').contents().find('div.wish-bubble-system').each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('bonus', match[2]);
                 }
             });
@@ -324,7 +344,7 @@
         let res = 0;
         let stat = menu.get_data('stat', 0);
         let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-        console.log(user);
+        //log(user);
         let rows = $('#iframe-shout-box').contents().find('td.shoutrow');
         //[< 1分钟前]  系统: 响应了 xxx 的请求，奖励 3 魔力值！
         let re_bonus = /\[< 1分钟前\]\s*系统: 响应了\s*(\S+)\s*的请求，奖励\s*(\d+)\s*魔力值/
@@ -334,7 +354,7 @@
             rows.each(function() {
                 let match = matchRegExp(re_up, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('up', match[2] + 'GB');
 
                     stat ^= dic_stat['sh_up'];
@@ -348,7 +368,7 @@
             rows.each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
-                    console.log(match);
+                    log(match);
                     saveToVault('bonus', match[2]);
 
                     stat ^= dic_stat['sh_bonus'];
@@ -369,7 +389,7 @@
         if (!canShout()) return;
 
         let stat = getStatValue(['sh_up', 'sh_bonus']);
-        console.log(stat);
+        log(`stat is ${stat}`);
 
         let temp = menu.get_data('temp');
         // 上次喊话超过 1 分钟，继续喊话
@@ -387,8 +407,9 @@
 
             let t = Date.now();
             let id = setInterval(() => {
-                console.log(`handleCBG: ${Date.now() - t}`);
+                log(`handleCBG: ${Date.now() - t}`);
                 if (Date.now() - t > 60000) { //timeout
+                    log('timeout.');
                     clearInterval(id);
                 }
 
