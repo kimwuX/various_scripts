@@ -101,7 +101,7 @@
 
     function getStatValue(key_list) {
         let stat = 0;
-        let temp = menu.get_data('temp');
+        let temp = menu.get_data('date');
         if (new Date(temp).toLocaleDateString() != now.toLocaleDateString()) {
             key_list.forEach(key => {
                 if (menu.get_menu_value(key)) {
@@ -118,10 +118,10 @@
 
     function saveToVault(key, value) {
         let arr = menu.get_str_data(key, []);
-        arr.push(`${now.toLocaleDateString()}:${value}`);
+        arr.unshift(`${now.toLocaleDateString()}:${value}`);
         //保留30天记录
         while(arr.length > 30) {
-            arr.shift();
+            arr.pop();
         }
         menu.set_str_data(key, arr);
         menu.save_vault();
@@ -197,7 +197,7 @@
         //签到优先
         if (isSignable()) return;
 
-        let temp = menu.get_data('temp');
+        let temp = menu.get_data('date');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
             if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
@@ -208,7 +208,7 @@
                 $('input#hbsubmit').click();
             }
 
-            menu.set_data('temp', now.toLocaleString());
+            menu.set_data('date', now.toLocaleString());
             menu.save_vault();
 
             let t = Date.now();
@@ -242,8 +242,8 @@
         setTimeout(() => {
             let user = $('#info_block a[href*="userdetails.php"]').text().trim();
             log(user);
-            //[< 1分钟前]  掌管啤酒瓶的神 @xxx 掌管啤酒瓶的神听到了你的愿望，增加了-39啤酒瓶
-            let re_bonus = /\[< 1分钟前\]\s*掌管啤酒瓶的神\s*@(\S+)\s+掌管啤酒瓶的神听到了你的愿望，增加了(-?\d+)啤酒瓶/
+            //[< 1分钟前]  掌管啤酒瓶的神 @xxx 听到了你的愿望，增加了-39啤酒瓶
+            let re_bonus = /\[< 1分钟前\]\s*掌管啤酒瓶的神\s*@(\S+)\s+听到了你的愿望，增加了(-?\d+)啤酒瓶/
             $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
                 let match = matchRegExp(re_bonus, $(this).text());
                 if (match && match[1] == user) {
@@ -342,67 +342,58 @@
 
     function analyzeCBG() {
         let res = 0;
-        let stat = menu.get_data('stat', 0);
         let user = $('#info_block a[href*="userdetails.php"]').text().trim();
         //log(user);
-        let rows = $('#iframe-shout-box').contents().find('td.shoutrow');
         //[< 1分钟前]  系统: 响应了 xxx 的请求，奖励 3 魔力值！
         let re_bonus = /\[< 1分钟前\]\s*系统: 响应了\s*(\S+)\s*的请求，奖励\s*(\d+)\s*魔力值/
         //[< 1分钟前]  系统: 响应了 xxx 的请求，奖励 2 GB上传！
         let re_up = /\[< 1分钟前\]\s*系统: 响应了 \s*(\S+)\s*的请求，奖励\s*(\d+)\s*GB上传/
-        if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
-            rows.each(function() {
-                let match = matchRegExp(re_up, $(this).text());
-                if (match && match[1] == user) {
-                    log(match);
-                    saveToVault('up', match[2] + 'GB');
-
-                    stat ^= dic_stat['sh_up'];
-                    menu.set_data('stat', stat);
-                    menu.save_vault();
-                    res += 1;
-                }
-            });
-        }
-        if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
-            rows.each(function() {
-                let match = matchRegExp(re_bonus, $(this).text());
-                if (match && match[1] == user) {
-                    log(match);
-                    saveToVault('bonus', match[2]);
-
-                    stat ^= dic_stat['sh_bonus'];
-                    menu.set_data('stat', stat);
-                    menu.save_vault();
-                    res += 1;
-                }
-            });
-        }
-        if (stat < 1) {
-            menu.set_data('date', now.toLocaleString());
-            menu.save_vault();
-        }
+        $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
+            let match = matchRegExp(re_up, $(this).text());
+            if (match && match[1] == user) {
+                log(match);
+                saveToVault('up', match[2] + 'GB');
+                res += 1;
+            }
+            match = matchRegExp(re_bonus, $(this).text());
+            if (match && match[1] == user) {
+                log(match);
+                saveToVault('bonus', match[2]);
+                res += 1;
+            }
+        });
         return res > 0;
     }
 
     function handleCBG() {
-        if (!canShout()) return;
-
         let stat = getStatValue(['sh_up', 'sh_bonus']);
         log(`stat is ${stat}`);
+        if (stat < 1) {
+            log("Aleady shouted.");
+            return;
+        }
 
-        let temp = menu.get_data('temp');
+        //签到优先
+        if (isSignable()) return;
+
+        let temp = menu.get_data('date');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
             if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
                 $('input#shbox_text').val("阁主，求上传");
                 $('input#hbsubmit').click();
+
+                stat ^= dic_stat['sh_up'];
+                menu.set_data('stat', stat);
             } else if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
                 $('input#shbox_text').val("阁主，求魔力");
                 $('input#hbsubmit').click();
+
+                stat ^= dic_stat['sh_bonus'];
+                menu.set_data('stat', stat);
             }
 
-            menu.set_data('temp', now.toLocaleString());
+            menu.set_data('date', now.toLocaleString());
             menu.save_vault();
 
             let t = Date.now();

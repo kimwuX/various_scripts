@@ -58,10 +58,10 @@
 
     function savePrize(key, value) {
         let arr = vault.get_str_data(key, []);
-        arr.push(`${now.toLocaleDateString()}:${value}`);
+        arr.unshift(`${now.toLocaleDateString()}:${value}`);
         //保留30天记录
         while(arr.length > 30) {
-            arr.shift();
+            arr.pop();
         }
         vault.set_str_data(key, arr);
         vault.save_vault();
