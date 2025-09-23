@@ -5,7 +5,11 @@
 // @description  指定时段自动打开网页，方便后续自动签到
 // @author       kim.wu
 // @match       *://kim.local/
+// @connect      cdn.jsdelivr.net
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @grant        GM_openInTab
+// @grant        GM_xmlhttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @icon         https://img101.pixhost.to/images/125/547184887_6.png
 // @run-at       document-end
@@ -30,6 +34,35 @@
         } else {
             func(`---open_sites---\n[${new Date().toTimeString()}] ${data}`);
         }
+    }
+
+    function getConfig(url, callback) {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: url,
+            timeout: 30000,
+            responseType: "json",
+            onerror: function(error) {
+                log('get config error.', 2);
+                log(error, 2);
+            },
+            onloadstart: function() {
+                log('getting config.');
+            },
+            ontimeout: function() {
+                log('get config timeout.', 2);
+            },
+            onload: function(response) {
+                //console.log(response);
+                if (response.status == 200) {
+                    log('config getted successfully.');
+                    log(response.response);
+                    callback(response.response);
+                } else {
+                    log(`failed to get config: ${response.status} ${response.statusText}`, 2);
+                }
+            }
+        });
     }
 
     function nextTime(hour, minute, second, offset) {
@@ -85,6 +118,8 @@
     }
 
     function signPlan() {
+        let urls = GM_getValue('urls');
+        log(urls);
         let now = new Date();
         let arr = [2, 4, 6, 8, 12, 18, 20, 22];
         for (let i = 0; i < arr.length; i++) {
@@ -93,16 +128,10 @@
             log(`openSites${idx + 1} at ${tt}`);
             setTimeout(() => {
                 log(`openSites${idx + 1} begin.`);
-                openSites(site_list.slice());
+                openSites(urls.slice());
             }, tt - now);
         }
-    }
 
-    setTimeout(function () {
-        log('open_sites.');
-        signPlan();
-
-        let now = new Date();
         setInterval(() => {
             log('heartbeat.');
             if (now.getDate() != new Date().getDate()) {
@@ -111,72 +140,21 @@
         }, 3600000);
 
         playAudio(); //防止休眠
+    }
+
+    setTimeout(function () {
+        log('open_sites.');
+        let urls = GM_getValue('urls');
+        if (urls == undefined) {
+            let path = 'https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/config/signin.json';
+            getConfig(path,  obj => {
+                GM_setValue('urls', obj.urls);
+                signPlan();
+            });
+        } else {
+            signPlan();
+        }
 
     }, 1000);
-
-    let site_list = [
-        'https://www.tjupt.org/attendance.php',
-        'https://ptchdbits.co/',
-        'https://u2.dmhy.org/',
-        'https://hdsky.me/',
-        'https://open.cd/',
-        'https://kp.m-team.cc/',
-        'https://springsunday.net/',
-        //'https://pt.hd4fans.org/',
-        'https://totheglory.im/',
-        'https://www.pttime.org/',
-        'https://hdtime.org/',
-        //'https://hdchina.org/',
-        'https://pterclub.com/',
-        'https://hdarea.club/',
-        'https://pthome.net/',
-        'https://ourbits.club/',
-        'https://pt.soulvoice.club/',
-        'https://www.haidan.video/',
-        'https://hdcity.city/',
-        'https://pt.sjtu.edu.cn/',
-        //'https://hdatmos.club/',
-        'https://hdhome.org/',
-        'https://pt.btschool.club/',
-        'https://greatposterwall.com/',
-        'https://pt.keepfrds.com/',
-        'https://www.hddolby.com/',
-        'https://www.torrentleech.org/',
-        'https://hd-space.org/',
-        'https://pt.eastgame.org/',
-        'https://www.hitpt.com/',
-        'https://audiences.me/',
-        'https://dicmusic.com/',
-        'https://rousi.zip/',
-        'https://ubits.club/',
-        'https://hhanclub.top/',
-        'https://lemonhd.club/',
-        'https://qingwapt.com/',
-        'https://zmpt.cc/',
-        'https://sewerpt.com/',
-        'https://cspt.top/',
-        'https://pandapt.net/',
-        'https://www.agsvpt.com/',
-        'https://www.nicept.net/',
-        'https://www.ptskit.org/',
-        'https://13city.org/',
-        'https://discfan.net/',
-        'https://piggo.me/',
-        //'https://www.icc2022.com/',
-        'https://www.hxpt.org/',
-        'https://carpt.net/',
-        'https://www.ptlover.cc/',
-        'https://bilibili.download/',
-        'https://cangbao.ge/',
-        'https://ptsbao.club/',
-        'https://longpt.org/',
-        'https://pt.luckpt.de/',
-        'https://www.skyey2.com/',
-        //'https://ikunshare.com/',
-        'https://pting.club/',
-        'https://iptv.cc/',
-        'https://ssdforum.org/',
-        'https://www.wnflb2023.com/'
-    ];
 
 })();
