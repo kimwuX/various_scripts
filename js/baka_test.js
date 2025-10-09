@@ -8,6 +8,7 @@
 // @match       *://tjupt.org/attendance.php*
 // @match       *://www.tjupt.org/attendance.php*
 // @match       *://u2.dmhy.org/showup.php*
+// @match       *://52pt.site/bakatest.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -162,7 +163,7 @@
         }
         let a = dic_chd[id];
 
-        $('input[name="submit"]').click(function () {
+        $('input[type="submit"]').click(function () {
             //log('click.');
             a = [];
             $('input[name="choice[]"]').each(function () {
@@ -192,8 +193,62 @@
         //提交
         if (chk) {
             setTimeout(function () {
-                $('input[name="submit"]').click();
+                //$('input[name="submit"]').click();
+                $('input[name="wantskip"]').click();
             }, delay);
+        }
+    }
+
+    function sign52() {
+        let els = $("font").filter(function () {
+            return /连续\d+天签到/.test($(this).text());
+        });
+        if (els.length > 0) {
+            return;
+        }
+
+        let dic_52 = menu.get_str_data('dic', {});
+        log(dic_52);
+        let id = $('input[name="questionid"]').val();
+        //log(id);
+        if (isEmptyString(id)) {
+            return;
+        }
+        let a = dic_52[id];
+
+        $('input[type="submit"]').click(function () {
+            //log('click.');
+            a = [];
+            $('input[name="choice[]"]').each(function () {
+                if ($(this).prop('checked') == true) {
+                    a.push($(this).val());
+                }
+            });
+            //log(a);
+            if (id && a.length > 0) {
+                dic_52[id] = a.sort();
+            }
+            //log(dic_52);
+            //log(JSON.stringify(dic_52));
+            menu.set_str_data('dic', dic_52);
+            menu.save_vault();
+        });
+
+        let chk = false;
+        if (a) {
+            $('input[name="choice[]"]').each(function () {
+                if (a.indexOf($(this).val()) != -1) {
+                    $(this).prop("checked", true);
+                    chk = true;
+                }
+            });
+        }
+        //提交
+        if (chk) {
+            setTimeout(function () {
+                //$('input[name="submit"]').click();
+                $('input[name="wantskip"]').click();
+            }, 100);
         }
     }
 
@@ -457,6 +512,8 @@
             }
         } else if (host.search(/dmhy/i) != -1) {
             signU2(training);
+        } else if (host.search(/52pt/i) != -1) {
+            sign52();
         }
 
     }, 1000);

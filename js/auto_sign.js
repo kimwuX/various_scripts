@@ -61,6 +61,16 @@
 // @match       *://ptsbao.club/*
 // @match       *://longpt.org/*
 // @match       *://pt.luckpt.de/*
+// @match       *://pt.0ff.cc/*
+// @match       *://pt.novahd.top/*
+// @match       *://tmpt.top/*
+// @match       *://ptchina.org/*
+// @match       *://ptfans.cc/*
+// @match       *://pt.aling.de/*
+// @match       *://dubhe.site/*
+// @match       *://pt.gtkpw.xyz/*
+// @match       *://pt.lajidui.top/*
+// @match       *://crabpt.vip/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
@@ -144,7 +154,7 @@
             //log(res[0]);
             let t1 = new Date();
             let v1 = GM_getValue(host);
-            if (host.search(/ptchdbits/i) != -1) {
+            if (host.search(/ptchdbits|52pt/i) != -1) {
                 if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
                     log("Aleady Signed.");
                 } else {

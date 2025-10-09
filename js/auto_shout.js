@@ -11,6 +11,7 @@
 // @match       *://bilibili.download/
 // @match       *://pt.luckpt.de/
 // @match       *://cangbao.ge/
+// @match       *://dubhe.site/
 // @match       *://qingwapt.com/index.php*
 // @match       *://new.qingwa.pro/index.php*
 // @match       *://zmpt.cc/index.php*
@@ -18,6 +19,7 @@
 // @match       *://bilibili.download/index.php*
 // @match       *://pt.luckpt.de/index.php*
 // @match       *://cangbao.ge/index.php*
+// @match       *://dubhe.site/index.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -413,6 +415,32 @@
         }
     }
 
+    function handleTS() {
+        if (!canShout()) return;
+
+        if (menu.get_menu_value('sh_bonus')) {
+            $('input#shbox_text').val("天枢娘 求魔力");
+            $('input#hbsubmit').click();
+        }
+
+        menu.set_data('date', now.toLocaleString());
+        menu.save_vault();
+
+        setTimeout(() => {
+            let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+            log(user);
+            //[< 1分钟前]  admin 恭喜xxx，已射魔力50000
+            let re_bonus = /\[< 1分钟前\]\s*admin\s*恭喜(\S+?)，已射魔力(\d+)/
+            $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
+                let match = matchRegExp(re_bonus, $(this).text());
+                if (match && match[1] == user) {
+                    log(match);
+                    saveToVault('bonus', match[2]);
+                }
+            });
+        }, 3000);
+    }
+
     setTimeout(function () {
         let host = location.host;
         if (host.search(/qingwa/i) != -1) {
@@ -427,6 +455,8 @@
             handleLuck();
         } else if (host.search(/cangbao/i) != -1) {
             handleCBG();
+        } else if (host.search(/dubhe/i) != -1) {
+            handleTS();
         }
     }, 3000);
 

@@ -147,7 +147,7 @@
         let urls = GM_getValue('urls');
         if (urls == undefined) {
             let path = 'https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/config/signin.json';
-            getConfig(path,  obj => {
+            getConfig(path, obj => {
                 GM_setValue('urls', obj.urls);
                 signPlan();
             });
