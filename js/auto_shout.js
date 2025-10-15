@@ -16,6 +16,7 @@
 // @match       *://new.qingwa.pro/index.php*
 // @match       *://zmpt.cc/index.php*
 // @match       *://13city.org/index.php*
+// @match       *://13city.org/medal.php*
 // @match       *://bilibili.download/index.php*
 // @match       *://pt.luckpt.de/index.php*
 // @match       *://cangbao.ge/index.php*
@@ -230,8 +231,71 @@
         }
     }
 
+    function observer_13city() {
+        let ob = new Observer(function(list_add, list_remove) {
+            let target = $('div.layui-layer.layui-layer-dialog.layui-layer-molv');
+            list_add.forEach(node => {
+                target.each(function() {
+                    if (node == this) {
+                        log(node);
+                        if ($(this).find('div:contains("购买确认")').length > 0) {
+                            let btn = $(this).find('a.layui-layer-btn0');
+                            if (btn.length > 0) {
+                                menu.set_data('temp', Date.now());
+                                menu.save_vault();
+                                btn[0].click();
+                            }
+                        }
+                    }
+                });
+            });
+        });
+        ob.observe(document.body);
+    }
+
+    function buy13CityMedal() {
+        log('buy13CityMedal');
+
+        let offset = Date.now() - menu.get_data('temp');
+        log(`${offset/1000}s`);
+        if (!isNaN(offset) && offset < 60000) {
+            $('button.buy[data-id="11"]').each(function() {
+                log(this);
+                if (/已拥有/i.test($(this).text())) {
+                    menu.delete_data('temp');
+                    menu.set_data('medal', now.toLocaleString());
+                    menu.save_vault();
+                }
+            });
+        } else {
+            $('button.buy[data-id="11"]').filter(function() {
+                return !$(this).prop('disabled');
+            }).first().each(function() {
+                observer_13city();
+                this.click();
+            });
+        }
+    }
+
     function handle13City() {
         if (!canShout()) return;
+
+        let offset = now - new Date(menu.get_data('medal'));
+        // 24*60*60=86400000
+        log(`medal time elapses ${offset/86400000} days.`);
+        // 7*24*60*60*1000=604800000
+        if (isNaN(offset) || offset > 604800000) {
+            if (location.href.search(/medal/i) != -1) {
+                buy13CityMedal();
+            } else {
+                $('#info_block a').filter(function() {
+                    return /\[勋章\]/i.test($(this).text());
+                }).each(function() {
+                    this.click();
+                });
+            }
+            return;
+        }
 
         if (menu.get_menu_value('sh_bonus')) {
             $('input#shbox_text').val("掌管啤酒瓶的神请赐予我啤酒瓶");
