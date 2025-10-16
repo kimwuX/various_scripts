@@ -262,8 +262,10 @@
             $('button.buy[data-id="11"]').each(function() {
                 log(this);
                 if (/已拥有/i.test($(this).text())) {
+                    // 7*24*60*60*1000=604800000
+                    let exp = new Date(now.getTime() + 604800000);
+                    menu.set_data('medal', exp.toLocaleString());
                     menu.delete_data('temp');
-                    menu.set_data('medal', now.toLocaleString());
                     menu.save_vault();
                 }
             });
@@ -280,11 +282,9 @@
     function handle13City() {
         if (!canShout()) return;
 
-        let offset = now - new Date(menu.get_data('medal'));
-        // 24*60*60=86400000
-        log(`medal time elapses ${offset/86400000} days.`);
-        // 7*24*60*60*1000=604800000
-        if (isNaN(offset) || offset > 604800000) {
+        let offset = new Date(menu.get_data('medal')) - now;
+        if (isNaN(offset) || offset < 0) {
+            log('medal has expired.');
             if (location.href.search(/medal/i) != -1) {
                 buy13CityMedal();
             } else {
@@ -296,6 +296,8 @@
             }
             return;
         }
+        // 24*60*60=86400000
+        log(`medal has ${(offset/86400000).toFixed(2)} days left.`);
 
         if (menu.get_menu_value('sh_bonus')) {
             $('input#shbox_text').val("掌管啤酒瓶的神请赐予我啤酒瓶");
