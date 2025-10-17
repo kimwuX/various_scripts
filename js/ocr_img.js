@@ -42,6 +42,16 @@
         return !(str != null && str.length > 0);
     }
 
+    function isSignable() {
+        let re_s = /签\s*到|簽\s*到|打\s*卡|check in/i;
+        let re_d = /已|获得|成功|查看|記錄|详情/;
+        let res = $('#info_block a').filter(function () {
+            return re_s.test(this.textContent) && !re_d.test(this.textContent);
+        });
+
+        return res && res.length > 0;
+    }
+
     const RETRY_CNT = 3;
     function recoCaptcha(img64, handler, count) {
         if (isEmptyString(img64)) {
@@ -181,6 +191,9 @@
     }
 
     function signHDS() {
+        if (!isSignable()) {
+            return;
+        }
         let t = Date.now();
         let id = setInterval(() => {
             log(`interval ${Date.now() - t}`);
@@ -193,7 +206,7 @@
                 clearInterval(id);
 
                 $('#showupimg').after(createTips());
-                $('#layui-layer2').css('height', '200px');
+                $('.layui-layer').css('height', '200px');
                 $('.layui-layer-content').css('height', '150px');
 
                 try {
