@@ -133,6 +133,8 @@
     function handleQW() {
         if (!canShout()) return;
 
+        if ($('input#shbox_text').length == 0) return;
+
         if (menu.get_menu_value('sh_up')) {
             $('input#shbox_text').val("蛙总，求上传");
             $('input#hbsubmit').click();
@@ -200,6 +202,8 @@
         //签到优先
         if (isSignable()) return;
 
+        if ($('input#shbox_text').length == 0) return;
+
         let temp = menu.get_data('date');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
@@ -261,7 +265,7 @@
         if (!isNaN(offset) && offset < 60000) {
             $('button.buy[data-id="11"]').each(function() {
                 log(this);
-                if (/已拥有/i.test($(this).text())) {
+                if (/已经购买/i.test($(this).text())) {
                     // 7*24*60*60*1000=604800000
                     let exp = new Date(now.getTime() + 604800000);
                     menu.set_data('medal', exp.toLocaleString());
@@ -299,6 +303,8 @@
         // 24*60*60=86400000
         log(`medal has ${(offset/86400000).toFixed(2)} days left.`);
 
+        if ($('input#shbox_text').length == 0) return;
+
         if (menu.get_menu_value('sh_bonus')) {
             $('input#shbox_text').val("掌管啤酒瓶的神请赐予我啤酒瓶");
             $('input#hbsubmit').click();
@@ -324,6 +330,8 @@
 
     function handleRailgun() {
         if (!canShout()) return;
+
+        if ($('input#shbox_text').length == 0) return;
 
         if (menu.get_menu_value('sh_up')) {
             $('input#shbox_text').val("炮姐，求上传");
@@ -385,6 +393,8 @@
     function handleLuck() {
         if (!canShout()) return;
 
+        if ($('input#shbox_text').length == 0) return;
+
         if (menu.get_menu_value('sh_bonus')) {
             $('input#shbox_text').val("幸运池祈愿");
             $('input#hbsubmit').click();
@@ -444,6 +454,8 @@
         //签到优先
         if (isSignable()) return;
 
+        if ($('input#shbox_text').length == 0) return;
+
         let temp = menu.get_data('date');
         // 上次喊话超过 1 分钟，继续喊话
         if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
@@ -483,6 +495,8 @@
 
     function handleTS() {
         if (!canShout()) return;
+
+        if ($('input#shbox_text').length == 0) return;
 
         if (menu.get_menu_value('sh_bonus')) {
             $('input#shbox_text').val("天枢娘 求魔力");

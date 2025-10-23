@@ -101,7 +101,7 @@
         if (arr.length > 0) {
             log(arr[0]);
             let t = 30000;
-            if (arr[0].search(/tjupt|hdsky|open|zmpt|cangbao/i) != -1) {
+            if (arr[0].search(/tjupt|hdsky|open|zmpt|13city|cangbao/i) != -1) {
                 t = 60000;
             }
             //let win = window.open(arr.shift());
