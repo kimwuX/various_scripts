@@ -8,6 +8,7 @@
 // @match       *://hdhome.org/*
 // @match       *://hdchina.org/*
 // @match       *://pterclub.com/*
+// @match       *://pterclub.net/*
 // @match       *://pthome.net/*
 // @match       *://pt.soulvoice.club/*
 // @match       *://pt.btschool.club/*
