@@ -14,7 +14,7 @@
 // @exclude     */fun.php*
 // @exclude     */blank.htm*
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://img99.pixhost.to/images/274/509385792_5.png
+// @icon         https://img1.pixhost.to/images/10104/659998256_8.png
 // @run-at       document-end
 // ==/UserScript==
 

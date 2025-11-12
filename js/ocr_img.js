@@ -17,7 +17,7 @@
 // @grant        GM_xmlhttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/npm/js-base64@3.7.7/base64.min.js
-// @icon         https://img95.pixhost.to/images/777/468772950_4.png
+// @icon         https://img1.pixhost.to/images/10104/659998252_4.png
 // @run-at       document-end
 // ==/UserScript==
 

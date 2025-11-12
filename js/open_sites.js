@@ -11,7 +11,7 @@
 // @grant        GM_openInTab
 // @grant        GM_xmlhttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @icon         https://img101.pixhost.to/images/125/547184887_6.png
+// @icon         https://img1.pixhost.to/images/10104/659998254_6.png
 // @run-at       document-end
 // ==/UserScript==
 

@@ -17,7 +17,7 @@
 // @grant        GM_unregisterMenuCommand
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
-// @icon         https://img95.pixhost.to/images/777/468772954_2.png
+// @icon         https://img1.pixhost.to/images/10104/660001680_2.png
 // @run-at       document-end
 // ==/UserScript==
 

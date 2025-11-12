@@ -16,7 +16,7 @@
 // @grant        GM_deleteValue
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
-// @icon         https://img100.pixhost.to/images/604/539401618_5.png
+// @icon         https://img1.pixhost.to/images/10104/659998253_5.png
 // @run-at       document-end
 // ==/UserScript==
 

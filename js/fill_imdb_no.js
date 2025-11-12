@@ -6,7 +6,7 @@
 // @author       kim.wu
 // @match       *://hdhome.org/torrents.php*
 // @require      https://code.jquery.com/jquery-2.1.1.min.js
-// @icon         https://img95.pixhost.to/images/777/468772953_3.png
+// @icon         https://img1.pixhost.to/images/10104/659998248_3.png
 // @run-at       document-end
 // ==/UserScript==
 

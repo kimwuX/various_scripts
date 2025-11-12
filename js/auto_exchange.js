@@ -15,7 +15,7 @@
 // @grant        GM_unregisterMenuCommand
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
-// @icon         https://img1.pixhost.to/images/6456/610588578_budgeting.png
+// @icon         https://img1.pixhost.to/images/10104/659998259_10.png
 // @run-at       document-end
 // ==/UserScript==
 
