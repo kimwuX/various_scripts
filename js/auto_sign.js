@@ -63,6 +63,7 @@
 // @match       *://longpt.org/*
 // @match       *://pt.luckpt.de/*
 // @match       *://pt.0ff.cc/*
+// @match       *://farmm.cc/*
 // @match       *://pt.novahd.top/*
 // @match       *://tmpt.top/*
 // @match       *://ptchina.org/*
@@ -70,6 +71,7 @@
 // @match       *://pt.aling.de/*
 // @match       *://dubhe.site/*
 // @match       *://pt.gtkpw.xyz/*
+// @match       *://pt.gtk.pw/*
 // @match       *://pt.lajidui.top/*
 // @match       *://crabpt.vip/*
 // @match       *://www.52movie.top/*

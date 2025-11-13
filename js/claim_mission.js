@@ -9,6 +9,7 @@
 // @match       *://carpt.net/*
 // @match       *://crabpt.vip/*
 // @match       *://cspt.top/*
+// @match       *://farmm.cc/*
 // @match       *://longpt.org/*
 // @match       *://pt.0ff.cc/*
 // @match       *://pt.lajidui.top/*
@@ -32,6 +33,7 @@
         ['on', '自动认领任务', true],
     ];
     let menu = new Menu(menu_All);
+    let now = new Date();
 
     function log(data, level = 0) {
         let func;
@@ -85,6 +87,12 @@
             return false;
         }
 
+        //特殊站点判断
+        if(host.search(/0ff|farmm/i) != -1) {
+            //周循环任务
+            return now.getDay() == 1;
+        }
+
         return true;
     }
 
@@ -132,7 +140,7 @@
                 btn = $('input.claim[data-id="6"]');
             } else if(host.search(/longpt/i) != -1) {
                 btn = $('input.claim[data-id="2"]');
-            } else if(host.search(/0ff/i) != -1) {
+            } else if(host.search(/0ff|farmm/i) != -1) {
                 btn = $('input.claim[data-id="12"]');
             } else if (host.search(/lajidui/i) != -1) {
                 btn = $('input.claim[data-id="1"]');
