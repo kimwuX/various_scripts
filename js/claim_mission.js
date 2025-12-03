@@ -14,7 +14,6 @@
 // @match       *://pt.0ff.cc/*
 // @match       *://pt.lajidui.top/*
 // @match       *://pt.novahd.top/*
-// @match       *://www.hitpt.com/*
 // @match       *://www.ptskit.org/*
 // @exclude     */fun.php*
 // @exclude     */shoutbox.php*
@@ -90,7 +89,7 @@
         }
 
         //特殊站点判断
-        if(host.search(/0ff|farmm|hitpt/i) != -1) {
+        if(host.search(/0ff|farmm/i) != -1) {
             //周循环任务
             return now.getDay() == 1;
         }
@@ -148,8 +147,6 @@
                 btn = $('input.claim[data-id="1"]');
             } else if(host.search(/novahd/i) != -1) {
                 btn = $('input.claim[data-id="3"]');
-            } else if(host.search(/hitpt/i) != -1) {
-                btn = $('input.claim[data-id="1"]');
             } else if(host.search(/ptskit/i) != -1) {
                 btn = $('input.claim[data-id="12"]');
             }

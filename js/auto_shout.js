@@ -493,32 +493,87 @@
         }
     }
 
+    function analyzeTS() {
+        let res = 0;
+        let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+        //log(user);
+        //[< 1分钟前]  admin 奇迹发生了！xxx获得了神明赠送的949点魔力值！
+        //[< 1分钟前]  admin 天降祥瑞！xxx获得了神明赠送的796点魔力值！
+        //[< 1分钟前]  admin 神明被xxx的坚持感动，送出了392点魔力值！
+        //[< 1分钟前]  admin xxx的诚心感动了天地，获得了639点魔力值奖励！
+        //[< 1分钟前]  admin xxx的虔诚打动了神明，获得了325点魔力值！
+        //[< 1分钟前]  admin xxx的感言感动了神明，获得了941点魔力值！
+        //[< 1分钟前]  admin xxx的愿望实现了！神明赐予了1109点魔力值！
+        let re_bonus = /\[< 1分钟前\]\s*admin .*?(\w+).*?(\d+)点魔力值/
+        //[< 1分钟前]  admin 神明听到了xxx的呼唤，慷慨地送出了50MB上传量！
+        //[< 1分钟前]  admin 神明被xxx的真诚打动，赐予了50MB上传量！
+        //[< 1分钟前]  admin xxx的祈祷得到了回应，神明送来了50MB上传量！
+        let re_up = /\[< 1分钟前\]\s*admin .*?(\w+).*?(\d+)MB上传量/
+        $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
+            let match = matchRegExp(re_up, $(this).text());
+            if (match && match[1] == user) {
+                log(match);
+                saveToVault('up', match[2] + 'MB');
+                res += 1;
+            }
+            match = matchRegExp(re_bonus, $(this).text());
+            if (match && match[1] == user) {
+                log(match);
+                saveToVault('bonus', match[2]);
+                res += 1;
+            }
+        });
+        return res > 0;
+    }
+
     function handleTS() {
-        if (!canShout()) return;
+        let stat = getStatValue(['sh_up', 'sh_bonus']);
+        log(`stat is ${stat}`);
+        if (stat < 1) {
+            log("Aleady shouted.");
+            return;
+        }
+
+        //签到优先
+        if (isSignable()) return;
 
         if ($('input#shbox_text').length == 0) return;
 
-        if (menu.get_menu_value('sh_bonus')) {
-            $('input#shbox_text').val("天枢娘 求魔力");
-            $('input#hbsubmit').click();
-        }
+        let temp = menu.get_data('date');
+        // 上次喊话超过 1 分钟，继续喊话
+        if (temp == undefined || now - new Date(temp) > 1 * 60 * 1000) {
+            if ((stat & dic_stat['sh_up']) == dic_stat['sh_up']) {
+                $('input#shbox_text').val("求上传");
+                $('input#hbsubmit').click();
 
-        menu.set_data('date', now.toLocaleString());
-        menu.save_vault();
+                stat ^= dic_stat['sh_up'];
+                menu.set_data('stat', stat);
+            } else if ((stat & dic_stat['sh_bonus']) == dic_stat['sh_bonus']) {
+                $('input#shbox_text').val("求魔力");
+                $('input#hbsubmit').click();
 
-        setTimeout(() => {
-            let user = $('#info_block a[href*="userdetails.php"]').text().trim();
-            log(user);
-            //[< 1分钟前]  admin 恭喜xxx，已射魔力50000
-            let re_bonus = /\[< 1分钟前\]\s*admin\s*恭喜(\S+?)，已射魔力(\d+)/
-            $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
-                let match = matchRegExp(re_bonus, $(this).text());
-                if (match && match[1] == user) {
-                    log(match);
-                    saveToVault('bonus', match[2]);
+                stat ^= dic_stat['sh_bonus'];
+                menu.set_data('stat', stat);
+            }
+
+            menu.set_data('date', now.toLocaleString());
+            menu.save_vault();
+
+            let t = Date.now();
+            let id = setInterval(() => {
+                log(`handleTS: ${Date.now() - t}`);
+                if (Date.now() - t > 60000) { //timeout
+                    log('timeout.');
+                    clearInterval(id);
                 }
-            });
-        }, 3000);
+
+                if (analyzeTS()) {
+                    clearInterval(id);
+                } else {
+                    $('input#hbsubmit').click();
+                }
+            }, 5000);
+        }
     }
 
     setTimeout(function () {

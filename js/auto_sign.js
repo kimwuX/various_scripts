@@ -75,6 +75,7 @@
 // @match       *://pt.lajidui.top/*
 // @match       *://crabpt.vip/*
 // @match       *://www.52movie.top/*
+// @match       *://p.t-baozi.cc/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
