@@ -83,9 +83,8 @@ class Menu extends Vault {
     // 构造方法
     constructor(menu_list) {
         super();
-        this.menu_list = menu_list;
-        this.menu_ID = [];
 
+        this.menu_list = menu_list;
         this.register_menu();
     }
 
@@ -99,23 +98,23 @@ class Menu extends Vault {
 
     // 注册脚本菜单
     register_menu() {
-        for (let i = 0; i < this.menu_ID.length; i++) {
-            GM_unregisterMenuCommand(this.menu_ID[i]);
-        }
-
-        //this.print_vault();
+        // this.print_vault();
         let dic = this.get_menu_data();
         for (const arr of this.menu_list) {
             if (dic.hasOwnProperty(arr[0])) {
                 arr[2] = dic[arr[0]];
             }
         }
-        //console.log(this.menu_list);
+        // console.log(this.menu_list);
 
         for (let i = 0; i < this.menu_list.length; i++) { // 循环注册脚本菜单
-            this.menu_ID[i] = GM_registerMenuCommand(
-                `${this.menu_list[i][2] ? '✅' : '❌'} ${this.menu_list[i][1]}`, () => {
+            let idx = i + 1;
+            GM_registerMenuCommand(
+                `${this.menu_list[i][2] ? '✔️' : '❌'} ${idx}.${this.menu_list[i][1]}`, () => {
+                    // console.log(i, this.menu_list[i]);
                     this.menu_switch(this.menu_list[i][2], this.menu_list[i][0], this.menu_list[i][1]);
+                }, {
+                    id : idx
                 }
             );
         }

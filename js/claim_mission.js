@@ -15,6 +15,7 @@
 // @match       *://pt.lajidui.top/*
 // @match       *://pt.novahd.top/*
 // @match       *://www.ptskit.org/*
+// @match       *://www.ptlover.cc/*
 // @exclude     */fun.php*
 // @exclude     */shoutbox.php*
 // @grant        GM_setValue
@@ -149,6 +150,8 @@
                 btn = $('input.claim[data-id="3"]');
             } else if(host.search(/ptskit/i) != -1) {
                 btn = $('input.claim[data-id="12"]');
+            } else if(host.search(/ptlover/i) != -1) {
+                btn = $('input.claim[data-id="10"]');
             }
             log(btn)
             if (btn.length > 0) {
