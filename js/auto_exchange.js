@@ -4,15 +4,7 @@
 // @version      1.0.0
 // @description  自动点击兑换按钮
 // @author       kim.wu
-// @match       *://rousi.zip/mybonus.php*
-// @match       *://sewerpt.com/mybonus.php*
-// @match       *://pterclub.com/mybonus.php*
-// @match       *://www.hitpt.com/mybonus.php*
-// @match       *://www.ptlover.cc/mybonus.php*
-// @match       *://pt.eastgame.org/mybonus.php*
-// @match       *://pt.btschool.club/mybonus.php*
-// @match       *://pt.soulvoice.club/mybonus.php*
-// @match       *://bilibili.download/mybonus.php*
+// @match        */mybonus.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -155,17 +147,27 @@
         if (max_count > 0 && counter >= max_count)
             return res;
 
-        let reg = null;
-        if (location.host.search(/bilibili|hitpt|ptlover|sewerpt|soulvoice/i) != -1) {
-            reg = /100(.0)?\s*GB\s*上(传|傳)量/i;
-        } else {
-            reg = /10(.0)?\s*GB\s*上(传|傳)量/i;
+        let regs = [
+            /100(.0)?\s*GB\s*上(传|傳)量/i,
+            /10(.0)?\s*GB\s*上(传|傳)量/i
+        ];
+        let tr = $('form[action="?action=exchange"]').parent().filter(function () {
+            let txt = $(this).find('h1,h3').text();
+            return regs[0].test(txt) && !/出售|减少|減少|魔力/i.test(txt);
+        });
+        let i = 1;
+        while (i < regs.length && tr.length == 0) {
+            tr = $('form[action="?action=exchange"]').parent().filter(function () {
+                let txt = $(this).find('h1,h3').text();
+                return regs[i].test(txt) && !/出售|减少|減少|魔力/i.test(txt);
+            });
+            i++;
+        }
+        if (tr.length == 0) {
+            return false;
         }
 
-        $('form[action="?action=exchange"]').parent().filter(function () {
-            let txt = $(this).find('h1').text();
-            return reg.test(txt) && !/出售|减少|減少/i.test(txt);
-        }).find('input[name="submit"]').filter(function() {
+        tr.find('input[name="submit"]').filter(function() {
             return !$(this).prop("disabled");
         }).each(function() {
             menu.set_data("counter_up", ++counter);
@@ -188,19 +190,28 @@
         if (max_count > 0 && counter >= max_count)
             return res;
 
-        let reg = null;
-        if (location.host.search(/bilibili|hitpt|sewerpt|soulvoice/i) != -1) {
-            reg = /100(.0)?\s*GB\s*下(载|載)量/i;
-        } else if (location.host.search(/ptlover/i) != -1) {
-            reg = /20(.0)?\s*GB\s*下(载|載)量/i;
-        } else {
-            reg = /10(.0)?\s*GB\s*下(载|載)量/i;
+        let regs = [
+            /100(.0)?\s*GB\s*下(载|載)量/i,
+            /20(.0)?\s*GB\s*下(载|載)量/i,
+            /10(.0)?\s*GB\s*下(载|載)量/i
+        ];
+        let tr = $('form[action="?action=exchange"]').parent().filter(function () {
+            let txt = $(this).find('h1,h3').text();
+            return regs[0].test(txt) && !/出售|减少|減少|魔力/i.test(txt);
+        });
+        let i = 1;
+        while (i < regs.length && tr.length == 0) {
+            tr = $('form[action="?action=exchange"]').parent().filter(function () {
+                let txt = $(this).find('h1,h3').text();
+                return regs[i].test(txt) && !/出售|减少|減少|魔力/i.test(txt);
+            });
+            i++;
+        }
+        if (tr.length == 0) {
+            return false;
         }
 
-        $('form[action="?action=exchange"]').parent().filter(function () {
-            let txt = $(this).find('h1').text();
-            return reg.test(txt) && !/出售|减少|減少/i.test(txt);
-        }).find('input[name="submit"]').filter(function() {
+        tr.find('input[name="submit"]').filter(function() {
             return !$(this).prop("disabled");
         }).each(function() {
             menu.set_data("counter_down", ++counter);
@@ -216,8 +227,9 @@
         log('auto_exchange');
 
         let ms = 0;
-        if (location.host.search(/bilibili|hitpt|ptlover|sewerpt|soulvoice/i) != -1) {
-            ms = 5000;
+        let result = /系统限制\s*(\d+)\s*秒内只能点击交换按钮一次/i.exec(document.body.innerText);
+        if (result != null) {
+            ms = parseInt(result[1]) * 1000 - 3000;
         }
         setTimeout(() => {
             let res = false;

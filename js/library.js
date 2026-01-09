@@ -21,7 +21,7 @@ class Observer {
         const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
         this.__observer = new MutationObserver(mutationList =>
             mutationList.filter(m => m.type === 'childList').forEach(m => {
-                //console.log(m);
+                // console.log(m);
                 try{
                     callback(m.addedNodes, m.removedNodes);
                 } catch (err) {}
@@ -31,7 +31,7 @@ class Observer {
 }
 
 /**
- * 储存类
+ * 储存类，需要允许使用 [GM_getValue, GM_setValue]
  * @author kim.wu <https://github.com/kimwuX>
  * @class
  */
@@ -75,7 +75,7 @@ class Vault {
 }
 
 /**
- * 菜单类
+ * 菜单类，需要允许使用 [GM_registerMenuCommand, GM_notification]
  * @author kim.wu <https://github.com/kimwuX>
  * @class
  */
@@ -142,6 +142,48 @@ class Menu extends Vault {
                 return menu[2];
             }
         }
+    }
+}
+
+/**
+ * 工具类，需要允许使用 [GM.cookie, GM.xmlHttpRequest]
+ * @author kim.wu <https://github.com/kimwuX>
+ * @class
+ */
+class Utils {
+    static async getCookie(key) {
+        let res = null;
+        const cookies = await GM.cookie.list()
+        // console.log(cookies);
+        for (const element of cookies) {
+            // console.log(element);
+            if (element.name == key) {
+                res = element.value;
+            }
+        }
+        // console.log(res);
+        if (!res) {
+            return Promise.reject(`get cookie[${key}] failed!`);
+        }
+        return res;
+    }
+
+    static async httpGet(url, responseType, cookie, timeout) {
+        const r = await GM.xmlHttpRequest({
+            method: 'GET',
+            url: url,
+            headers: {
+              "User-Agent": navigator.userAgent
+            },
+            cookie: cookie,
+            timeout: timeout || 15000,
+            responseType: responseType
+        });
+        // console.log(r);
+        if (!r.response) {
+            return Promise.reject(`get "${url}" ${r.status} ${r.statusText}!`);
+        }
+        return r.response;
     }
 }
 

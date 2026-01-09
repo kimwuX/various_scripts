@@ -91,12 +91,17 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
+// @grant        GM.cookie
+// @grant        GM.xmlHttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
 // @icon         https://img1.pixhost.to/images/10104/659998245_1.png
 // @run-at       document-end
 // ==/UserScript==
 
 (function () {
+    let now = new Date();
+
     function log(data, level = 0) {
         let func;
         if (level == 2) {
@@ -113,13 +118,100 @@
         }
     }
 
+    function formatDate(date) {
+        let year = date.getFullYear();         // 获取年份
+        let month = ('0' + (date.getMonth() + 1)).slice(-2); // 获取月份，并确保月份是两位数
+        let day = ('0' + date.getDate()).slice(-2);         // 获取日期，并确保日期是两位数
+        return year + month + day;            // 拼接成yyyymmdd格式
+    }
+
     function isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
+    function ym_observer() {
+        let ob = new Observer(function(list_add, list_remove) {
+            let target = $('div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical');
+            list_add.forEach(node => {
+                target.each(function() {
+                    if (node == this) {
+                        log(node);
+                        let btn = $(this).find('button').filter(function () {
+                            return /签\s*到/i.test($(this).text());
+                        });
+                        if (btn.length > 0) {
+                            ob.disconnect();
+                            let t = Date.now();
+                            let id = setInterval(() => {
+                                log(`interval ${Date.now() - t}`);
+                                if (Date.now() - t > 30000) { //timeout
+                                    log('timeout.');
+                                    clearInterval(id);
+                                }
+                                btn.click();
+                            }, 5000);
+                        }
+                    }
+                });
+            });
+        });
+        ob.observe(document.body);
+    }
+
+    function checkYema(result) {
+        let checked = false;
+        if (result.success) {
+            let t = formatDate(now);
+            for (const element of result.data) {
+                if (String(element.checkDay) == t) {
+                    checked = true;
+                    break;
+                }
+            }
+        }
+        if (checked) {
+            GM_setValue(location.host, now.toLocaleString());
+            log('今天已经签过到了');
+            return;
+        }
+
+        let hash = "#/consumer/checkIn";
+        if (location.href.indexOf(hash) == -1) {
+            location.hash = hash;
+            location.reload();
+        } else {
+            ym_observer();
+        }
+    }
+
+    function signYema() {
+        Utils.getCookie('auth').then(result => {
+            log(result);
+            return Utils.httpGet(
+                `${location.origin}/api/consumer/fetch365AttendanceList`,
+                'json',
+                {'auth': result}
+            );
+        }).then(result => {
+            log(result);
+            checkYema(result);
+        }).catch(error => {
+            log(error, 2);
+        });
+    }
+
     setTimeout(function () {
-        let res, host = location.host;
-        if (host.search(/totheglory/i) != -1) {
+        let host = location.host;
+        let v1 = GM_getValue(host);
+        if (v1 && new Date(v1).toDateString() == now.toDateString()) {
+            log("Aleady Signed.");
+            return;
+        }
+
+        let res;
+        if (host.search(/yemapt/i) != -1) {
+            signYema();
+        } else if (host.search(/totheglory/i) != -1) {
             res = $('.bottom a').filter(function () {
                 return isSignable($(this).text());
             });
@@ -161,31 +253,21 @@
 
         if (res && res.length > 0) {
             //log(res[0]);
-            let t1 = new Date();
-            let v1 = GM_getValue(host);
             if (host.search(/ptchdbits|52pt/i) != -1) {
-                if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    log("Aleady Signed.");
-                } else {
-                    if (location.pathname.search(/bakatest\.php/i) != -1) {
-                        let els = $("font").filter(function () {
-                            return /连续\d+天签到/.test($(this).text());
-                        });
-                        if (els.length > 0) {
-                            GM_setValue(host, t1.toLocaleString());
-                            log('今天已经签过到了');
-                        }
-                    } else {
-                        res[0].click();
+                if (location.pathname.search(/bakatest\.php/i) != -1) {
+                    let els = $("font").filter(function () {
+                        return /连续\d+天签到/.test($(this).text());
+                    });
+                    if (els.length > 0) {
+                        GM_setValue(host, now.toLocaleString());
+                        log('今天已经签过到了');
                     }
-                }
-            } else if (host.search(/hhanclub/i) != -1) {
-                if (v1 && new Date(v1).toDateString() == t1.toDateString()) {
-                    log("Aleady Signed.");
                 } else {
-                    GM_setValue(host, t1.toLocaleString());
                     res[0].click();
                 }
+            } else if (host.search(/hhanclub/i) != -1) {
+                GM_setValue(host, now.toLocaleString());
+                res[0].click();
             } else {
                 res[0].click();
             }

@@ -581,12 +581,6 @@
     function handlePTSKit() {
         if (!canShout()) return;
 
-        let offset = now - new Date(menu.get_data('date'));
-        if (!isNaN(offset) && offset < 86400000) {
-            log('not time yet.');
-            return;
-        }
-
         if ($('input#shbox_text').length == 0) return;
 
         if (menu.get_menu_value('sh_bonus')) {
@@ -596,6 +590,20 @@
 
         menu.set_data('date', now.toLocaleString());
         menu.save_vault();
+
+        setTimeout(() => {
+            let user = $('#info_block a[href*="userdetails.php"]').text().trim();
+            log(user);
+            //[< 1分钟前]  [系统] 恭喜用户「xxx」触发关键词「短剧第一站」，获得291点魔力值！
+            let re_bonus = /\[< 1分钟前\]\s*\[系统\] 恭喜用户「(\S+)」触发关键词「短剧第一站」，获得(\d+)点魔力值/
+            $('#iframe-shout-box').contents().find('td.shoutrow').each(function() {
+                let match = matchRegExp(re_bonus, $(this).text());
+                if (match && match[1] == user) {
+                    log(match);
+                    saveToVault('bonus', match[2]);
+                }
+            });
+        }, 3000);
     }
 
     setTimeout(function () {
