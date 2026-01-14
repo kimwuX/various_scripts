@@ -168,13 +168,17 @@ class Utils {
         return res;
     }
 
-    static async httpGet(url, responseType, cookie, timeout) {
+    static async httpGet(url, headers, responseType, cookie, timeout) {
+        if (!headers) {
+            headers = {};
+        }
+        if (!headers.hasOwnProperty("User-Agent")) {
+            headers["User-Agent"] = navigator.userAgent;
+        }
         const r = await GM.xmlHttpRequest({
             method: 'GET',
             url: url,
-            headers: {
-              "User-Agent": navigator.userAgent
-            },
+            headers: headers,
             cookie: cookie,
             timeout: timeout || 15000,
             responseType: responseType

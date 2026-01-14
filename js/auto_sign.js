@@ -80,6 +80,7 @@
 // @match       *://pt.ying.us.kg/*
 // @match       *://www.yemapt.org/*
 // @match       *://www.tangpt.top/*
+// @match       *://rousi.pro/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
@@ -118,39 +119,27 @@
         }
     }
 
-    function formatDate(date) {
-        let year = date.getFullYear();         // 获取年份
-        let month = ('0' + (date.getMonth() + 1)).slice(-2); // 获取月份，并确保月份是两位数
-        let day = ('0' + date.getDate()).slice(-2);         // 获取日期，并确保日期是两位数
-        return year + month + day;            // 拼接成yyyymmdd格式
-    }
-
     function isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
-    function ym_observer() {
+    function formatDate(date, sep) {
+        let res = [];
+        res[0] = date.getFullYear();                      // 获取年份
+        res[1] = ('0' + (date.getMonth() + 1)).slice(-2); // 获取月份，并确保月份是两位数
+        res[2] = ('0' + date.getDate()).slice(-2);        // 获取日期，并确保日期是两位数
+        return res.join(sep);                             // 拼接格式
+    }
+
+    function observeAdd(selector, callback) {
         let ob = new Observer(function(list_add, list_remove) {
-            let target = $('div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical');
+            let target = $(selector);
             list_add.forEach(node => {
+                // log(node);
                 target.each(function() {
                     if (node == this) {
                         log(node);
-                        let btn = $(this).find('button').filter(function () {
-                            return /签\s*到/i.test($(this).text());
-                        });
-                        if (btn.length > 0) {
-                            ob.disconnect();
-                            let t = Date.now();
-                            let id = setInterval(() => {
-                                log(`interval ${Date.now() - t}`);
-                                if (Date.now() - t > 30000) { //timeout
-                                    log('timeout.');
-                                    clearInterval(id);
-                                }
-                                btn.click();
-                            }, 5000);
-                        }
+                        callback(node, ob);
                     }
                 });
             });
@@ -161,7 +150,7 @@
     function checkYema(result) {
         let checked = false;
         if (result.success) {
-            let t = formatDate(now);
+            let t = formatDate(now, '');
             for (const element of result.data) {
                 if (String(element.checkDay) == t) {
                     checked = true;
@@ -180,7 +169,23 @@
             location.hash = hash;
             location.reload();
         } else {
-            ym_observer();
+            observeAdd('div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical', (node, ob) => {
+                let btn = $(node).find('button').filter(function () {
+                    return /签\s*到/i.test($(this).text());
+                });
+                if (btn.length > 0) {
+                    ob.disconnect();
+                    let t = Date.now();
+                    let id = setInterval(() => {
+                        log(`interval ${Date.now() - t}`);
+                        if (Date.now() - t > 30000) { //timeout
+                            log('timeout.');
+                            clearInterval(id);
+                        }
+                        btn.click();
+                    }, 5000);
+                }
+            });
         }
     }
 
@@ -189,12 +194,67 @@
             log(result);
             return Utils.httpGet(
                 `${location.origin}/api/consumer/fetch365AttendanceList`,
+                null,
                 'json',
                 {'auth': result}
             );
         }).then(result => {
             log(result);
             checkYema(result);
+        }).catch(error => {
+            log(error, 2);
+        });
+    }
+
+    function checkRousi(result) {
+        if (result?.code > 0) {
+            log(result?.message, 1);
+            return;
+        }
+        if (result?.attendance?.attended_dates) {
+            let t = formatDate(now, '-');
+            if (result.attendance.attended_dates.includes(t)) {
+                GM_setValue(location.host, now.toLocaleString());
+                log('今天已经签过到了');
+                return;
+            }
+        }
+
+        let path = "/points";
+        if (location.href.indexOf(path) == -1) {
+            location.pathname = path;
+            //location.reload();
+        } else {
+            observeAdd('div.space-y-6', (node, ob) => {
+                let btn = $(node).find('button').filter(function () {
+                    // 签到 +100
+                    // return /签\s*到/i.test($(this).text());
+                    // 试试手气
+                    return /试试手气/i.test($(this).text());
+                });
+                if (btn.length > 0) {
+                    ob.disconnect();
+                    btn.click();
+                }
+            });
+        }
+    }
+
+    function signRousi() {
+        let token = localStorage.getItem('token');
+        log(token);
+        if (!token) {
+            log('未登录，请登录后重试', 1);
+            return;
+        }
+
+        Utils.httpGet(
+            `${location.origin}/api/points/init`,
+            {'Authorization': `Bearer ${token}`},
+            'json'
+        ).then(result => {
+            log(result);
+            checkRousi(result);
         }).catch(error => {
             log(error, 2);
         });
@@ -211,6 +271,8 @@
         let res;
         if (host.search(/yemapt/i) != -1) {
             signYema();
+        } else if (host.search(/rousi\.pro/i) != -1) {
+            signRousi();
         } else if (host.search(/totheglory/i) != -1) {
             res = $('.bottom a').filter(function () {
                 return isSignable($(this).text());
