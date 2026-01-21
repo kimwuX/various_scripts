@@ -30,7 +30,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_unregisterMenuCommand
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
 // @icon         https://img1.pixhost.to/images/10104/659998255_7.png
 // @run-at       document-end
 // ==/UserScript==

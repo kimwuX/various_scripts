@@ -95,7 +95,7 @@
 // @grant        GM.cookie
 // @grant        GM.xmlHttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
-// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/js/library.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
 // @icon         https://img1.pixhost.to/images/10104/659998245_1.png
 // @run-at       document-end
 // ==/UserScript==
@@ -139,7 +139,9 @@
                 target.each(function() {
                     if (node == this) {
                         log(node);
-                        callback(node, ob);
+                        if (callback()) {
+                            ob.disconnect();
+                        }
                     }
                 });
             });
@@ -169,12 +171,19 @@
             location.hash = hash;
             location.reload();
         } else {
-            observeAdd('div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical', (node, ob) => {
-                let btn = $(node).find('button').filter(function () {
+            let selector = 'div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical';
+            if ($(selector).length > 0) {
+                innerCheck();
+            } else {
+                log('未找到签到节点，开始监听节点');
+                observeAdd(selector, innerCheck);
+            }
+            function innerCheck() {
+                log('开始签到...');
+                let btn = $(selector).find('button').filter(function () {
                     return /签\s*到/i.test($(this).text());
                 });
                 if (btn.length > 0) {
-                    ob.disconnect();
                     let t = Date.now();
                     let id = setInterval(() => {
                         log(`interval ${Date.now() - t}`);
@@ -184,8 +193,10 @@
                         }
                         btn.click();
                     }, 5000);
+                    return true;
                 }
-            });
+                return false;
+            }
         }
     }
 
@@ -225,18 +236,27 @@
             location.pathname = path;
             //location.reload();
         } else {
-            observeAdd('div.space-y-6', (node, ob) => {
-                let btn = $(node).find('button').filter(function () {
+            let selector = 'div.space-y-6';
+            if ($(selector).length > 0) {
+                innerCheck();
+            } else {
+                log('未找到签到节点，开始监听节点');
+                observeAdd(selector, innerCheck);
+            }
+            function innerCheck() {
+                log('开始签到...');
+                let btn = $(selector).find('button').filter(function () {
                     // 签到 +100
                     // return /签\s*到/i.test($(this).text());
                     // 试试手气
                     return /试试手气/i.test($(this).text());
                 });
                 if (btn.length > 0) {
-                    ob.disconnect();
                     btn.click();
+                    return true;
                 }
-            });
+                return false;
+            }
         }
     }
 
