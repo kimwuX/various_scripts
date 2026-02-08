@@ -9,6 +9,8 @@
 // @match       *://www.tjupt.org/attendance.php*
 // @match       *://u2.dmhy.org/showup.php*
 // @match       *://52pt.site/bakatest.php*
+// @match       *://pt.0ff.cc/attendance.php*
+// @match       *://farmm.cc/attendance.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -497,6 +499,16 @@
         }
     }
 
+    function signFarmm() {
+        let btns = $('input.btn[value="立即签到"]');
+        if (btns.length > 0) {
+            log("find checkin button, delay 10s...");
+            setTimeout(() => {
+                btns.first().click();
+            }, 10000);
+        }
+    }
+
     setTimeout(function () {
         //刷题
         let training = menu.get_menu_value('simulated');
@@ -514,6 +526,8 @@
             signU2(training);
         } else if (host.search(/52pt/i) != -1) {
             sign52();
+        } else if (host.search(/0ff|farmm/i) != -1) {
+            signFarmm();
         }
 
     }, 1000);

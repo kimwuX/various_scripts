@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  重要公告自动点击阅读
 // @author       kim.wu
-// @match       *://hhanclub.top/*
+// @match       *://hhanclub.net/*
 // @match       *://kp.m-team.cc/*
 // @match       *://tjupt.org/*
 // @match       *://www.tjupt.org/*

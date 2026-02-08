@@ -40,7 +40,7 @@
 // @match       *://rousi.zip/*
 // @match       *://ptchdbits.co/*
 // @match       *://ubits.club/*
-// @match       *://hhanclub.top/*
+// @match       *://hhanclub.net/*
 // @match       *://lemonhd.club/*
 // @match       *://qingwapt.com/*
 // @match       *://new.qingwa.pro/*
@@ -222,9 +222,9 @@
             log(result?.message, 1);
             return;
         }
-        if (result?.attendance?.attended_dates) {
+        if (result?.data?.attendance?.attended_dates) {
             let t = formatDate(now, '-');
-            if (result.attendance.attended_dates.includes(t)) {
+            if (result.data.attendance.attended_dates.includes(t)) {
                 GM_setValue(location.host, now.toLocaleString());
                 log('今天已经签过到了');
                 return;
