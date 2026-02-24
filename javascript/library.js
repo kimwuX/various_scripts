@@ -1,4 +1,38 @@
 /**
+ * 基类
+ * @author kim.wu <https://github.com/kimwuX>
+ * @class
+ */
+class AppBase {
+    // 构造方法
+    constructor(name) {
+        this.name = name || 'app_base';
+        this.log('inited.');
+    }
+
+    /**
+     * 打印控制台日志
+     * @param data 输出内容
+     * @param level 1-警告级别，2-错误级别，默认普通级别
+     */
+    log(data, level = 0) {
+        let func;
+        if (level == 2) {
+            func = console.error;
+        } else if (level == 1) {
+            func = console.warn;
+        } else {
+            func = console.log;
+        }
+        if (data instanceof Object) {
+            func(data);
+        } else {
+            func(`---${this.name}---\n[${new Date().toLocaleTimeString()}] ${data}`);
+        }
+    }
+}
+
+/**
  * 观察者类
  * @author kim.wu <https://github.com/kimwuX>
  * @class
@@ -146,14 +180,37 @@ class Menu extends Vault {
 }
 
 /**
- * 工具类，需要允许使用 [GM.cookie, GM.xmlHttpRequest]
+ * 工具类
  * @author kim.wu <https://github.com/kimwuX>
  * @class
  */
 class Utils {
+    /**
+     * 判断是否空白字符串
+     * @param {string} str 
+     * @returns 
+     */
+    static isEmptyString(str) {
+        return !(str != null && str.trim().length > 0);
+    }
+
+    /**
+     * 判断是否有效日期对象
+     * @param {Date} date 
+     * @returns 
+     */
+    static isValidDate(date) {
+        return date instanceof Date && !isNaN(date.getTime());
+    }
+
+    /**
+     * 获取网站 cookie，需要允许使用 [GM.cookie]
+     * @param key 指定 cookie 键
+     * @returns 指定 cookie 值
+     */
     static async getCookie(key) {
         let res = null;
-        const cookies = await GM.cookie.list()
+        const cookies = await GM.cookie.list();
         // console.log(cookies);
         for (const element of cookies) {
             // console.log(element);
@@ -168,6 +225,15 @@ class Utils {
         return res;
     }
 
+    /**
+     * 发起HTTP GET请求，需要允许使用 [GM.xmlHttpRequest]
+     * @param url 请求地址
+     * @param headers 请求头
+     * @param responseType 响应数据类型
+     * @param cookie 请求 cookie
+     * @param timeout 超时时间
+     * @returns 响应内容
+     */
     static async httpGet(url, headers, responseType, cookie, timeout) {
         if (!headers) {
             headers = {};
