@@ -204,56 +204,72 @@ class Utils {
     }
 
     /**
-     * 获取网站 cookie，需要允许使用 [GM.cookie]
-     * @param key 指定 cookie 键
-     * @returns 指定 cookie 值
+     * 获取网站 cookie，需要允许使用 [GM_cookie]
+     * @param {string} key 需要获取的 cookie 键名，如果不传值则获取所有 cookie
+     * @returns {Promise<any>} 返回获取的 cookie 对象数组
      */
-    static async getCookie(key) {
-        let res = null;
-        const cookies = await GM.cookie.list();
-        // console.log(cookies);
-        for (const element of cookies) {
-            // console.log(element);
-            if (element.name == key) {
-                res = element.value;
-            }
-        }
-        // console.log(res);
-        if (!res) {
-            return Promise.reject(`get cookie[${key}] failed!`);
-        }
-        return res;
+    static getCookie(key) {
+        return new Promise((resolve, reject) => {
+            GM_cookie.list({ name: key }, (cookies, error) => {
+                if (error) {
+                    reject(new Error(`Get cookie[key=${key}] error: ${error}`));
+                } else {
+                    // console.log(cookies);
+                    resolve(cookies);
+                }
+            });
+        });
     }
 
     /**
-     * 发起HTTP GET请求，需要允许使用 [GM.xmlHttpRequest]
-     * @param url 请求地址
-     * @param headers 请求头
-     * @param responseType 响应数据类型
-     * @param cookie 请求 cookie
-     * @param timeout 超时时间
-     * @returns 响应内容
+     * 发起 HTTP GET 请求，需要允许使用 [GM_xmlhttpRequest]
+     * @param {string} url - 请求地址
+     * @param {string} responseType - 响应类型 ('text', 'json', 'arrayBuffer', 'blob')
+     * @param {Object} options - 加载选项，可以包含 headers/cookie/timeout/onProgress 等参数
+     * @returns {Promise<any>} 返回加载完成的数据
      */
-    static async httpGet(url, headers, responseType, cookie, timeout) {
-        if (!headers) {
-            headers = {};
-        }
-        if (!headers.hasOwnProperty("User-Agent")) {
-            headers["User-Agent"] = navigator.userAgent;
-        }
-        const r = await GM.xmlHttpRequest({
-            method: 'GET',
-            url: url,
-            headers: headers,
-            cookie: cookie,
-            timeout: timeout || 15000,
-            responseType: responseType
+    static httpGet(url, responseType = 'text', options = {}) {
+        return new Promise((resolve, reject) => {
+            options = options || {};
+            let headers = options.headers || {};
+            if (!headers.hasOwnProperty("User-Agent")) {
+                headers["User-Agent"] = navigator.userAgent;
+            }
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: url,
+                headers: headers,
+                cookie: options.cookie,
+                timeout: options.timeout || 15000,
+                responseType: responseType,
+                onload: result => {
+                    // console.log(result);
+                    if (result.status >= 200 && result.status < 300) {
+                        resolve(result.response);
+                    } else {
+                        reject(new Error(`Get ${url} HTTP Error: ${result.status} ${result.statusText}`));
+                    }
+                },
+                onabort: () => {
+                    reject(new Error(`Loading ${url} was aborted`));
+                },
+                onerror: () => {
+                    reject(new Error(`Network error while loading ${url}`));
+                },
+                ontimeout: () => {
+                    reject(new Error(`Timeout while loading ${url}`));
+                },
+                onprogress: result => {
+                    // console.log(result);
+                    if (result.lengthComputable) {
+                        const percentComplete = (result.loaded / result.total) * 100;
+                        // console.log(`${Math.ceil(percentComplete)}% loaded`);
+                        if (options.onProgress) {
+                            options.onProgress(percentComplete, result.loaded, result.total);
+                        }
+                    }
+                }
+            });
         });
-        // console.log(r);
-        if (!r.response) {
-            return Promise.reject(`get "${url}" ${r.status} ${r.statusText}!`);
-        }
-        return r.response;
     }
 }
-
