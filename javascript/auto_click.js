@@ -6,14 +6,19 @@
 // @author       kim.wu
 // @match        https://www.baidu.com/*
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
 // @icon         https://www.baidu.com/favicon.ico
 // @run-at       document-end
 // ==/UserScript==
 
-(function () {
+class MyApp extends AppBase {
+    constructor() {
+        super('auto_click');
+        this.main();
+    }
 
-    setTimeout(function() {
-
+    main() {
+        const self = this;
         if ($("input[value='放弃考核']").length > 0) {
             $("input[value='放弃考核']")[0].click();
         } else if ($("a:contains('这里')").length > 0) {
@@ -21,6 +26,9 @@
         } else if ($("a:contains('返回上一页')").length > 0) {
             $("a:contains('返回上一页')")[0].click();
         }
-    }, 1000 + Math.random() * 2000);
+    }
+}
 
-  })();
+setTimeout(function () {
+    new MyApp();
+}, 1000 + Math.random() * 2000);

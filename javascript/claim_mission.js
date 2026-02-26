@@ -30,30 +30,18 @@
 // @run-at       document-end
 // ==/UserScript==
 
-(function () {
-    let menu_All = [
-        ['on', '自动认领任务', true],
-    ];
-    let menu = new Menu(menu_All);
-    let now = new Date();
-
-    function log(data, level = 0) {
-        let func;
-        if (level == 2) {
-            func = console.error;
-        } else if (level == 1) {
-            func = console.warn;
-        } else {
-            func = console.log;
-        }
-        if (data instanceof Object) {
-            func(data);
-        } else {
-            func(`---claim_mission---\n[${new Date().toLocaleTimeString()}] ${data}`);
-        }
+class MyApp extends AppBase {
+    constructor() {
+        super('claim_mission');
+        let menu_All = [
+            ['on', '自动认领任务', true],
+        ];
+        this.menu = new Menu(menu_All);
+        this.now = new Date();
+        this.main();
     }
 
-    function isSignable() {
+    isSignable() {
         let re_s = /签\s*到|簽\s*到|打\s*卡|check in/i;
         let re_d = /已|获得|成功|查看|記錄|详情/;
         let res = $('#info_block a').filter(function () {
@@ -63,9 +51,10 @@
         return res && res.length > 0;
     }
 
-    function canClaim() {
+    canClaim() {
+        const self = this;
         //签到优先
-        if (isSignable()) return false;
+        if (self.isSignable()) return false;
 
         //存在进行中的任务
         let task = null;
@@ -85,33 +74,34 @@
             });
         }
         if (task && task.length > 0) {
-            log(task)
+            self.log(task);
             return false;
         }
 
         //特殊站点判断
         if(host.search(/0ff|farmm/i) != -1) {
             //周循环任务
-            return now.getDay() == 1;
+            return self.now.getDay() == 1;
         }
 
         return true;
     }
 
-    function ly_observer() {
+    ly_observer() {
+        const self = this;
         let ob = new Observer(function(list_add, list_remove) {
             let target = $('div.layui-layer.layui-layer-dialog');
             list_add.forEach(node => {
-                target.each(function() {
+                target.each(function () {
                     if (node == this) {
-                        log(node);
+                        self.log(node);
                         let btn = $(this).find('a.layui-layer-btn0');
                         if (btn.length > 0) {
-                            log(btn);
+                            self.log(btn);
                             btn[0].click();
 
-                            menu.set_data('date', new Date().toLocaleString());
-                            menu.save_vault();
+                            self.menu.set_data('date', new Date().toLocaleString());
+                            self.menu.save_vault();
                         }
                     }
                 });
@@ -120,11 +110,12 @@
         ob.observe(document.body);
     }
 
-    function handleTask() {
-        if (!canClaim()) return;
+    handleTask() {
+        const self = this;
+        if (!self.canClaim()) return;
 
         if (location.href.search(/task\.php/i) == -1) {
-            $('a[href*="task.php"]').each(function() {
+            $('a[href*="task.php"]').each(function () {
                 this.click();
             });
         } else {
@@ -153,9 +144,9 @@
             } else if(host.search(/ptlover/i) != -1) {
                 btn = $('input.claim[data-id="10"]');
             }
-            log(btn)
+            self.log(btn);
             if (btn.length > 0) {
-                ly_observer();
+                self.ly_observer();
                 setTimeout(() => {
                     btn.click();
                 }, 500);
@@ -163,11 +154,14 @@
         }
     }
 
-    setTimeout(function () {
-        log('claim_mission.');
-        if (menu.get_menu_value('on')) {
-            handleTask();
+    main() {
+        const self = this;
+        if (self.menu.get_menu_value('on')) {
+            self.handleTask();
         }
-    }, 2000);
+    }
+}
 
-})();
+setTimeout(function () {
+    new MyApp();
+}, 2000);

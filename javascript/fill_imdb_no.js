@@ -12,19 +12,19 @@
 
 (function () {
 
-    $('.torrentname a').filter(function() {
-        return /imdb\.com/i.test($(this).prop('href'))
-    }).each(function() {
-        //console.log($(this).prop('href'))
-        let m = /tt(\d+)/.exec($(this).prop('href'))
+    $('.torrentname a').filter(function () {
+        return /imdb\.com/i.test($(this).prop('href'));
+    }).each(function () {
+        //console.log($(this).prop('href'));
+        let m = /tt(\d+)/.exec($(this).prop('href'));
         if (m && m.length > 1) {
             if (m[1].length < 7) {
-                let n = m[1].padStart(7, '0')
-                n = $(this).prop('href').replace(m[1], n)
-                $(this).prop('href', n)
+                let n = m[1].padStart(7, '0');
+                n = $(this).prop('href').replace(m[1], n);
+                $(this).prop('href', n);
             }
         }
-        //console.log($(this).prop('href'))
-    })
+        //console.log($(this).prop('href'));
+    });
 
 })();

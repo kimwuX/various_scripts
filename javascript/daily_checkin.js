@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         自动签到
+// @name         每日签到
 // @namespace    http://www.kimwu.com/
 // @version      1.0.0
 // @description  PT站点自动签到脚本
@@ -88,42 +88,32 @@
 // @exclude     */attendance.php*
 // @exclude     */shoutbox.php*
 // @exclude     */fun.php*
+// @exclude     */blank.htm*
 // @exclude     */take2fa.php*
+// @exclude     *qingwa*/banner/
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
-// @grant        GM.cookie
-// @grant        GM.xmlHttpRequest
+// @grant        GM_cookie
+// @grant        GM_xmlhttpRequest
 // @require      https://code.jquery.com/jquery-1.12.4.js
 // @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
 // @icon         https://img1.pixhost.to/images/10104/659998245_1.png
 // @run-at       document-end
 // ==/UserScript==
 
-(function () {
-    let now = new Date();
-
-    function log(data, level = 0) {
-        let func;
-        if (level == 2) {
-            func = console.error;
-        } else if (level == 1) {
-            func = console.warn;
-        } else {
-            func = console.log;
-        }
-        if (data instanceof Object) {
-            func(data);
-        } else {
-            func(`---auto_sign---\n[${new Date().toLocaleTimeString()}] ${data}`);
-        }
+class MyApp extends AppBase {
+    constructor() {
+        super('daily_checkin');
+        this.now = new Date();
+        this.main();
     }
 
-    function isSignable(str) {
+    isSignable(str) {
         return /签\s*到|簽\s*到|打\s*卡|check in/i.test(str) && !/已|获得|成功|查看|記錄|详情/.test(str);
     }
 
-    function formatDate(date, sep) {
+    formatDate(date, sep) {
         let res = [];
         res[0] = date.getFullYear();                      // 获取年份
         res[1] = ('0' + (date.getMonth() + 1)).slice(-2); // 获取月份，并确保月份是两位数
@@ -131,14 +121,15 @@
         return res.join(sep);                             // 拼接格式
     }
 
-    function observeAdd(selector, callback) {
+    observeAdd(selector, callback) {
+        const self = this;
         let ob = new Observer(function(list_add, list_remove) {
             let target = $(selector);
             list_add.forEach(node => {
-                // log(node);
-                target.each(function() {
+                //self.log(node);
+                target.each(function () {
                     if (node == this) {
-                        log(node);
+                        self.log(node);
                         if (callback()) {
                             ob.disconnect();
                         }
@@ -149,10 +140,11 @@
         ob.observe(document.body);
     }
 
-    function checkYema(result) {
+    handleYema(result) {
+        const self = this;
         let checked = false;
         if (result.success) {
-            let t = formatDate(now, '');
+            let t = self.formatDate(self.now, '');
             for (const element of result.data) {
                 if (String(element.checkDay) == t) {
                     checked = true;
@@ -161,8 +153,8 @@
             }
         }
         if (checked) {
-            GM_setValue(location.host, now.toLocaleString());
-            log('今天已经签过到了');
+            GM_setValue(location.host, self.now.toLocaleString());
+            self.log('今天已经签过到了');
             return;
         }
 
@@ -175,20 +167,20 @@
             if ($(selector).length > 0) {
                 innerCheck();
             } else {
-                log('未找到签到节点，开始监听节点');
-                observeAdd(selector, innerCheck);
+                self.log('未找到签到节点，开始监听节点');
+                self.observeAdd(selector, innerCheck);
             }
             function innerCheck() {
-                log('开始签到...');
+                self.log('开始签到...');
                 let btn = $(selector).find('button').filter(function () {
                     return /签\s*到/i.test($(this).text());
                 });
                 if (btn.length > 0) {
                     let t = Date.now();
                     let id = setInterval(() => {
-                        log(`interval ${Date.now() - t}`);
+                        self.log(`interval ${Date.now() - t}`);
                         if (Date.now() - t > 30000) { //timeout
-                            log('timeout.');
+                            self.log('timeout.');
                             clearInterval(id);
                         }
                         btn.click();
@@ -200,33 +192,40 @@
         }
     }
 
-    function signYema() {
+    checkInYema() {
+        const self = this;
         Utils.getCookie('auth').then(result => {
-            log(result);
-            return Utils.httpGet(
+            self.log(result);
+            let cookies = {};
+            result.forEach(item => 
+                cookies[item.name] = item.value
+            );
+            //self.log(cookies);
+            return Utils.load(
                 `${location.origin}/api/consumer/fetch365AttendanceList`,
-                null,
-                'json',
-                {'auth': result}
+                'json', {
+                    'cookie': cookies
+                }
             );
         }).then(result => {
-            log(result);
-            checkYema(result);
+            self.log(result);
+            self.handleYema(result);
         }).catch(error => {
-            log(error, 2);
+            self.log(error, 2);
         });
     }
 
-    function checkRousi(result) {
+    handleRousi(result) {
+        const self = this;
         if (result?.code > 0) {
-            log(result?.message, 1);
+            self.log(result?.message, 1);
             return;
         }
         if (result?.data?.attendance?.attended_dates) {
-            let t = formatDate(now, '-');
+            let t = self.formatDate(self.now, '-');
             if (result.data.attendance.attended_dates.includes(t)) {
-                GM_setValue(location.host, now.toLocaleString());
-                log('今天已经签过到了');
+                GM_setValue(location.host, self.now.toLocaleString());
+                self.log('今天已经签过到了');
                 return;
             }
         }
@@ -240,11 +239,11 @@
             if ($(selector).length > 0) {
                 innerCheck();
             } else {
-                log('未找到签到节点，开始监听节点');
-                observeAdd(selector, innerCheck);
+                self.log('未找到签到节点，开始监听节点');
+                self.observeAdd(selector, innerCheck);
             }
             function innerCheck() {
-                log('开始签到...');
+                self.log('开始签到...');
                 let btn = $(selector).find('button').filter(function () {
                     // 签到 +100
                     // return /签\s*到/i.test($(this).text());
@@ -260,100 +259,106 @@
         }
     }
 
-    function signRousi() {
+    checkInRousi() {
+        const self = this;
         let token = localStorage.getItem('token');
-        log(token);
+        self.log(token);
         if (!token) {
-            log('未登录，请登录后重试', 1);
+            self.log('未登录，请登录后重试', 1);
             return;
         }
 
-        Utils.httpGet(
+        Utils.load(
             `${location.origin}/api/points/init`,
-            {'Authorization': `Bearer ${token}`},
-            'json'
+            'json', {
+                'headers': {'Authorization': `Bearer ${token}`}
+            }
         ).then(result => {
-            log(result);
-            checkRousi(result);
+            self.log(result);
+            self.handleRousi(result);
         }).catch(error => {
-            log(error, 2);
+            self.log(error, 2);
         });
     }
 
-    setTimeout(function () {
+    main() {
+        const self = this;
         let host = location.host;
         let v1 = GM_getValue(host);
-        if (v1 && new Date(v1).toDateString() == now.toDateString()) {
-            log("Aleady Signed.");
+        if (v1 && new Date(v1).toDateString() == self.now.toDateString()) {
+            self.log("Aleady checked in.");
             return;
         }
 
         let res;
         if (host.search(/yemapt/i) != -1) {
-            signYema();
+            self.checkInYema();
         } else if (host.search(/rousi\.pro/i) != -1) {
-            signRousi();
+            self.checkInRousi();
         } else if (host.search(/totheglory/i) != -1) {
             res = $('.bottom a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/hdchina/i) != -1) {
             res = $('.userinfort a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/btschool/i) != -1) {
             res = $('.outer>p a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/haidan/i) != -1) {
             res = $('.userinfo #modalBtn').filter(function () {
-                return isSignable($(this).prop('value'));
+                return self.isSignable($(this).prop('value'));
             });
         } else if (host.search(/hdcity/i) != -1) {
             res = $('.button-group a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/hhanclub/i) != -1) {
             res = $('#user-info-panel a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/cspt/i) != -1) {
             res = $('a.not-attended');
         } else if (host.search(/ikunshare|pting/i) != -1) {
             res = $('button#checkInButton').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         } else if (host.search(/wnflb2023/i) != -1) {
             res = $('img#fx_checkin_b').filter(function () {
-                return isSignable($(this).attr('alt'));
+                return self.isSignable($(this).attr('alt'));
             }).parent();
         } else {
             res = $('#info_block a').filter(function () {
-                return isSignable($(this).text());
+                return self.isSignable($(this).text());
             });
         }
 
         if (res && res.length > 0) {
-            //log(res[0]);
+            //self.log(res[0]);
             if (host.search(/ptchdbits|52pt/i) != -1) {
                 if (location.pathname.search(/bakatest\.php/i) != -1) {
                     let els = $("font").filter(function () {
                         return /连续\d+天签到/.test($(this).text());
                     });
                     if (els.length > 0) {
-                        GM_setValue(host, now.toLocaleString());
-                        log('今天已经签过到了');
+                        GM_setValue(host, self.now.toLocaleString());
+                        self.log('今天已经签过到了');
                     }
                 } else {
                     res[0].click();
                 }
             } else if (host.search(/hhanclub/i) != -1) {
-                GM_setValue(host, now.toLocaleString());
+                GM_setValue(host, self.now.toLocaleString());
                 res[0].click();
             } else {
                 res[0].click();
             }
         }
-    }, 1000);
+    }
+}
 
-})();
+setTimeout(function () {
+    new MyApp();
+}, 1000);

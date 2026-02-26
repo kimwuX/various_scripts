@@ -14,20 +14,27 @@
 // @exclude     */fun.php*
 // @exclude     */blank.htm*
 // @require      https://code.jquery.com/jquery-1.12.4.js
+// @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
 // @icon         https://img1.pixhost.to/images/10104/659998256_8.png
 // @run-at       document-end
 // ==/UserScript==
 
-(function () {
-    function handleCommon(btn, cbx) {
+class MyApp extends AppBase {
+    constructor() {
+        super('check_notice');
+        this.main();
+    }
+
+    handle(btn, cbx) {
+        const self = this;
         if (btn.length > 0) {
-            console.log(btn);
+            self.log(btn);
             if (cbx) {
                 cbx.prop('checked', true);
             }
 
             let id = setInterval(() => {
-                console.log(new Date());
+                self.log('tiktok.');
                 if (!btn.prop('disabled')) {
                     clearInterval(id);
                     btn.click();
@@ -36,21 +43,24 @@
         }
     }
 
-    setTimeout(function () {
-        console.log('check_notice.');
+    main() {
+        const self = this;
         let host = location.host;
         if (host.search(/hhanclub/i) != -1) {
-            handleCommon($('#notify_confirm'), $('#confirm_notify_select'));
+            self.handle($('#notify_confirm'), $('#confirm_notify_select'));
         } else if (host.search(/m-team/i) != -1) {
-            handleCommon($('.ant-modal-root .ant-btn'));
+            self.handle($('.ant-modal-root .ant-btn'));
         } else if (host.search(/tjupt/i) != -1) {
-            handleCommon($('#confirm-read-button'), $('#readed'));
+            self.handle($('#confirm-read-button'), $('#readed'));
         } else if (host.search(/springsunday/i) != -1) {
-            handleCommon($('.news-modal-main #NewsModalCloseBtn'));
+            self.handle($('.news-modal-main #NewsModalCloseBtn'));
         } else if (host.search(/pterclub/i) != -1) {
             let pb = $('input[name="confirm-news"]');
-            handleCommon(pb.siblings('button'), pb);
+            self.handle(pb.siblings('button'), pb);
         }
-    }, 5000);
+    }
+}
 
-})();
+setTimeout(function () {
+    new MyApp();
+}, 5000);
