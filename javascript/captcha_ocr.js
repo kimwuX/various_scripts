@@ -26,6 +26,14 @@ class MyApp extends AppBase {
     constructor() {
         super('captcha_ocr');
         this.main();
+        this._HOSTS = [
+            'http://server.local:9899', 
+            'https://movie-pilot.org'
+        ];
+    }
+
+    get HOSTS() {
+        return this._HOSTS;
     }
 
     isSignable() {
@@ -38,38 +46,38 @@ class MyApp extends AppBase {
         return res && res.length > 0;
     }
 
-    async recoCaptcha(img64, handler) {
+    async recoCaptcha(img64) {
         const self = this;
-        let hosts = ['http://server.local:9899', 'https://movie-pilot.org'];
-        for (let attempt = 0; attempt < hosts.length; attempt++) {
+        let captcha = null;
+        for (let attempt = 0; attempt < this.HOSTS.length; attempt++) {
             try {
-                let url = hosts[attempt] + '/captcha/base64';
+                let url = this.HOSTS[attempt] + '/captcha/base64';
+                self.log(`OCR(${attempt + 1}): ${url}`);
                 if (attempt > 0) {
-                    self.log(`Retrying(${attempt}) to post: ${url}`);
-                    self.showTips(`第${attempt}次重试...`);
+                    self.showTips(`<i>第${attempt}次重试中...</i>`);
                 } else {
-                    self.log(`Posting: ${url}`);
                     self.showTips('正在识别验证码...');
                 }
                 const result = await Utils.post(url, 
                     JSON.stringify({base64_img: img64}),
                     'json', {
-                        'headers': {"Content-Type": "application/json"},
-                        'timeout': 20000
+                        'headers': {"Content-Type": "application/json"}
                     }
                 );
                 self.log(result);
-                if (handler && handler(result)) {
+                if (result && result.result.length == 6) {
                     self.showTips('验证码识别成功。', 'green');
-                    return result;
+                    captcha = result.result;
+                    break;
                 }
             } catch (error) {
                 self.log(error.message, 1);
-                if (attempt + 1 == hosts.length) {
+                if (attempt + 1 == this.HOSTS.length) {
                     throw new Error(`Failed to recognize captcha: ${error.message}`);
                 }
             }
         }
+        return captcha;
     }
 
     readFile(file) {
@@ -106,10 +114,12 @@ class MyApp extends AppBase {
         ).then(result =>
             self.readFile(result)
         ).then(result =>
-            self.recoCaptcha(result, handler)
-        ).catch(error => {
+            self.recoCaptcha(result)
+        ).then(result => {
+            handler && handler(result);
+        }).catch(error => {
             self.log(error, 2);
-            self.showTips('验证码识别失败！', 'red');
+            self.showTips('<b>验证码识别失败！</b>', 'red');
         });
     }
 
@@ -122,7 +132,7 @@ class MyApp extends AppBase {
 
     showTips(text, color='black') {
         $('#captips').css('color', color);
-        $('#captips').text(text);
+        $('#captips').html(text);
     }
 
     regLogin() {
@@ -132,11 +142,7 @@ class MyApp extends AppBase {
 
             try {
                 self.ocr(this.src, res => {
-                    if (res && res.result && res.result.length == 6) {
-                        $('input[name="imagestring"]').val(res.result);
-                        return true;
-                    }
-                    return false;
+                    $('input[name="imagestring"]').val(res);
                 });
             }
             catch (error) {
@@ -152,13 +158,9 @@ class MyApp extends AppBase {
 
             try {
                 self.ocr($('#frmSignin img').prop('src'), res => {
-                    if (res && res.result && res.result.length == 6) {
-                        $('#imagestring').val(res.result);
-                        self.log($('#ok'));
-                        $('#ok')[0].click();
-                        return true;
-                    }
-                    return false;
+                    $('#imagestring').val(res);
+                    self.log($('#ok'));
+                    $('#ok')[0].click();
                 });
             }
             catch (error) {
@@ -189,13 +191,9 @@ class MyApp extends AppBase {
 
                 try {
                     self.ocr($('#showupimg').prop('src'), res => {
-                        if (res && res.result && res.result.length == 6) {
-                            $('#imagestring').val(res.result);
-                            self.log($('#showupbutton'));
-                            $('#showupbutton')[0].click();
-                            return true;
-                        }
-                        return false;
+                        $('#imagestring').val(res);
+                        self.log($('#showupbutton'));
+                        $('#showupbutton')[0].click();
                     });
                 }
                 catch (error) {
@@ -217,17 +215,13 @@ class MyApp extends AppBase {
 
             try {
                 self.ocr(img.prop('src'), res => {
-                    if (res && res.result && res.result.length == 6) {
-                        form.find('input[name="imagestring"]').val(res.result);
-                        form.find('input[type="submit"]').filter(function () {
-                            return /签\s*到|簽\s*到/i.test(this.value);
-                        }).each(function () {
-                            self.log(this);
-                            this.click();
-                        });
-                        return true;
-                    }
-                    return false;
+                    form.find('input[name="imagestring"]').val(res);
+                    form.find('input[type="submit"]').filter(function () {
+                        return /签\s*到|簽\s*到/i.test(this.value);
+                    }).each(function () {
+                        self.log(this);
+                        this.click();
+                    });
                 });
             }
             catch (error) {
