@@ -81,6 +81,7 @@
 // @match       *://www.yemapt.org/*
 // @match       *://www.tangpt.top/*
 // @match       *://rousi.pro/*
+// @match       *://hdfans.org/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
@@ -151,6 +152,9 @@ class MyApp extends AppBase {
                     break;
                 }
             }
+        } else {
+            self.log('获取签到状态失败', 1);
+            return;
         }
         if (checked) {
             GM_setValue(location.host, self.now.toLocaleString());
@@ -196,6 +200,9 @@ class MyApp extends AppBase {
         const self = this;
         Utils.getCookie('auth').then(result => {
             self.log(result);
+            if (!result || result.length == 0) {
+                return Promise.reject(new Error('未登录，请登录后重试'));
+            }
             let cookies = {};
             result.forEach(item => 
                 cookies[item.name] = item.value
