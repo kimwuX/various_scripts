@@ -82,6 +82,7 @@
 // @match       *://www.tangpt.top/*
 // @match       *://rousi.pro/*
 // @match       *://hdfans.org/*
+// @match       *://pt.xingyungept.org/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*

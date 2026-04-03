@@ -16,6 +16,7 @@
 // @match       *://pt.novahd.top/*
 // @match       *://www.ptskit.org/*
 // @match       *://www.ptlover.cc/*
+// @match       *://www.tangpt.top/*
 // @exclude     */fun.php*
 // @exclude     */shoutbox.php*
 // @grant        GM_setValue
@@ -143,6 +144,8 @@ class MyApp extends AppBase {
                 btn = $('input.claim[data-id="12"]');
             } else if(host.search(/ptlover/i) != -1) {
                 btn = $('input.claim[data-id="10"]');
+            } else if(host.search(/tangpt/i) != -1) {
+                btn = $('input.claim[data-id="5"]');
             }
             self.log(btn);
             if (btn.length > 0) {
