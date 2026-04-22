@@ -2,12 +2,14 @@
 // @name         福利抽奖
 // @namespace    http://www.kimwu.com/
 // @version      1.0.0
-// @description  青蛙每日福利，柠檬神游三清天，LongPT每日抽奖
+// @description  青蛙每日福利，柠檬神游三清天，LongPT每日抽奖，躺平PT领红包
 // @author       kim.wu
 // @match       *://qingwapt.com/*
 // @match       *://new.qingwa.pro/*
 // @match       *://lemonhd.club/*
 // @match       *://longpt.org/*
+// @match       *://www.tangpt.top/
+// @match       *://www.tangpt.top/index.php
 // @exclude     */fun.php*
 // @exclude     */shoutbox.php*
 // @exclude     *qingwa*/banner/
@@ -101,6 +103,12 @@ class MyApp extends AppBase {
             return text.match(pattern);
         }
         return null;
+    }
+
+    isElementVisible(el) {
+        return $(el).css('opacity') > 0 && 
+            $(el).css('visibility') !== 'hidden' && 
+            $(el).css('display') !== 'none';
     }
 
     qw_observer() {
@@ -271,6 +279,46 @@ class MyApp extends AppBase {
         }
     }
 
+    tang_observer() {
+        const self = this;
+        let ob = new Observer(function(list_add, list_remove) {
+            let target = $('div.layui-layer.layui-layer-dialog');
+            list_add.forEach(node => {
+                target.each(function () {
+                    if (node == this) {
+                        self.log(node);
+                        // 今天已经领取50个，每天最多领50个。
+                        if ($(this).find('div:contains("每天最多领")').length > 0) {
+                            self.vault.set_data('date', self.now.toLocaleString());
+                            self.vault.save_vault();
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        });
+        ob.observe(document.body);
+    }
+
+    handleTangPT() {
+        const self = this;
+        if (!self.canDraw()) return;
+
+        self.tang_observer();
+        setInterval(() => {
+            if (self.isElementVisible('#redpacket-modal')) {
+                if (self.isElementVisible('.rp-detail-page')) {
+                    $('#redpacket-open-done').click();
+                }
+                else if (self.isElementVisible('.rp-cover-page')) {
+                    $('#redpacket-open-cover').click();
+                }
+            } else if ($('.redpacket-banner-btn').length > 0) {
+                $('.redpacket-banner-btn').click();
+            }
+        }, 1500 + Math.random() * 1500);
+    }
+
     main() {
         const self = this;
         let host = location.host;
@@ -280,6 +328,8 @@ class MyApp extends AppBase {
             self.handleNM();
         } else if (host.search(/longpt/i) != -1) {
             self.handleLongPT();
+        } else if (host.search(/tangpt/i) != -1) {
+            self.handleTangPT();
         }
     }
 }

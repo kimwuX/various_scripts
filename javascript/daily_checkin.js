@@ -27,7 +27,7 @@
 // @match       *://52pt.site/*
 // @match       *://moecat.best/*
 // @match       *://pt.hd4fans.org/*
-// @match       *://www.haidan.video/*
+// @match       *://www.haidan.cc/*
 // @match       *://www.pttime.org/*
 // @match       *://hdtime.org/*
 // @match       *://hdatmos.club/*
@@ -49,7 +49,7 @@
 // @match       *://sewerpt.com/*
 // @match       *://cspt.top/*
 // @match       *://pandapt.net/*
-// @match       *://www.agsvpt.com/*
+// @match       *://pt.agsvpt.cn/*
 // @match       *://www.ptskit.org/*
 // @match       *://13city.org/*
 // @match       *://piggo.me/*
@@ -83,6 +83,8 @@
 // @match       *://rousi.pro/*
 // @match       *://hdfans.org/*
 // @match       *://pt.xingyungept.org/*
+// @match       *://hdvideo.top/*
+// @match       *://sunnypt.top/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
