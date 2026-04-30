@@ -85,6 +85,9 @@
 // @match       *://pt.xingyungept.org/*
 // @match       *://hdvideo.top/*
 // @match       *://sunnypt.top/*
+// @match       *://mua.xloli.cc/*
+// @match       *://pt.hdclone.top/*
+// @match       *://duckboobee.org/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*
