@@ -78,8 +78,9 @@ class Observer {
  */
 class Vault {
     // 构造方法
-    constructor() {
-        this.__vault = GM_getValue(location.host) || {};
+    constructor(host) {
+        this.__host = host || location.hostname;
+        this.__vault = GM_getValue(this.__host) || {};
     }
 
     /**
@@ -140,7 +141,7 @@ class Vault {
      * 保存数据到本地
      */
     save_vault() {
-        GM_setValue(location.host, this.__vault);
+        GM_setValue(this.__host, this.__vault);
     }
 
     /**
