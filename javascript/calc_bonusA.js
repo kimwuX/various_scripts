@@ -114,6 +114,7 @@
 // @exclude      *://springsunday.net/*
 // @exclude      *://totheglory.im/*
 // @exclude      *://qingwapt.com/*
+// @exclude      *://mua.xloli.cc/*
 
 // @license      GPL License
 // @grant        GM_setValue
@@ -127,7 +128,6 @@ class MyApp extends AppBase {
 
     constructor() {
         super('calc_bonusA');
-        this.vault = new Vault();
         this.init();
         this.main();
     }
@@ -200,27 +200,28 @@ class MyApp extends AppBase {
         self.isFormulaPage = location.href.includes(self.formulaPath);
         self.isMybonusPage = location.href.includes(self.bonusPath);
         self.log([self.host, self.isFormulaPage, self.isMybonusPage].join());
+        self.vault = new Vault(self.host);
     }
 
     calcA(T, S, N, T0, N0) {
         const self = this;
-        let c1 = 1 - Math.pow(10, -(T / self.T0));
+        let c1 = 1 - Math.pow(10, -(T / self.coef.T0));
         // 当断种时，显示续种后的实际值，因为当前状态值无意义
         N = N ? N : 1;
         // 当前状态值，加入做种后实际值会小于当前值
-        let c2 = 1 + Math.pow(2, .5) * Math.pow(10, -(N - 1) / (self.N0 - 1));
+        let c2 = 1 + Math.pow(2, .5) * Math.pow(10, -(N - 1) / (self.coef.N0 - 1));
         return c1 * S * c2;
     }
 
     calcB(A, B0, L) {
         const self = this;
-        return self.B0 * (2 / Math.PI) * Math.atan(A / self.L);
+        return self.coef.B0 * (2 / Math.PI) * Math.atan(A / self.coef.L);
     }
 
     calcAbyB(B, B0, L) {
         const self = this;
         //从B值反推A值
-        return Math.tan(B / self.B0 / (2 / Math.PI)) * self.L;
+        return Math.tan(B / self.coef.B0 / (2 / Math.PI)) * self.coef.L;
     }
 
     initChart(T0, N0, B0, L) {
@@ -571,22 +572,18 @@ class MyApp extends AppBase {
             }
             self.log('魔力值参数获取成功：\n' + [tT0, tN0, tB0, tL, tB0_s, tL_s].join());
             //更新参数
-            self.T0 = tT0;
-            self.N0 = tN0;
-            self.B0 = tB0;
-            self.L = tL;
-            self.B0_s = tB0_s;
-            self.L_s = tL_s;
-            GM_setValue(self.host + '.T0', self.T0);
-            GM_setValue(self.host + '.N0', self.N0);
-            GM_setValue(self.host + '.B0', self.B0);
-            GM_setValue(self.host + '.L', self.L);
-            if (self.B0_s) {
-                GM_setValue(self.host + '.B0_s', self.B0_s);
+            self.coef.T0 = tT0;
+            self.coef.N0 = tN0;
+            self.coef.B0 = tB0;
+            self.coef.L = tL;
+            if (tB0_s) {
+                self.coef.B0_s = tB0_s;
             }
-            if (self.L_s) {
-                GM_setValue(self.host + '.L_s', self.L_s);
+            if (tL_s) {
+                self.coef.L_s = tL_s;
             }
+            self.vault.set_str_data('coef', self.coef);
+            self.vault.save_vault();
             return true;
         } catch (error) {
             self.log('魔力值参数获取出错：\n' + error, 2);
@@ -596,14 +593,10 @@ class MyApp extends AppBase {
 
     run() {
         const self = this;
-        self.T0 = GM_getValue(self.host + '.T0');
-        self.N0 = GM_getValue(self.host + '.N0');
-        self.B0 = GM_getValue(self.host + '.B0');
-        self.L = GM_getValue(self.host + '.L');
-        self.B0_s = GM_getValue(self.host + '.B0_s');
-        self.L_s = GM_getValue(self.host + '.L_s');
+        self.coef = self.vault.get_str_data('coef', {});
+        self.log(self.coef);
 
-        let argsReady = self.T0 && self.N0 && self.B0 && self.L && true;
+        let argsReady = self.coef.T0 && self.coef.N0 && self.coef.B0 && self.coef.L && true;
         if (self.isFormulaPage) {
             argsReady = this.update_args() || argsReady;
         } else if (!argsReady) {
@@ -614,7 +607,7 @@ class MyApp extends AppBase {
         if (self.isMybonusPage) {
             try {
                 if (argsReady) {
-                    self.initChart(self.T0, self.N0, self.B0, self.L);
+                    self.initChart(self.coef.T0, self.coef.N0, self.coef.B0, self.coef.L);
                 }
             } catch (error) {
                 self.log('B - A 图初始化失败：\n' + error);
