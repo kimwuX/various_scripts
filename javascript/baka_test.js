@@ -223,11 +223,16 @@ class MyApp extends AppBase {
                 }
             });
         }
+        let captcha = $('span#captcha_code_span').text();
+        self.log('验证码：' + captcha);
+        if (captcha) {
+            $('input[name="captcha"]').val(captcha);
+        }
         //提交
         if (chk) {
             setTimeout(function () {
-                //$('input[name="submit"]').click();
-                $('input[name="wantskip"]').click();
+                //$('button[name="submit"]').click();
+                $('button[name="wantskip"]').click();
             }, 100);
         }
     }

@@ -173,7 +173,7 @@ class MyApp extends AppBase {
             location.hash = hash;
             location.reload();
         } else {
-            let selector = 'div.ant-flex.css-mgrif2.ant-flex-align-stretch.ant-flex-gap-middle.ant-flex-vertical';
+            let selector = 'div.ant-flex';
             if ($(selector).length > 0) {
                 innerCheck();
             } else {
@@ -183,7 +183,7 @@ class MyApp extends AppBase {
             function innerCheck() {
                 self.log('开始签到...');
                 let btn = $(selector).find('button').filter(function () {
-                    return /签\s*到/i.test($(this).text());
+                    return /签\s*到|人机验证加载中/i.test($(this).text());
                 });
                 if (btn.length > 0) {
                     let t = Date.now();
