@@ -6,6 +6,7 @@
 // @require      https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js
 // @require      https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js
 // @require      https://cdn.jsdelivr.net/gh/kimwuX/various_scripts@master/javascript/library.js
+// @icon         https://img2.pixhost.to/images/7914/726570621_11.png
 
 // @match        *://*.tjupt.org/torrents.php*
 // @match        *://ptchdbits.co/torrents.php*
@@ -88,6 +89,7 @@
 // @match        *://pt.hdclone.top/torrents.php*
 // @match        *://duckboobee.org/torrents.php*
 // @match        *://mua.xloli.cc/torrents.php*
+// @match        *://dstudio.me/torrents.php*
 
 // @match        *://dubhe.site/*
 // @match        *://kp.m-team.cc/*
@@ -663,7 +665,7 @@ class MyApp extends AppBase {
         let site = self.get_site_name();
         let i_T, i_S, i_N, addFlag = false;
         $('table.torrents').filter(function () {
-            return $(this).find('tbody>tr').length > 10;
+            return $(this).find('tbody:first>tr').length > 1;
         }).find('tbody>tr').each(function (row) {
             let $this = $(this);
             if (row == 0) {

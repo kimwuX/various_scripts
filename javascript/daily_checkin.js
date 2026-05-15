@@ -88,6 +88,7 @@
 // @match       *://mua.xloli.cc/*
 // @match       *://pt.hdclone.top/*
 // @match       *://duckboobee.org/*
+// @match       *://dstudio.me/*
 // @match       *://ikunshare.com/*
 // @match       *://pting.club/*
 // @match       *://www.wnflb2023.com/*

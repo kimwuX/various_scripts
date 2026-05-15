@@ -11,6 +11,7 @@
 // @match       *://52pt.site/bakatest.php*
 // @match       *://pt.0ff.cc/attendance.php*
 // @match       *://farmm.cc/attendance.php*
+// @match       *://dstudio.me/attendance.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -496,6 +497,17 @@ class MyApp extends AppBase {
         }
     }
 
+    signDStudio() {
+        const self = this;
+        let btns = $('input.btn[value="立即签到"]');
+        if (btns.length > 0) {
+            self.log("find checkin button, delay 10s...");
+            setTimeout(() => {
+                btns.first().click();
+            }, 10000);
+        }
+    }
+
     main() {
         const self = this;
         let host = location.host;
@@ -515,6 +527,8 @@ class MyApp extends AppBase {
             self.sign52();
         } else if (host.search(/0ff|farmm/i) != -1) {
             self.signFarmm();
+        } else if (host.search(/dstudio/) != -1) {
+            self.signDStudio();
         }
     }
 }
